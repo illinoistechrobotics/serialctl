@@ -8,7 +8,7 @@
 typedef struct{
         int fd;
         struct termios spconfig;
-        char *device;
+        const char *device;
 } connection_t;
 
 

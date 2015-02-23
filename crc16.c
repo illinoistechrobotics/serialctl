@@ -1,3 +1,4 @@
+#include "crc16.h"
 /* http://www.nongnu.org/avr-libc/user-manual/group__util__crc.html
  * uint8_t serno[] = { 0x02, 0x1c, 0xb8, 0x01, 0, 0, 0, 0xa2 };
  * int
@@ -16,6 +17,7 @@ uint16_t compute_crc(char *data, int len){
                 crc=crc16_update(crc,data[i]);
         }
         return crc;
+}
 uint16_t crc16_update(uint16_t crc, uint8_t a){
         int i;
         crc ^= a;
