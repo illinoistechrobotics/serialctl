@@ -32,7 +32,7 @@ int main(int argc, char ** argv){
             return 2;
             }
         printf("x: %i, y: %i, CRC: %i\n", ctl.stickX, ctl.stickY, ctl.cksum); 
-        usleep(30E3);
+        usleep(20E3);
         }
         return 0;
 }

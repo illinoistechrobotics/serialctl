@@ -1,6 +1,7 @@
 #include "serio.h"
 #include "base64.h"
 #include "crc16.h"
+#include "packet.h"
 
 int serio_init(connection_t *ctx, const char *serdev){
         ctx->device=serdev;

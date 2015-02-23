@@ -14,4 +14,4 @@ $(EXECUTABLE): $(OBJECTS)
 .c.o:
 	    $(CC) $(SDL_CFLAGS) $(CFLAGS) $< -o $@
 clean:
-	    rm *o $(EXECUTABLE)
+	    rm *.o $(EXECUTABLE)
