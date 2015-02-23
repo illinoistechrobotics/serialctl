@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-c -Wall -Werror -g
-LDFLAGS= 
-SOURCES=base64.c crc16.c serio.c main.c joystick.c
+LDFLAGS=-lncurses 
+SOURCES=base64.c crc16.c serio.c main.c joystick.c ui.c
 OBJECTS=$(SOURCES:.c=.o)
 	EXECUTABLE=main
 SDL_CFLAGS := $(shell sdl2-config --cflags)
