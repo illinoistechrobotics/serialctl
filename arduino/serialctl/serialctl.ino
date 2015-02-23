@@ -22,10 +22,17 @@ comm_state cs;
 #define SerComm Serial
 
 void setup(){
-  SerComm.begin(57600);
+  SerComm.begin(115200);
   comm_init();
+  pinMode(13,OUTPUT);
 }
 void loop(){
   comm_parse();
-  
+  SerComm.println("Hello");
+  delay(10);
+  if(active->stickX < 100){
+    digitalWrite(13,HIGH);
+  } else {
+    digitalWrite(13,LOW);
+  }
 }
