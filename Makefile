@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -Wall
+CFLAGS=-c -Wall -Werror -g
 LDFLAGS=
 SOURCES=base64.c crc16.c serio.c main.c
 OBJECTS=$(SOURCES:.c=.o)
