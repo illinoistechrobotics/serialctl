@@ -21,7 +21,7 @@ void serio_close(connection_t *ctx){
         close(ctx->fd);
 }
 
-ssize_t serio_send(connection_t *ctx, char *data, size_t len){
+ssize_t serio_send(connection_t *ctx, void *data, size_t len){
         int rv;
         char datap[2+B64_ENC_LEN(len)];
         if(ctx->fd==-1 || len==0 || data==NULL){

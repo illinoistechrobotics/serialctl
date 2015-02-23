@@ -13,5 +13,5 @@ typedef struct{
 
 
 int serio_init(connection_t *ctx, const char *serdev);
-ssize_t serio_send(connection_t *ctx, char *data, size_t len);
+ssize_t serio_send(connection_t *ctx, void *data, size_t len);
 void serio_close(connection_t *ctx);
