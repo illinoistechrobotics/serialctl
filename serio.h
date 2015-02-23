@@ -2,8 +2,10 @@
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
+#define SFRAME 0xf0
+#define EFRAME 0xe0
+
 typedef struct{
-        short int status;
         int fd;
         struct termios spconfig;
         char *device;
@@ -11,4 +13,4 @@ typedef struct{
 
 
 int serio_init(connection_t *ctx, const char *serdev);
-void serio_error(const char *errorstr);
+void serio_close(connection_t *ctx);
