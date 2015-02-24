@@ -15,24 +15,30 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "packet.h"
 
-packet_t pA, pB;
+packet_t pA, pB, safe;
 packet_t *active, *incoming;
 comm_state cs;
 
 #define SerComm Serial
 
-void setup(){
+void setup() {
+  //Initialize safe to safe values!!
+  safe.stickX = 127;
+  safe.stickY = 127;
+  safe.btnhi = 0;
+  safe.btnlo = 0 ;
   SerComm.begin(115200);
   comm_init();
-  pinMode(13,OUTPUT);
+  pinMode(13, OUTPUT);
 }
-void loop(){
+void loop() {
+  //Every line sent to the computer gets us a new state
+  SerComm.println("Im the arduino");
   comm_parse();
-  SerComm.println("Hello");
   delay(10);
-  if(active->stickX < 100){
-    digitalWrite(13,HIGH);
+  if (active->stickX < 100) {
+    digitalWrite(13, HIGH);
   } else {
-    digitalWrite(13,LOW);
+    digitalWrite(13, LOW);
   }
 }

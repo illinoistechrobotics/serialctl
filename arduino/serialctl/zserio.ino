@@ -9,7 +9,9 @@
 uint16_t crc;
 char encstr[1 + B64_ENC_LEN(sizeof(packet_t))];
 int recvcount;
+long ptime;
 void comm_init() {
+  ptime = 0;
   cs = COMM_WAIT;
   active = &pA;
   incoming = &pB;
@@ -54,6 +56,7 @@ void comm_parse() {
       if(crc = ntohs(incoming->cksum)){
         //SerComm.println("vaild");
         cs=COMM_VALID;
+        ptime=millis();
         tmp=active;
         active=incoming;
         incoming=tmp;
@@ -62,5 +65,9 @@ void comm_parse() {
        // SerComm.println("Invalid");
       }
     }
+  }
+  if(millis()-ptime > 80){
+    //Been too long, copy safe state over active one
+    memcpy(active,&safe,sizeof(packet_t)-sizeof(uint16_t));
   }
 }
