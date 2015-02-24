@@ -3,8 +3,9 @@
 #include "crc16.h"
 #include "packet.h"
 #include <string.h>
-ssize_t serio_read(connection_t *ctx, char *buf);
+int bidx;
 int serio_init(connection_t *ctx, const char *serdev){
+        bidx=0;
         ctx->device=serdev;
         ctx->fd=open(ctx->device, O_RDWR | O_NOCTTY | O_NDELAY);
         printf("opened\n");
@@ -44,12 +45,9 @@ void serio_close(connection_t *ctx){
 ssize_t serio_send(connection_t *ctx, void *data, size_t len){
         int rv;
         char datap[2+B64_ENC_LEN(len)];
-        char buf[128];
         if(ctx->fd==-1 || len==0 || data==NULL){
                 return -3;
         }
-        serio_read(ctx,buf);
-        printf("Read: %s",buf);
         //Add 2 bytes overhead, encode and send
         datap[0] = SFRAME;
         rv = base64_encode(datap+1,data,len);
@@ -59,22 +57,37 @@ ssize_t serio_send(connection_t *ctx, void *data, size_t len){
         datap[1+B64_ENC_LEN(len)] = EFRAME;
         return write(ctx->fd,datap,2+B64_ENC_LEN(len));
 }
-ssize_t serio_read(connection_t *ctx, char *buf)
+ssize_t serio_recv(connection_t *ctx, char *buf)
 { 
-                char b[1];
-                int i=0;
+                static char ba[RECVBUF];
+                char *next;
                 do { 
-                        int n = read(ctx->fd, b, 1);  // read a char at a time
+                        if(bidx == RECVBUF-1){
+                            bidx=0;
+                            printf("Input buffer overflow!\n");
+                            memset(ba,0x00,RECVBUF);
+                        }
+                        int n = read(ctx->fd, ba+bidx, RECVBUF-(bidx+1));  // read as much as possible
                         if( n==-1) return -1;    // couldn't read
                         if( n==0 ) {
                                 usleep( 5 * 1000 ); // wait 5 msec try again
                                 continue;
                         }
-                        buf[i] = b[0];
-                        i ++;
-                } while( b[0] != '\n' );
-
-                buf[i] = 0;  // null terminate the string
-        return 0;
+                        bidx += n;
+                        ba[bidx]=0x00;
+                } while(strchr(ba,'\n') == NULL);
+                buf[0]=0x00;
+                next = strchr(ba,'\n');
+                next[0] = 0x00;
+                next++;
+                //Heartbeat or data?
+                if(ba[0] != '$'){
+                    strcpy(buf,ba);
+                    }
+                //Move rest including null to front
+                memmove(ba,next,strlen(next)+1);
+                //update length
+                bidx = strlen(ba);
+        return strlen(buf);
 }
 
