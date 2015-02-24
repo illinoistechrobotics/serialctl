@@ -1,10 +1,13 @@
 #include "serio.h"
+#include <unistd.h>
+#include <fcntl.h>
 #include "base64.h"
 #include "crc16.h"
 #include "packet.h"
 #include <string.h>
 int bidx;
 int serio_init(connection_t *ctx, const char *serdev){
+        int opts;
         bidx=0;
         ctx->device=serdev;
         ctx->fd=open(ctx->device, O_RDWR | O_NOCTTY | O_NDELAY);
@@ -29,12 +32,22 @@ int serio_init(connection_t *ctx, const char *serdev){
         (ctx->spconfig).c_oflag &= ~OPOST; // make raw
 
         // see: http://unixwiz.net/techtips/termios-vmin-vtime.html
-        (ctx->spconfig).c_cc[VMIN]  = 0;
-        (ctx->spconfig).c_cc[VTIME]  = 20;
+        (ctx->spconfig).c_cc[VMIN]  = 1;
+        (ctx->spconfig).c_cc[VTIME]  = 0;
 
         cfsetispeed(&(ctx->spconfig), B115200);
         cfsetospeed(&(ctx->spconfig), B115200);
         tcsetattr(ctx->fd,TCSANOW,&(ctx->spconfig));
+        opts = fcntl(ctx->fd,F_GETFL);
+        if (opts < 0) {
+                perror("fcntl(F_GETFL)");
+                return -1;
+        }
+        opts = (opts & ~(O_NDELAY));
+        if (fcntl(ctx->fd,F_SETFL,opts) < 0) {
+                perror("fcntl(F_SETFL)");
+                return -1;
+        }
         printf("serial port opened\n");
         return 0;
 }
@@ -59,35 +72,35 @@ ssize_t serio_send(connection_t *ctx, void *data, size_t len){
 }
 ssize_t serio_recv(connection_t *ctx, char *buf)
 { 
-                static char ba[RECVBUF];
-                char *next;
-                do { 
-                        if(bidx == RECVBUF-1){
-                            bidx=0;
-                            printf("Input buffer overflow!\n");
-                            memset(ba,0x00,RECVBUF);
-                        }
-                        int n = read(ctx->fd, ba+bidx, RECVBUF-(bidx+1));  // read as much as possible
-                        if( n==-1) return -1;    // couldn't read
-                        if( n==0 ) {
-                                usleep( 5 * 1000 ); // wait 5 msec try again
-                                continue;
-                        }
-                        bidx += n;
-                        ba[bidx]=0x00;
-                } while(strchr(ba,'\n') == NULL);
-                buf[0]=0x00;
-                next = strchr(ba,'\n');
-                next[0] = 0x00;
-                next++;
-                //Heartbeat or data?
-                if(ba[0] != '$'){
-                    strcpy(buf,ba);
-                    }
-                //Move rest including null to front
-                memmove(ba,next,strlen(next)+1);
-                //update length
-                bidx = strlen(ba);
+        static char ba[RECVBUF];
+        char *next;
+        do { 
+                if(bidx == RECVBUF-1){
+                        bidx=0;
+                        printf("Input buffer overflow!\n");
+                        memset(ba,0x00,RECVBUF);
+                }
+                int n = read(ctx->fd, ba+bidx, RECVBUF-(bidx+1));  // read as much as possible
+                if( n==-1) return -1;    // couldn't read
+                if( n==0 ) {
+                        usleep( 5 * 1000 ); // wait 5 msec try again
+                        continue;
+                }
+                bidx += n;
+                ba[bidx]=0x00;
+        } while(strchr(ba,'\n') == NULL);
+        buf[0]=0x00;
+        next = strchr(ba,'\n');
+        next[0] = 0x00;
+        next++;
+        //Heartbeat or data?
+        if(ba[0] != '$'){
+                strcpy(buf,ba);
+        }
+        //Move rest including null to front
+        memmove(ba,next,strlen(next)+1);
+        //update length
+        bidx = strlen(ba);
         return strlen(buf);
 }
 
