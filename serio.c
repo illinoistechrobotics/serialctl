@@ -49,6 +49,7 @@ int serio_init(connection_t *ctx, const char *serdev){
                 return -1;
         }
         printf("serial port opened\n");
+        tcflush(ctx->fd,TCIOFLUSH);
         return 0;
 }
 void serio_close(connection_t *ctx){
