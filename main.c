@@ -19,8 +19,8 @@ int main(int argc, char ** argv){
         short loop=1;
         connection_t c;
         packet_t ctl;
-//        if(joystick_init(atoi(argv[2])) != 0)
-//          return 1;
+        if(joystick_init(atoi(argv[2])) != 0)
+          return 1;
         if(serio_init(&c, argv[1]))
             return 2;
         while(loop){
@@ -28,16 +28,15 @@ int main(int argc, char ** argv){
             printf("Error reading data!\n");
             return 2;
             }
-//        if(joystick_update(&ctl) != 0){
-//           return 1;
-//            }
+        if(joystick_update(&ctl) != 0){
+           return 1;
+            }
         packet_crc(&ctl); 
         if(serio_send(&c, &ctl, sizeof(packet_t)) < 0){
             printf("Unable to send data!\n");
             return 2;
             }
         printf("x: %i, y: %i, CRC: %i, Remote end said: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
-//        usleep(150E3);
         }
         return 0;
 }
