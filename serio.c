@@ -28,8 +28,7 @@ int serio_init(connection_t *ctx, const char *serdev){
         (ctx->spconfig).c_cflag |= CREAD | CLOCAL;  // turn on READ & ignore ctrl lines
         (ctx->spconfig).c_iflag &= ~(IXON | IXOFF | IXANY); // turn off s/w flow ctrl
 
-        (ctx->spconfig).c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // make raw
-        (ctx->spconfig).c_oflag &= ~OPOST; // make raw
+        cfmakeraw(&(ctx->spconfig)); // make raw
 
         // see: http://unixwiz.net/techtips/termios-vmin-vtime.html
         (ctx->spconfig).c_cc[VMIN]  = 1;
@@ -87,6 +86,9 @@ ssize_t serio_recv(connection_t *ctx, char *buf)
                         usleep( 5 * 1000 ); // wait 5 msec try again
                         continue;
                 }
+                #ifdef DEBUG
+                printf("read(): %i, bidx: %i\n",n, bidx);
+                #endif
                 bidx += n;
                 ba[bidx]=0x00;
         } while(strchr(ba,'\n') == NULL);
@@ -95,6 +97,9 @@ ssize_t serio_recv(connection_t *ctx, char *buf)
         next[0] = 0x00;
         next++;
         //Heartbeat or data?
+        #ifdef DEBUG
+        printf("%x\n",ba[0]);
+        #endif
         if(ba[0] != '$'){
                 strcpy(buf,ba);
         }

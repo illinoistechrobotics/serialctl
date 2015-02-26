@@ -2,6 +2,12 @@
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+//Serial debug output
+#ifdef DEBUG
+#undef DEBUG
+#endif
+
 #define RECVBUF 256
 typedef struct{
         int fd;
