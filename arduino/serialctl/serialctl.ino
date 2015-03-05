@@ -14,14 +14,23 @@
 //    with this program; if not, write to the Free Software Foundation, Inc.,
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "packet.h"
+#define WATCHDOG_
 
+#ifdef WATCHDOG_
+#include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
+#endif
 packet_t pA, pB, safe;
 packet_t *active, *incoming;
 comm_state cs;
+long last_p;
 
 #define SerComm Serial
 
 void setup() {
+  #ifdef WATCHDOG_
+  wdt_enable(WDTO_250MS);  //Set 250ms WDT 
+  wdt_reset();             //watchdog timer reset 
+  #endif
   //Initialize safe to safe values!!
   safe.stickX = 127;
   safe.stickY = 127;
@@ -29,16 +38,26 @@ void setup() {
   safe.btnlo = 0 ;
   SerComm.begin(115200);
   comm_init();
+  init_pins();
+  last_p = millis();
   pinMode(13, OUTPUT);
 }
-void loop() {
+void loop(){
   //Every line sent to the computer gets us a new state
-  SerComm.println("Im the arduino");
+  wdt_reset();
+  print_data();
   comm_parse();
-  delay(10);
+  //Runs this every 500ms
+  if(millis()-last_p >= 500){
+    pumpAir();
+    last_p=millis();
+  }
+  //Control logic goes here
   if (active->stickX < 100) {
     digitalWrite(13, HIGH);
   } else {
     digitalWrite(13, LOW);
   }
+  //limits data rate
+  delay(10);
 }
