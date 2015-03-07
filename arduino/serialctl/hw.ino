@@ -66,8 +66,8 @@ void osmc_init(){
   fast_pwm();
 }
 void fast_pwm(){
-  TCCR1B = TCCR1B & 0b11111000 | 0x04;
-  TCCR4B = TCCR4B & 0b11111000 | 0x04;
+  TCCR1B = (TCCR1B & 0b11111000) | 0x04;
+  TCCR4B = (TCCR4B & 0b11111000) | 0x04;
 }
 // OSMC motor controller stuff
 // Low side outputs must be PWM capable and NOT 5 or 6 (on Uno)

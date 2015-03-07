@@ -8,7 +8,7 @@
 
 uint16_t crc;
 char encstr[2 + B64_ENC_LEN(sizeof(packet_t))];
-int recvcount;
+unsigned int recvcount;
 long ptime;
 void comm_init() {
   ptime = 0;
