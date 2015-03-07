@@ -55,7 +55,7 @@ void comm_parse() {
       base64_decode((char *)incoming, encstr, B64_ENC_LEN(sizeof(packet_t)));
       //Evaluate CRC16 and flip pointers if valid
       crc = compute_crc((char *)incoming, sizeof(packet_t)-sizeof(uint16_t));
-      if(crc = ntohs(incoming->cksum)){
+      if(crc == ntohs(incoming->cksum)){
         //SerComm.println("vaild");
         cs=COMM_VALID;
         ptime=millis();
@@ -74,6 +74,6 @@ void comm_parse() {
     memcpy(astate,&safe,sizeof(packet_t));
     cs=COMM_WAIT;
     recvcount = 0;
-    SerComm.println("!!!!FAILSAFE!!!!");
+    //SerComm.println("!!!!FAILSAFE!!!!");
   }
 }
