@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -7,10 +9,10 @@ extern "C"{
 #include <util/crc16.h>
 //Otherwise my own version
 #else
-uint16_t _crc16_update(uint16_t crc, uint8_t data);
+inline uint16_t _crc16_update(uint16_t crc, uint8_t data);
 #endif
 
-uint16_t compute_crc(char *data, int len);
+inline uint16_t compute_crc(char *data, int len);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -12,7 +12,7 @@
  */
 // C implemtation for computer
 #ifndef AVR
-uint16_t _crc16_update(uint16_t crc, uint8_t a){
+inline uint16_t _crc16_update(uint16_t crc, uint8_t a){
         int i;
         crc ^= a;
         for (i = 0; i < 8; ++i)
@@ -25,7 +25,7 @@ uint16_t _crc16_update(uint16_t crc, uint8_t a){
         return crc;
 }
 #endif
-uint16_t compute_crc(char *data, int len){
+inline uint16_t compute_crc(char *data, int len){
         uint16_t crc = 0xffff;
         int i;
         for(i=0; i<len; i++){
