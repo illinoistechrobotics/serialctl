@@ -70,16 +70,17 @@ void loop(){
     pumpAir();
     last_p=millis();
   }
+  
   tank_drive();
   
   //limits data rate
-  delay(100);
+  delay(75);
 }
 void tank_drive(){
   int right_out = 0;
   int left_out  = 0;
   int zeroed_left =  (astate->stickX) - 127;
-  int zeroed_right = (astate->stickY) - 127;
+  int zeroed_right = -1*((astate->stickY) - 127);
   if(abs(zeroed_left) > DEADBAND_HALF_WIDTH){
     if(zeroed_left>0){
       left_out = zeroed_left - DEADBAND_HALF_WIDTH;
