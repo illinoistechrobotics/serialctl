@@ -4,18 +4,9 @@
 #define PRESSURE_OFFSET 161
 #define MIN_PRESS 80
 #define MAX_PRESS 100
-#define CURRENT_LEFT A0
-#define CURRENT_RIGHT A1
-#define ALI1 7
-#define BLI1 8
-#define AHI1 22
-#define BHI1 23
-#define ALI2 11
-#define BLI2 12
-#define AHI2 24
-#define BHI2 25
-#define drive_left(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
-#define drive_right(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
+#define CURRENT_RIGHT A0
+#define CURRENT_LEFT A1
+
 #define PSI(x) ((analogRead(x)-(float)PRESSURE_OFFSET)/2.048)
 
 void init_pins(){
