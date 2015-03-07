@@ -57,6 +57,8 @@ void setup() {
   init_pins();
   last_p = millis();
   pinMode(13, OUTPUT);
+  drive_left(0);
+  drive_right(0);
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
 }
@@ -70,7 +72,6 @@ void loop(){
     pumpAir();
     last_p=millis();
   }
-  
   tank_drive();
   
   //limits data rate
