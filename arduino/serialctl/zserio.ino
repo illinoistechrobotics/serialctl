@@ -74,5 +74,6 @@ void comm_parse() {
     memcpy(astate,&safe,sizeof(packet_t));
     cs=COMM_WAIT;
     recvcount = 0;
+    SerComm.println("!!!!FAILSAFE!!!!");
   }
 }

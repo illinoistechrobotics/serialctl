@@ -1,4 +1,4 @@
-//    serialctl
+ //    serialctl
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -80,8 +80,8 @@ void loop(){
 void tank_drive(){
   int right_out = 0;
   int left_out  = 0;
-  int zeroed_left =  (astate->stickX) - 127;
-  int zeroed_right = -1*((astate->stickY) - 127);
+  int zeroed_left =     ((int)(astate->stickX)) - 127;
+  int zeroed_right = -1*((int)(astate->stickY)  - 127);
   if(abs(zeroed_left) > DEADBAND_HALF_WIDTH){
     if(zeroed_left>0){
       left_out = zeroed_left - DEADBAND_HALF_WIDTH;
