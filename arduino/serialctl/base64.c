@@ -89,7 +89,7 @@ int base64_decode(char * output, char * input, int inputLen) {
                         output[decLen++] = a3[j];
                 }
         }
-        output[decLen] = '\0';
+        //We don't need a null byte after the struct
         return decLen;
 }
 

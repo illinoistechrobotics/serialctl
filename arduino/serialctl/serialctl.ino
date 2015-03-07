@@ -20,11 +20,15 @@
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
 #endif
 packet_t pA, pB, safe;
-packet_t *active, *incoming;
+packet_t *astate, *incoming;
 comm_state cs;
 long last_p;
 
 #define SerComm Serial
+#define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
+#define ntohs(x) htons(x)
+#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
+#define ntohl(x) htonl(x)
 
 void setup() {
   #ifdef WATCHDOG_
@@ -35,12 +39,15 @@ void setup() {
   safe.stickX = 127;
   safe.stickY = 127;
   safe.btnhi = 0;
-  safe.btnlo = 0 ;
+  safe.btnlo = 0;
+  safe.cksum = 0b1000000010001011;
   SerComm.begin(115200);
   comm_init();
   init_pins();
   last_p = millis();
   pinMode(13, OUTPUT);
+  //copy safe values over the current state
+  memcpy(astate, &safe, sizeof(packet_t));
 }
 void loop(){
   //Every line sent to the computer gets us a new state
@@ -53,7 +60,8 @@ void loop(){
     last_p=millis();
   }
   //Control logic goes here
-  if (active->stickX < 100) {
+  
+  if (astate->stickX < 100) {
     digitalWrite(13, HIGH);
   } else {
     digitalWrite(13, LOW);

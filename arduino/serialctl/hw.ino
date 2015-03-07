@@ -27,7 +27,6 @@ osmc_init();
 }
 
 void pumpAir(){
-  Serial.println(analogRead(P_SENSOR));
   if(PSI(P_SENSOR)>=MAX_PRESS){
     digitalWrite(COMPRESS,LOW);
   } else if((PSI(P_SENSOR)<MIN_PRESS)&&(cs!=COMM_WAIT)){
