@@ -6,7 +6,7 @@ extern "C"{
 #endif
 
 #ifndef _BASE64_H
-#define B64_ENC_LEN(n) ((n) + 2 - (((n) + 2) % 3)) / 3 * 4
+#define B64_ENC_LEN(n) (((n) + 2 - (((n) + 2) % 3)) / 3 * 4)
 #define _BASE64_H
 
 /* b64_alphabet:

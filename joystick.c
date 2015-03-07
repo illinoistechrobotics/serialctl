@@ -32,8 +32,9 @@ int joystick_update(packet_t *ctl){
         SDL_JoystickUpdate();
         //populate controller struct
         ctl->stickX = (SDL_JoystickGetAxis(jstick, 1)/256)+128;
-        ctl->stickY = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
+        ctl->stickY = (SDL_JoystickGetAxis(jstick, 3)/256)+128;
         ctl->btnlo = 0;
+        ctl->btnhi = 0;
         for(i=0; (i<SDL_JoystickNumButtons(jstick) && i < 7); i++){
                 ctl->btnlo |= (SDL_JoystickGetButton(jstick,i) << i);
         }
