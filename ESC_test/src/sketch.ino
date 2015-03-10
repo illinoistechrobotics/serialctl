@@ -7,6 +7,7 @@ void setup()
 {
   Serial.begin(9600);
   spinner.attach(SPINNER_PIN);
+  pinMode(13,OUTPUT);
 }
 
 void loop()
@@ -25,7 +26,13 @@ void loop()
       usec = 2200;
       break;
     }
-    spinner.write_microseconds(usec);
+    if(usec){
+      digitalWrite(13,HIGH);
+    } else {
+      digitalWrite(13,LOW);
+    }
+      
+    spinner.writeMicroseconds(usec);
   }
   delay(100);
 }
