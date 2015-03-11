@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-c -Wall -Werror -g
-LDFLAGS=-lncurses 
+LDFLAGS=-lncurses
 SOURCES=base64.c crc16.c serio.c main.c joystick.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=main
