@@ -16,7 +16,9 @@
 #include "packet.h"
 #include "hw.h"
 #include "zserio.h"
-
+#include <Servo.h>
+#include "globals.h"
+Servo spinner, arm, winch;
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
@@ -44,12 +46,26 @@ long last_p;
 #ifdef WATCHDOG_
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
 #endif
+int getButton(int num){
+        if(num<=7){
+                return (astate.btnlo >> num) & 0x01;
+        } else if(num>7 && num <= 15){
+                return (astate.btnhi >> (num - 8)) & 0x01;
+        } else {
+                return 0;
+        }
 
 void setup() {
   #ifdef WATCHDOG_
   wdt_enable(WDTO_250MS);  //Set 250ms WDT 
   wdt_reset();             //watchdog timer reset 
   #endif
+  spinner.attach(SPINNER_PIN);
+  spinner.writeMicroseconds(0);
+  arm.attach(ARM_PIN);
+  arm.writeMicroseconds(1500);
+  winch.attach(WINCH_PIN);
+  winch.writeMicroseconds(1500);
   //Initialize safe to safe values!!
   safe.stickX = 127;
   safe.stickY = 127;
@@ -71,9 +87,22 @@ void loop(){
   wdt_reset();
   print_data();
   comm_parse();
+
+  if((getButton(0) ^ getButton(1))){
+    //both up and down buttons at same time is invalid
+    if(getButton(0)){
+        arm.writeMicroseconds(1000);
+        }
+    if(getButton(1)){
+        arm.writeMicroseconds(2000);
+        }
+    } else{
+    arm.writeMicroseconds(1500);
+    }
   //Runs this every 500ms
   if(millis()-last_p >= 500){
-    pumpAir();
+    //no compressor
+    
     last_p=millis();
   }
   tank_drive();

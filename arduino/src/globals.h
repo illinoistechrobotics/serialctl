@@ -4,7 +4,7 @@ extern packet_t pA, pB, safe;
 extern packet_t *astate, *incoming;
 extern comm_state cs;
 extern long last_p;
-
+extern Servo spinner, arm, winch; 
 #define SerComm Serial1
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
@@ -21,3 +21,6 @@ extern long last_p;
 #define drive_right(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
 #define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
+#define SPINNER_PIN 2
+#define ARM_PIN 3
+#define WINCH_PIN 4

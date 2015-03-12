@@ -4,12 +4,12 @@
 
 void init_pins(){
 //Compressor
-pinMode(COMPRESS,OUTPUT);
-digitalWrite(COMPRESS,LOW);
+//pinMode(COMPRESS,OUTPUT);
+//digitalWrite(COMPRESS,LOW);
 //Main motors
 osmc_init();
 }
-
+/*
 void pumpAir(){
   if(PSI(P_SENSOR)>=MAX_PRESS){
     digitalWrite(COMPRESS,LOW);
@@ -23,7 +23,7 @@ void pumpNow(){
     digitalWrite(COMPRESS,HIGH);
   }
 }
-
+*/
 void print_data(){
    float i1,i2,psi;
    i1=(analogRead(CURRENT_LEFT)-512.0-CURRENT_OFFSET)/1.28;
