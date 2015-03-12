@@ -1,13 +1,6 @@
-#define COMPRESS 43
-#define P_SENSOR A2
-#define CURRENT_OFFSET -2.5
-#define PRESSURE_OFFSET 161
-#define MIN_PRESS 80
-#define MAX_PRESS 100
-#define CURRENT_RIGHT A0
-#define CURRENT_LEFT A1
-
-#define PSI(x) ((analogRead(x)-(float)PRESSURE_OFFSET)/2.048)
+#include "hw.h"
+#include "packet.h"
+#include "globals.h"
 
 void init_pins(){
 //Compressor
@@ -66,8 +59,8 @@ void osmc_init(){
   fast_pwm();
 }
 void fast_pwm(){
-  TCCR1B = TCCR1B & 0b11111000 | 0x04;
-  TCCR4B = TCCR4B & 0b11111000 | 0x04;
+  TCCR1B = (TCCR1B & 0b11111000) | 0x04;
+  TCCR4B = (TCCR4B & 0b11111000) | 0x04;
 }
 // OSMC motor controller stuff
 // Low side outputs must be PWM capable and NOT 5 or 6 (on Uno)

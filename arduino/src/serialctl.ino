@@ -14,11 +14,9 @@
 //    with this program; if not, write to the Free Software Foundation, Inc.,
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "packet.h"
-#define WATCHDOG_
+#include "hw.h"
+#include "zserio.h"
 
-#ifdef WATCHDOG_
-#include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
-#endif
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
@@ -40,6 +38,12 @@ long last_p;
 #define drive_right(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
 #define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
+
+#define WATCHDOG_
+
+#ifdef WATCHDOG_
+#include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
+#endif
 
 void setup() {
   #ifdef WATCHDOG_
