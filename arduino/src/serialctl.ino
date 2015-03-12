@@ -77,6 +77,7 @@ void setup() {
   comm_init();
   init_pins();
   last_p = millis();
+  pinMode(REVERSE_PIN, OUTPUT);
   pinMode(13, OUTPUT);
   drive_left(0);
   drive_right(0);
@@ -89,18 +90,31 @@ void loop(){
   wdt_reset();
   print_data();
   comm_parse();
-
-  if((getButton(0) ^ getButton(1))){
+//arm
+  if((getButton(5) ^ getButton(7))){
     //both up and down buttons at same time is invalid
-    if(getButton(0)){
+    if(getButton(5)){
         arm.writeMicroseconds(1000);
         }
-    if(getButton(1)){
+    if(getButton(7)){
         arm.writeMicroseconds(2000);
         }
     } else{
     arm.writeMicroseconds(1500);
     }
+    //winch
+ if((getButton(0) ^ getButton(1))){
+    //both up and down buttons at same time is invalid
+    if(getButton(0)){
+        winch.writeMicroseconds(1000);
+        }
+    if(getButton(1)){
+        winch.writeMicroseconds(2000);
+        }
+    } else{
+    winch.writeMicroseconds(1500);
+    }
+
 
     if((millis()-last_s > 500) && (getButton(4) || getButton(6))){
         if(getButton(4)){
@@ -112,15 +126,21 @@ void loop(){
         speed=constrain(speed,-3,3);
         last_s = millis();
         }
-   if(cs == COMM_COMPLETE){
-           switch(speed){
-                   case '1':
+        //SerComm.println(speed);
+   if(cs != COMM_WAIT){
+            if(speed < 0){
+            digitalWrite(REVERSE_PIN,HIGH);
+            } else if(speed>0){
+            digitalWrite(REVERSE_PIN,LOW);
+            }
+           switch(abs(speed)){
+                   case 1:
                            usec = 1200;
                            break;
-                   case '2':
+                   case 2:
                            usec = 1700;
                            break;
-                   case '3':
+                   case 3:
                            usec = 2200;
                            break;
                    default:
@@ -129,7 +149,6 @@ void loop(){
    }else{
    usec=0;
    }
-   SerComm.println(usec);
     spinner.writeMicroseconds(usec);
     
   //Runs this every 500ms

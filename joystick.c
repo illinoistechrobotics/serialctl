@@ -71,6 +71,7 @@ int joystick_wait_safe(){
                 }
                 printf("Waiting for safe stick position\n");
         }while(unsafe);
+        printf("Sticks safe!\n");
         return 0;        
 
 }

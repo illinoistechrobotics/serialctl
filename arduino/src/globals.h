@@ -23,3 +23,4 @@ extern long last_p;
 #define SPINNER_PIN 2
 #define ARM_PIN 3
 #define WINCH_PIN 4
+#define REVERSE_PIN 41
