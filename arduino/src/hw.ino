@@ -1,7 +1,7 @@
 #include "hw.h"
 #include "packet.h"
 #include "globals.h"
-
+#include <Servo.h>
 void init_pins(){
 //Compressor
 //pinMode(COMPRESS,OUTPUT);

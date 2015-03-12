@@ -22,7 +22,8 @@ Servo spinner, arm, winch;
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-long last_p;
+int speed;
+long last_p,last_s=0,usec;
 
 #define SerComm Serial1
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
@@ -48,13 +49,13 @@ long last_p;
 #endif
 int getButton(int num){
         if(num<=7){
-                return (astate.btnlo >> num) & 0x01;
+                return (astate->btnlo >> num) & 0x01;
         } else if(num>7 && num <= 15){
-                return (astate.btnhi >> (num - 8)) & 0x01;
+                return (astate->btnhi >> (num - 8)) & 0x01;
         } else {
                 return 0;
         }
-
+}
 void setup() {
   #ifdef WATCHDOG_
   wdt_enable(WDTO_250MS);  //Set 250ms WDT 
@@ -79,6 +80,7 @@ void setup() {
   pinMode(13, OUTPUT);
   drive_left(0);
   drive_right(0);
+  speed=0;
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
 }
@@ -99,6 +101,37 @@ void loop(){
     } else{
     arm.writeMicroseconds(1500);
     }
+
+    if((millis()-last_s > 500) && (getButton(4) || getButton(6))){
+        if(getButton(4)){
+        speed++;
+        }
+        if(getButton(6)){
+        speed--;
+        }
+        speed=constrain(speed,-3,3);
+        last_s = millis();
+        }
+   if(cs == COMM_COMPLETE){
+           switch(speed){
+                   case '1':
+                           usec = 1200;
+                           break;
+                   case '2':
+                           usec = 1700;
+                           break;
+                   case '3':
+                           usec = 2200;
+                           break;
+                   default:
+                           usec = 0;
+            }
+   }else{
+   usec=0;
+   }
+   SerComm.println(usec);
+    spinner.writeMicroseconds(usec);
+    
   //Runs this every 500ms
   if(millis()-last_p >= 500){
     //no compressor

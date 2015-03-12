@@ -49,28 +49,28 @@ int joystick_update(packet_t *ctl){
         return 0;
 }
 int joystick_wait_safe(){
-        int i;
-        packet_t tmp;
+        int i, unsafe;
+        do{
+        unsafe=0;
         if(SDL_JoystickGetAttached(jstick) == SDL_FALSE)
                 return -1;
-        do{
+         for(i=0;i<8;i++){
                 usleep(1E5);
                 SDL_JoystickUpdate();
-                //populate controller struct
-                tmp.stickX = (SDL_JoystickGetAxis(jstick, 1)/256);
-                tmp.stickY = (SDL_JoystickGetAxis(jstick, 3)/256);
-                tmp.btnlo = 0;
-                tmp.btnhi = 0;
+                }
+                if(abs(SDL_JoystickGetAxis(jstick, 1)) > 2){
+                    unsafe=1;
+                    }
+                 if(abs(SDL_JoystickGetAxis(jstick, 3)) > 2){
+                    unsafe=1;
+                    }
                 for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 15)); i++){
-                        if(i<8){
-                                tmp.btnlo |= (SDL_JoystickGetButton(jstick,i) << i);
-                        } else if(i>=8 && i<15){
-                                tmp.btnhi |= (SDL_JoystickGetButton(jstick,i) << (i-8));
-                        }
+                                if(SDL_JoystickGetButton(jstick,i) != 0){
+                                unsafe=1;
+                                }
                 }
                 printf("Waiting for safe stick position\n");
-                printf("X: %i, Y: %i, buttons 0-7: %x, buttons 8+: %x\n", tmp.stickX, tmp.stickY, tmp.btnlo, tmp.btnhi);
-        }while(abs(tmp.stickX) < 2 && abs(tmp.stickY) < 2 && tmp.btnlo == 0 && tmp.btnhi == 0);
+        }while(unsafe);
         return 0;        
 
 }

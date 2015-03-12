@@ -19,14 +19,14 @@ int main(int argc, char ** argv){
         short loop=1;
         connection_t c;
         packet_t ctl;
+        if(serio_init(&c, argv[1]))
+            return 2;
         if(joystick_init(atoi(argv[2])) != 0)
           return 1;
         if(joystick_wait_safe() != 0)
           return 1;
-        if(serio_init(&c, argv[1]))
-            return 2;
         while(loop){
-        if(serio_recv(&c, msg) < 0){
+          if(serio_recv(&c, msg) < 0){
             printf("Error reading data!\n");
             return 2;
             }
