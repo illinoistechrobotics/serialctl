@@ -21,6 +21,8 @@ int main(int argc, char ** argv){
         packet_t ctl;
         if(joystick_init(atoi(argv[2])) != 0)
           return 1;
+        if(joystick_wait_safe() != 0)
+          return 1;
         if(serio_init(&c, argv[1]))
             return 2;
         while(loop){
