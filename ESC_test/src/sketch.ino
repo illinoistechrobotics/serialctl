@@ -1,5 +1,5 @@
 #include <Servo.h>
-#define SPINNER_PIN 3
+#define SPINNER_PIN 2
 
 Servo spinner;
 
@@ -8,8 +8,9 @@ void setup()
   Serial.begin(9600);
   spinner.attach(SPINNER_PIN);
   pinMode(13,OUTPUT);
+  pinMode(41,OUTPUT);
 }
-
+int dir = 0;
 void loop()
 {
   if(Serial.available()){
@@ -25,6 +26,9 @@ void loop()
     case '3':
       usec = 2200;
       break;
+    case 'r':
+      dir = !dir;
+      digitalWrite(41, dir?HIGH:LOW);
     }
     if(usec){
       digitalWrite(13,HIGH);
