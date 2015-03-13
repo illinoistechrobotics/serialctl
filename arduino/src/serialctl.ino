@@ -114,10 +114,10 @@ void loop(){
  if((getButton(0) ^ getButton(1))){
     //both up and down buttons at same time is invalid
     if(getButton(0)){
-        winch.writeMicroseconds(1000);
+        winch.writeMicroseconds(1250);
         }
     if(getButton(1)){
-        winch.writeMicroseconds(2000);
+        winch.writeMicroseconds(1750);
         }
     } else{
     winch.writeMicroseconds(1500);
@@ -125,10 +125,10 @@ void loop(){
 
 
     if((millis()-last_s > 500) && (getButton(4) || getButton(6))){
-        if(getButton(4)){
+        if(getButton(6)){
         speed++;
         }
-        if(getButton(6)){
+        if(getButton(4)){
         speed--;
         }
         speed=constrain(speed,-3,3);
