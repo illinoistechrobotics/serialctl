@@ -9,18 +9,12 @@ extern long last_p;
 #define ntohs(x) htons(x)
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
 #define ntohl(x) htonl(x)
-#define ALI1 7
-#define BLI1 8
-#define AHI1 22
-#define BHI1 23
-#define ALI2 11
-#define BLI2 12
-#define AHI2 24
-#define BHI2 25
-#define drive_right(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
-#define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
-#define SPINNER_PIN 2
-#define ARM_PIN 3
-#define WINCH_PIN 4
-#define REVERSE_PIN 41
+#define FRONT_LEFT 0
+#define FRONT_RIGHT 0
+#define REAR_LEFT 0
+#define REAR_RIGHT 0
+#define ARM_UP 0
+#define ARM_DOWN 0
+#define MANIP_KICK 0
+#define MANIP_GRIP 0

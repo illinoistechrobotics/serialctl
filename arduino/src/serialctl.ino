@@ -18,28 +18,16 @@
 #include "zserio.h"
 #include <Servo.h>
 #include "globals.h"
-Servo spinner, arm, winch;
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-int speed;
 long last_p,last_s=0,usec;
 
-#define SerComm Serial1
+#define SerComm Serial
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
 #define ntohl(x) htonl(x)
-#define ALI1 7
-#define BLI1 8
-#define AHI1 22
-#define BHI1 23
-#define ALI2 11
-#define BLI2 12
-#define AHI2 24
-#define BHI2 25
-#define drive_right(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
-#define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
 
 #define WATCHDOG_
@@ -47,6 +35,7 @@ long last_p,last_s=0,usec;
 #ifdef WATCHDOG_
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
 #endif
+
 int getButton(int num){
         if(num<=7){
                 return (astate->btnlo >> num) & 0x01;
@@ -61,12 +50,6 @@ void setup() {
   wdt_enable(WDTO_250MS);  //Set 250ms WDT 
   wdt_reset();             //watchdog timer reset 
   #endif
-  spinner.attach(SPINNER_PIN);
-  spinner.writeMicroseconds(0);
-  arm.attach(ARM_PIN);
-  arm.writeMicroseconds(1500);
-  winch.attach(WINCH_PIN);
-  winch.writeMicroseconds(1500);
   //Initialize safe to safe values!!
   safe.stickX = 127;
   safe.stickY = 127;
@@ -77,11 +60,8 @@ void setup() {
   comm_init();
   init_pins();
   last_p = millis();
-  pinMode(REVERSE_PIN, OUTPUT);
-  pinMode(13, OUTPUT);
   drive_left(0);
   drive_right(0);
-  speed=0;
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
 }
@@ -90,6 +70,7 @@ void loop(){
   wdt_reset();
   print_data();
   comm_parse();
+/*
 //arm
   if((getButton(5) ^ getButton(7))){
     //both up and down buttons at same time is invalid
@@ -115,48 +96,14 @@ void loop(){
     winch.writeMicroseconds(1500);
     }
 
-
-    if((millis()-last_s > 500) && (getButton(4) || getButton(6))){
-        if(getButton(4)){
-        speed++;
-        }
-        if(getButton(6)){
-        speed--;
-        }
-        speed=constrain(speed,-3,3);
-        last_s = millis();
-        }
-        //SerComm.println(speed);
-   if(cs != COMM_WAIT){
-            if(speed < 0){
-            digitalWrite(REVERSE_PIN,HIGH);
-            } else if(speed>0){
-            digitalWrite(REVERSE_PIN,LOW);
-            }
-           switch(abs(speed)){
-                   case 1:
-                           usec = 1200;
-                           break;
-                   case 2:
-                           usec = 1700;
-                           break;
-                   case 3:
-                           usec = 2200;
-                           break;
-                   default:
-                           usec = 0;
-            }
-   }else{
-   usec=0;
-   }
-    spinner.writeMicroseconds(usec);
-    
+ 
   //Runs this every 500ms
   if(millis()-last_p >= 500){
     //no compressor
     
     last_p=millis();
   }
+  */
   tank_drive();
   
   //limits data rate
@@ -182,8 +129,8 @@ void tank_drive(){
       turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
     }
   }
-  int left_out =     power_out + (turn_out/8);
-  int right_out = -1*power_out + (turn_out/8);
+  int left_out =     2*(power_out + (turn_out/8));
+  int right_out = 2*(-1*power_out + (turn_out/8));
 
   drive_left(left_out);
   drive_right(right_out);
