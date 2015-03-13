@@ -3,27 +3,9 @@
 #include "globals.h"
 #include <Servo.h>
 void init_pins(){
-//Compressor
-//pinMode(COMPRESS,OUTPUT);
-//digitalWrite(COMPRESS,LOW);
 //Main motors
 osmc_init();
 }
-/*
-void pumpAir(){
-  if(PSI(P_SENSOR)>=MAX_PRESS){
-    digitalWrite(COMPRESS,LOW);
-  } else if((PSI(P_SENSOR)<MIN_PRESS)&&(cs!=COMM_WAIT)){
-    digitalWrite(COMPRESS,HIGH);
-  }
-}
-
-void pumpNow(){
-  if((PSI(P_SENSOR)<MAX_PRESS)){
-    digitalWrite(COMPRESS,HIGH);
-  }
-}
-*/
 void print_data(){
    float i1,i2,psi;
    i1=(analogRead(CURRENT_LEFT)-512.0-CURRENT_OFFSET)/1.28;
@@ -33,9 +15,8 @@ void print_data(){
      SerComm.print(i1);
      SerComm.print("A   Right Current:");
      SerComm.print(i2);
-     SerComm.print("A   Air:");
-     SerComm.print(psi);
-     SerComm.println("PSI");
+     SerComm.print("A   Spinner:");
+     SerComm.println(speed);
 }
 void osmc_init(){
   digitalWrite(13,LOW);

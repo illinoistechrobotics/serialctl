@@ -1,6 +1,5 @@
 #pragma once
 
-#define COMPRESS 43
 #define P_SENSOR A2
 #define CURRENT_OFFSET -2.5
 #define PRESSURE_OFFSET 161
