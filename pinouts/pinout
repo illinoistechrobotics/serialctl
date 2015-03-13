@@ -1,0 +1,7 @@
+Arm:
+	Spinner:
+		ESC throttle -> 2 [PWM]
+		ESC reverse relay -> 41
+	Linear Actuator:
+	       Victor -> 3 [PWM]
+	       Limit switch
