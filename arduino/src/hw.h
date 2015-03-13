@@ -11,9 +11,8 @@
 #define PSI(x) ((analogRead(x)-(float)PRESSURE_OFFSET)/2.048)
 
 void init_pins();
-void pumpAir();
-void pumpNow();
 void print_data();
 void osmc_init();
 void fast_pwm();
 void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned short bli, unsigned short ahi, unsigned short bhi);
+int get_arm_interlock();

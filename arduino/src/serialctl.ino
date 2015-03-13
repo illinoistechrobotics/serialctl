@@ -103,7 +103,7 @@ void loop(){
     if(getButton(5) && get_arm_interlock() == 1){
         arm.writeMicroseconds(1000);
         }
-    if(getButton(7) && get_arm_interlock == 1(){
+    if(getButton(7) && get_arm_interlock() == 1){
         arm.writeMicroseconds(2000);
         }
     } else{
@@ -163,7 +163,7 @@ void loop(){
     //no compressor
     
     last_p=millis();
-    if(get_arm_interlock() == 0 || get_arm_interlock== -1){
+    if(get_arm_interlock() == 0 || get_arm_interlock() == -1){
       arm.writeMicroseconds(1500);
     }
   }
