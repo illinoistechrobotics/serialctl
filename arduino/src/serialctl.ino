@@ -78,9 +78,9 @@ void setup() {
   init_pins();
   last_p = millis();
   pinMode(REVERSE_PIN, OUTPUT);
-  pinMode(41, INPUT);
+  pinMode(43, INPUT);
   pinMode(42, INPUT);
-  digitalWrite(41, HIGH);
+  digitalWrite(43, HIGH);
   digitalWrite(42, HIGH);
   pinMode(13, OUTPUT);
   drive_left(0);
@@ -95,20 +95,21 @@ void loop(){
   print_data();
   comm_parse();
 //arm
-  if(get_arm_interlock() == 0 || get_arm_interlock() == -1){
+  if(get_arm_interlock() == -1){
     arm.writeMicroseconds(1500);
-  }
+  } else {
   if((getButton(5) ^ getButton(7))){
     //both up and down buttons at same time is invalid
     if(getButton(5) && get_arm_interlock() == 1){
         arm.writeMicroseconds(1000);
-        }
-    if(getButton(7) && get_arm_interlock() == 1){
+    }
+    else if(getButton(7)){
         arm.writeMicroseconds(2000);
         }
-    } else{
+    } else {
     arm.writeMicroseconds(1500);
     }
+  }
     //winch
  if((getButton(0) ^ getButton(1))){
     //both up and down buttons at same time is invalid
@@ -163,9 +164,6 @@ void loop(){
     //no compressor
     
     last_p=millis();
-    if(get_arm_interlock() == 0 || get_arm_interlock() == -1){
-      arm.writeMicroseconds(1500);
-    }
   }
   tank_drive();
   

@@ -19,8 +19,8 @@ void print_data(){
      SerComm.println(speed);
 }
 int get_arm_interlock(){
-  int NC = digitalRead(41);
-  int NO = digitalRead(42);
+  int NC = digitalRead(42);
+  int NO = digitalRead(43);
   if(NC == HIGH && NO == LOW){
     return 0;
   }
