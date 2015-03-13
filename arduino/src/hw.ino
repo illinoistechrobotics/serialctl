@@ -18,6 +18,18 @@ void print_data(){
      SerComm.print("A   Spinner:");
      SerComm.println(speed);
 }
+int get_arm_interlock(){
+  int NC = digitalRead(41);
+  int NO = digitalRead(42);
+  if(NC == HIGH && NO == LOW){
+    return 0;
+  }
+  if(NC == LOW && NO == HIGH){
+    return 1;
+  }
+  return -1;
+
+}
 void osmc_init(){
   digitalWrite(13,LOW);
   digitalWrite(ALI1,LOW);
