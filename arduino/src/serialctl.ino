@@ -22,7 +22,7 @@ Servo spinner, arm, winch;
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-int speed;
+int speed,av;
 long last_p,last_s=0,usec;
 
 #define SerComm Serial1
@@ -95,21 +95,23 @@ void loop(){
   print_data();
   comm_parse();
 //arm
-  if(get_arm_interlock() == -1){
-    arm.writeMicroseconds(1500);
-  } else {
+  av=1500;
+  //check for invalid states
   if((getButton(5) ^ getButton(7))){
     //both up and down buttons at same time is invalid
     if(getButton(5) && get_arm_interlock() == 1){
-        arm.writeMicroseconds(1000);
+        av=1000;
     }
     else if(getButton(7)){
-        arm.writeMicroseconds(2000);
+        av=2000;
         }
-    } else {
-    arm.writeMicroseconds(1500);
     }
-  }
+  //write out value
+  if(get_arm_interlock() == -1){
+    arm.writeMicroseconds(1500);
+  }else{
+    arm.writeMicroseconds(av);
+    }
     //winch
  if((getButton(0) ^ getButton(2))){
     //both up and down buttons at same time is invalid
