@@ -201,8 +201,16 @@ void tank_drive(){
     right_out *= 2;
   }
   if(getButton(4)){
-    left_out  /= 2;
-    right_out /= 2;
+    if(abs(power_out)> 75){
+      left_out  =    power_out/2 + (turn_out/4);
+      right_out = -1*power_out/2 + (turn_out/4);
+    } else if(abs(power_out) >  20){
+      left_out  =    power_out/2 + (turn_out/8);
+      right_out = -1*power_out/2 + (turn_out/8);
+    } else {
+      left_out  /= 2;
+      right_out /= 2;
+    }
   }
 
   drive_left(left_out);
