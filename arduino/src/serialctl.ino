@@ -111,12 +111,12 @@ void loop(){
     }
   }
     //winch
- if((getButton(4) ^ getButton(6))){
+ if((getButton(0) ^ getButton(2))){
     //both up and down buttons at same time is invalid
-    if(getButton(4)){
+    if(getButton(0)){
         winch.writeMicroseconds(1250);
         }
-    if(getButton(6)){
+    if(getButton(2)){
         winch.writeMicroseconds(1750);
         }
     } else{
@@ -192,6 +192,16 @@ void tank_drive(){
   }
   int left_out =     power_out + (turn_out/8);
   int right_out = -1*power_out + (turn_out/8);
+
+  //apply turbo mode
+  if(getButton(6)){
+    left_out  *= 2;
+    right_out *= 2;
+  }
+  if(getButton(4)){
+    left_out  /= 2;
+    right_out /= 2;
+  }
 
   drive_left(left_out);
   drive_right(right_out);
