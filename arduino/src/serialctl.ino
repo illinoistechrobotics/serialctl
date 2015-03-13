@@ -111,12 +111,12 @@ void loop(){
     }
   }
     //winch
- if((getButton(0) ^ getButton(1))){
+ if((getButton(4) ^ getButton(6))){
     //both up and down buttons at same time is invalid
-    if(getButton(0)){
+    if(getButton(4)){
         winch.writeMicroseconds(1250);
         }
-    if(getButton(1)){
+    if(getButton(6)){
         winch.writeMicroseconds(1750);
         }
     } else{
@@ -124,21 +124,21 @@ void loop(){
     }
 
 
-    if((millis()-last_s > 500) && (getButton(4) || getButton(6))){
-        if(getButton(6)){
-        speed++;
+    if((millis()-last_s > 500) && (getButton(3) || getButton(1))){
+        if(getButton(1)){
+	  speed--;
         }
-        if(getButton(4)){
-        speed--;
+        if(getButton(3)){
+	  speed++;
         }
         speed=constrain(speed,-3,3);
         last_s = millis();
         }
         //SerComm.println(speed);
    if(cs != COMM_WAIT){
-            if(speed < 0){
+            if(speed > 0){
             digitalWrite(REVERSE_PIN,HIGH);
-            } else if(speed>0){
+            } else if(speed<0){
             digitalWrite(REVERSE_PIN,LOW);
             }
            switch(abs(speed)){
