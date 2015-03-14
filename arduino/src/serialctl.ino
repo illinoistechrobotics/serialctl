@@ -197,19 +197,34 @@ void tank_drive(){
 
   //apply turbo mode
   if(getButton(6)){
-    left_out  *= 2;
-    right_out *= 2;
-  }
-  if(getButton(4)){
     if(abs(power_out)> 75){
-      left_out  =    power_out/2 + (turn_out/4);
-      right_out = -1*power_out/2 + (turn_out/4);
+      left_out  =    power_out*2 + (turn_out);
+      right_out = -1*power_out*2 + (turn_out);
+    } else if(abs(power_out) >  20){
+      left_out  =    power_out*2 + (turn_out/4);
+      right_out = -1*power_out*2 + (turn_out/4);
+    } else {
+      left_out  *= 2;
+      right_out *= 2;
+    }
+  } else if(getButton(4)){
+    if(abs(power_out)> 75){
+      left_out  =    power_out/2 + (turn_out/2);
+      right_out = -1*power_out/2 + (turn_out/2);
     } else if(abs(power_out) >  20){
       left_out  =    power_out/2 + (turn_out/8);
       right_out = -1*power_out/2 + (turn_out/8);
     } else {
       left_out  /= 2;
       right_out /= 2;
+    }
+  } else {
+    if(abs(power_out)> 75){
+      left_out  =    power_out + (turn_out);
+      right_out = -1*power_out + (turn_out);
+    } else if(abs(power_out) >  20){
+      left_out  =    power_out + (turn_out/4);
+      right_out = -1*power_out + (turn_out/4);
     }
   }
 
