@@ -21,6 +21,7 @@
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
+int grip;
 long last_p,last_s=0,usec;
 
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
@@ -58,6 +59,7 @@ void setup() {
   SerComm.begin(57600);
   comm_init();
   init_pins();
+  grip=0;
   last_p = millis();
   drive_left(0);
   drive_right(0);
@@ -69,40 +71,30 @@ void loop(){
   wdt_reset();
   print_data();
   comm_parse();
-/*
-//arm
-  if((getButton(5) ^ getButton(7))){
-    //both up and down buttons at same time is invalid
-    if(getButton(5)){
-        arm.writeMicroseconds(1000);
-        }
-    if(getButton(7)){
-        arm.writeMicroseconds(2000);
-        }
-    } else{
-    arm.writeMicroseconds(1500);
-    }
-    //winch
- if((getButton(0) ^ getButton(1))){
-    //both up and down buttons at same time is invalid
-    if(getButton(0)){
-        winch.writeMicroseconds(1000);
-        }
-    if(getButton(1)){
-        winch.writeMicroseconds(2000);
-        }
-    } else{
-    winch.writeMicroseconds(1500);
-    }
-
- 
-  //Runs this every 500ms
-  if(millis()-last_p >= 500){
-    //no compressor
-    
-    last_p=millis();
+  if(getButton(5)){
+    //arm up
+    digitalWrite(ARM_UP,HIGH);
+    } else {
+    digitalWrite(ARM_UP,LOW);
   }
-  */
+if(getButton(7)){
+    //arm down
+    digitalWrite(ARM_DOWN,HIGH);
+    } else {
+    digitalWrite(ARM_DOWN,LOW);
+  }
+if(getButton(2)){
+    //kick
+    digitalWrite(MANIP_KICK,HIGH);
+    } else {
+    digitalWrite(MANIP_KICK,LOW);
+  }
+if(getButton(1) && (millis()-last_s > 500)){
+    //grip
+    last_s=millis();
+    grip=(grip+1)%2;
+    digitalWrite(MANIP_GRIP,grip);
+  }
  tank_drive();
   
   //limits data rate
@@ -128,9 +120,16 @@ void tank_drive(){
       turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
     }
   }
-  int left_out =     2*(power_out + (turn_out/8));
-  int right_out = 2*(-1*power_out + (turn_out/8));
-
+  int left_out =     (power_out + (turn_out/2))/2;
+  int right_out = (power_out - (turn_out/2))/2;
+   if(getButton(4)){
+    left_out=left_out*2;
+    right_out=right_out*2;
+    }
+    if(getButton(6)){
+    left_out=left_out*2;
+    right_out=right_out*2;
+    }
   drive_left(left_out);
   drive_right(right_out);
 }

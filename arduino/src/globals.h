@@ -13,8 +13,8 @@ extern long last_p;
 #define FRONT_LEFT 3
 #define FRONT_RIGHT 5
 #define REAR_LEFT 6
-#define REAR_RIGHT 9
-#define ARM_UP 10
-#define ARM_DOWN 11
+#define REAR_RIGHT 10
+#define ARM_UP 7
+#define ARM_DOWN 8
 #define MANIP_KICK 12
 #define MANIP_GRIP 13
