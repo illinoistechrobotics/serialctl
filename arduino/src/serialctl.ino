@@ -133,7 +133,7 @@ void loop(){
         if(getButton(3)){
 	  speed++;
         }
-        speed=constrain(speed,-3,3);
+        speed=constrain(speed,-1,1);
         last_s = millis();
         }
         //SerComm.println(speed);
