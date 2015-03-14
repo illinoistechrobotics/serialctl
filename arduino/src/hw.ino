@@ -12,6 +12,7 @@ void init_pins(){
         digitalWrite(MANIP_KICK,LOW);
         digitalWrite(ARM_UP,LOW);
         digitalWrite(ARM_DOWN,LOW);
+        talon_init();
 }
 void print_data(){
         SerComm.println("Roslund");

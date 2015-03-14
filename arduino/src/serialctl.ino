@@ -23,7 +23,6 @@ packet_t *astate, *incoming;
 comm_state cs;
 long last_p,last_s=0,usec;
 
-#define SerComm Serial
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
@@ -56,7 +55,7 @@ void setup() {
   safe.btnhi = 0;
   safe.btnlo = 0;
   safe.cksum = 0b1000000010001011;
-  SerComm.begin(115200);
+  SerComm.begin(57600);
   comm_init();
   init_pins();
   last_p = millis();
@@ -104,7 +103,7 @@ void loop(){
     last_p=millis();
   }
   */
-  tank_drive();
+ tank_drive();
   
   //limits data rate
   delay(75);
