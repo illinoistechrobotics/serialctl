@@ -38,8 +38,8 @@ long last_p,last_s=0,usec;
 #define BLI2 12
 #define AHI2 24
 #define BHI2 25
-#define drive_right(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
-#define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
+#define drive_right(x) drive_osmc(x,1,ALI1,BLI1,AHI1,BHI1)
+#define drive_left(x) drive_osmc(x,1,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
 
 #define WATCHDOG_
@@ -126,7 +126,7 @@ void loop(){
     }
 
 
-    if((millis()-last_s > 500) && (getButton(3) || getButton(1))){
+    if((millis()-last_s > 100) && (getButton(3) || getButton(1))){
         if(getButton(1)){
 	  speed--;
         }
@@ -204,10 +204,10 @@ void tank_drive(){
       left_out  =    power_out*2 + (turn_out/4);
       right_out = -1*power_out*2 + (turn_out/4);
     } else {
-      left_out  *= 2;
-      right_out *= 2;
+      left_out  =    power_out + (turn_out);
+      right_out = -1*power_out + (turn_out);
     }
-  } else if(getButton(4)){
+  } else if(getButton(4)){ //precision mode
     if(abs(power_out)> 75){
       left_out  =    power_out/2 + (turn_out/2);
       right_out = -1*power_out/2 + (turn_out/2);
