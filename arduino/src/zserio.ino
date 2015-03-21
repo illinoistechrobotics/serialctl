@@ -8,6 +8,7 @@ char encstr[2 + B64_ENC_LEN(sizeof(packet_t))];
 unsigned int recvcount;
 long ptime;
 void comm_init() {
+  SerComm.begin(115200);
   ptime = 0;
   cs = COMM_WAIT;
   astate = &pA;
