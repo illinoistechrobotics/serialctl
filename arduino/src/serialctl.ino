@@ -25,15 +25,6 @@ comm_state cs;
 int speed,av;
 long last_p,last_s=0,usec;
 
-#define SerComm Serial1
-#define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
-#define ntohs(x) htons(x)
-#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
-#define ntohl(x) htonl(x)
-#define drive_right(x) drive_osmc(x,1,ALI1,BLI1,AHI1,BHI1)
-#define drive_left(x) drive_osmc(x,1,ALI2,BLI2,AHI2,BHI2)
-#define DEADBAND_HALF_WIDTH 5
-
 #define WATCHDOG_
 
 #ifdef WATCHDOG_
