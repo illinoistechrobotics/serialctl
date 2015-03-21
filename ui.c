@@ -12,11 +12,18 @@ static CDKLABEL *status_box;
 static CDKLABEL *turbo_box;
 static CDKLABEL *precision_box;
 
+static CDKLABEL *estop_box;
+
 char * turbo_on[1] = {"TURBO ON"};
 char * turbo_off[1] = {"TURBO OFF"};
 
 char * precision_on[1] = {"PRECISION ON"};
 char * precision_off[1] = {"PRECISION OFF"};
+
+char * estop_on[1] = {"ESTOP ON "};
+char * estop_off[1] = {"ESTOP OFF"};
+
+boolean estop = false;
 
 int getButton(packet_t * astate, int num){
         if(num<=7){
@@ -65,18 +72,19 @@ int init_ui(){
     drawCDKSlider(throttle, true);
     drawCDKSlider(steer, true);
 
+    //This is the jenkest, but I'm using a big string to get the label big enough :)
   char *mesg[1] = {"                                                                                                                                                                                                                                       "};
   status_box = newCDKLabel(cdk_master, 0, parent_y-3, mesg, 1, true, false);
   turbo_box = newCDKLabel(cdk_master, 0, 8, turbo_off, 1, true, false);
   precision_box = newCDKLabel(cdk_master, 20, 8, precision_off, 1, true, false);
 
+  estop_box = newCDKLabel(cdk_master, 0, 16, estop_off, 1, true, false);
   return 0;
 }
 
 void refresh_ui(packet_t * ctl, char * msg){
   //TODO: unbreak window resize
   // draw to our windows
-
   char * mesg[1] = {msg};
   setCDKLabelMessage(status_box,mesg, 1);
   if(getButton(ctl,6)){
@@ -88,6 +96,17 @@ void refresh_ui(packet_t * ctl, char * msg){
     setCDKLabelMessage(precision_box,precision_on, 1);
   } else {
     setCDKLabelMessage(precision_box,precision_off, 1);
+  }
+  if(getButton(ctl,7)){
+    estop = false;
+  }
+  if(getButton(ctl,5)){
+    estop = true;
+  }
+  if(estop){
+    setCDKLabelMessage(estop_box,estop_on, 1);
+  } else {
+    setCDKLabelMessage(estop_box,estop_off, 1);
   }
 
   if(ctl->stickX != old_throttle){
@@ -101,7 +120,4 @@ void refresh_ui(packet_t * ctl, char * msg){
     setCDKSliderValue(steer, ctl->stickY);
     drawCDKSlider(steer, true);
   }
-
-  // refresh each window
-  //refreshCDKScreen(cdk_master);
 }

@@ -2,15 +2,17 @@
 #include "packet.h"
 #include "globals.h"
 #include <Servo.h>
+#define LEFT_SPEEDSERVO_ADDR 1
+#define RIGHT_SPEEDSERVO_ADDR 2
+boolean estop_state = false;
 void init_pins(){
   Wire.begin();
 }
-int countup = 0;
 void print_data(){
-  SerComm.print("Testing printback: ");
-  SerComm.println(countup++);
-  if(countup > 100){
-    countup = 0;
+  if(estop_state){
+    SerComm.println("ESTOP");
+  } else {
+    SerComm.println("Good to roll");
   }
 }
 int getButton(int num){
@@ -22,7 +24,39 @@ int getButton(int num){
                 return 0;
         }
 }
+void estop(){
+  Wire.beginTransmission(LEFT_SPEEDSERVO_ADDR);
+  Wire.write(5);
+  Wire.endTransmission();
+  Wire.beginTransmission(RIGHT_SPEEDSERVO_ADDR);
+  Wire.write(5);
+  Wire.endTransmission();
+}
+void drive_left(int speed){
+  double promoted = speed;
+  Wire.beginTransmission(LEFT_SPEEDSERVO_ADDR);
+  Wire.write(0);
+  Wire.write((byte *) &promoted, 4);
+  Wire.endTransmission();
+}
+void drive_right(int speed){
+  double promoted = speed;
+  Wire.beginTransmission(RIGHT_SPEEDSERVO_ADDR);
+  Wire.write(0);
+  Wire.write((byte *) &promoted, 4);
+  Wire.endTransmission();
+}
 void tank_drive(){
+  if(getButton(7)){
+    estop_state = false;
+  }
+  if(getButton(5)){
+    estop_state = true;
+  }
+  if(estop_state){
+    estop();
+    return;
+  }
   int power_out = 0;
   int turn_out  = 0;
   int zeroed_power =    ((int)(astate->stickX) - 127);

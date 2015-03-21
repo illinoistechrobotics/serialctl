@@ -37,8 +37,7 @@ void setup() {
   #endif
   comm_init();
   init_pins();
-  drive_left(0);
-  drive_right(0);
+  estop();
   speed=0;
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
