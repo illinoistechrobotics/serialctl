@@ -2,6 +2,7 @@
 #include "crc16.h"
 #include "packet.h"
 #include "globals.h"
+#include "hw.h"
 
 uint16_t crc;
 char encstr[2 + B64_ENC_LEN(sizeof(packet_t))];
@@ -70,6 +71,7 @@ void comm_parse() {
     memcpy(astate,&safe,sizeof(packet_t));
     cs=COMM_WAIT;
     recvcount = 0;
+    estop();
     SerComm.println("FAILSAFE");
   }
 }
