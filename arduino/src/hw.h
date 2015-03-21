@@ -4,3 +4,4 @@
 void init_pins();
 void print_data();
 void tank_drive();
+int getButton(int num);
