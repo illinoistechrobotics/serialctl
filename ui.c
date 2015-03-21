@@ -14,14 +14,14 @@ static CDKLABEL *precision_box;
 
 static CDKLABEL *estop_box;
 
-char * turbo_on[1] = {"TURBO ON"};
-char * turbo_off[1] = {"TURBO OFF"};
+char * turbo_on[1] = {"</B/2>TURBO  ON<!2>"};
+char * turbo_off[1] = {"</B/C>TURBO OFF<!C>"};
 
-char * precision_on[1] = {"PRECISION ON"};
-char * precision_off[1] = {"PRECISION OFF"};
+char * precision_on[1] = {"</B/3>PRECISION  ON<!3>"};
+char * precision_off[1] = {"</B/C>PRECISION OFF<!C>"};
 
-char * estop_on[1] = {"ESTOP ON "};
-char * estop_off[1] = {"ESTOP OFF"};
+char * estop_on[1] = {"</B/2>ESTOP  ON<!2>"};
+char * estop_off[1] = {"</B/3>ESTOP OFF<!3>"};
 
 boolean estop = false;
 
