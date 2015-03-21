@@ -1,11 +1,11 @@
 #include "serio.h"
 #include "crc16.h"
 #include "joystick.h"
+#include "ui.h"
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
 #include <time.h>
-
 void packet_crc(packet_t *p){
     p->cksum = htons(compute_crc((char *)p,sizeof(packet_t)-sizeof(uint16_t)));
     }
@@ -25,6 +25,7 @@ int main(int argc, char ** argv){
           return 1;
         if(joystick_wait_safe() != 0)
           return 1;
+	init_ui();
         while(loop){
           if(serio_recv(&c, msg) < 0){
             printf("Error reading data!\n");
@@ -38,8 +39,9 @@ int main(int argc, char ** argv){
             printf("Unable to send data!\n");
             return 2;
             }
-        printf("X: %i, Y: %i, CRC: %i, Resp: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
-//        usleep(150E3);
+        //printf("X: %i, Y: %i, CRC: %i, Resp: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
+	refresh_ui(&ctl, msg);
+//      usleep(150E3);
         }
         return 0;
 }

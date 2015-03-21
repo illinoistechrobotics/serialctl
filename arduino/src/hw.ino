@@ -5,7 +5,22 @@
 void init_pins(){
   Wire.begin();
 }
+int countup = 0;
 void print_data(){
+  SerComm.print("Testing printback: ");
+  SerComm.println(countup++);
+  if(countup > 100){
+    countup = 0;
+  }
+}
+int getButton(int num){
+        if(num<=7){
+                return (astate->btnlo >> num) & 0x01;
+        } else if(num>7 && num <= 15){
+                return (astate->btnhi >> (num - 8)) & 0x01;
+        } else {
+                return 0;
+        }
 }
 void tank_drive(){
   int power_out = 0;

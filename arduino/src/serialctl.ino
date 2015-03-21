@@ -30,15 +30,6 @@ long last_p,last_s=0,usec;
 #ifdef WATCHDOG_
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
 #endif
-int getButton(int num){
-        if(num<=7){
-                return (astate->btnlo >> num) & 0x01;
-        } else if(num>7 && num <= 15){
-                return (astate->btnhi >> (num - 8)) & 0x01;
-        } else {
-                return 0;
-        }
-}
 void setup() {
   #ifdef WATCHDOG_
   wdt_enable(WDTO_250MS);  //Set 250ms WDT 
@@ -46,7 +37,6 @@ void setup() {
   #endif
   comm_init();
   init_pins();
-  last_p = millis();
   drive_left(0);
   drive_right(0);
   speed=0;

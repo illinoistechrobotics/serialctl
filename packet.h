@@ -1,3 +1,4 @@
+#pragma once
 #include <stdint.h>
 #define SFRAME 0x5b
 #define EFRAME 0x5d
