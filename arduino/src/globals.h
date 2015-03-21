@@ -1,6 +1,7 @@
 #pragma once
 
-extern packet_t pA, pB, safe;
+extern packet_t pA, pB;
+extern const packet_t safe;
 extern packet_t *astate, *incoming;
 extern comm_state cs;
 extern long last_p;
