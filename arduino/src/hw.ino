@@ -12,7 +12,9 @@ void print_data(){
   if(estop_state){
     SerComm.println("ESTOP");
   } else {
-    SerComm.println("Good to roll");
+    if(cs != COMM_WAIT){
+      SerComm.println("Good to roll");
+    }
   }
 }
 int getButton(int num){
