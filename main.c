@@ -20,10 +20,13 @@ int main(int argc, char ** argv){
         connection_t c;
         packet_t ctl;
         if(serio_init(&c, argv[1]))
+	  printf("Unable to open serial port");
             return 2;
         if(joystick_init(atoi(argv[2])) != 0)
+	  printf("Unable to open joystick");
           return 1;
         if(joystick_wait_safe() != 0)
+	  printf("Unable to get safe values from the joystick");
           return 1;
 	init_ui();
         while(loop){
