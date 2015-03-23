@@ -89,8 +89,8 @@ void tank_drive(){
     multiplier = 2;
   }
 
-  int left_out =        multiplier*(power_out - (turn_out));
-  int right_out =    -1*multiplier*(power_out + (turn_out));
+  int left_out =        multiplier*(power_out - (turn_out/2));
+  int right_out =    -1*multiplier*(power_out + (turn_out/2));
 
   drive_left(left_out);
   drive_right(right_out);
