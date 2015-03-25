@@ -5,15 +5,43 @@
 #define LEFT_SPEEDSERVO_ADDR 1
 #define RIGHT_SPEEDSERVO_ADDR 2
 boolean estop_state = false;
+int last_left_speed, last_right_speed;
 void init_pins(){
   Wire.begin();
+}
+int read_speed(char address){
+  Wire.requestFrom(address,sizeof(int));
+  int timeout = millis();
+  while(Wire.available() <2 && millis() - timeout < 100){};
+  if(millis() - timeout > 100){
+    SerComm.println("Speed read timeout");
+    return 0;
+  } else {
+    byte buff[sizeof(int)];
+    for(int i = 0; i < sizeof(int); ++i){
+      buff[i] = Wire.read();
+    }
+    return *((int*) buff);
+  }
+}
+void print_speed(){
+  int left_speed = read_speed(LEFT_SPEEDSERVO_ADDR);
+  int right_speed = read_speed(RIGHT_SPEEDSERVO_ADDR);
+
+  char speedline[100];
+  snprintf(speedline, 100, "%d,%d,%d,%d", 
+	   left_speed,last_left_speed,
+	   right_speed,last_right_speed);
+  SerComm.println(speedline);
+
 }
 void print_data(){
   if(estop_state){
     SerComm.println("ESTOP");
   } else {
     if(cs != COMM_WAIT){
-      SerComm.println("Good to roll");
+      //SerComm.println("Good to roll");
+      print_speed();
     }
   }
 }
@@ -91,6 +119,9 @@ void tank_drive(){
 
   int left_out =        multiplier*(power_out - (turn_out/4));
   int right_out =    -1*multiplier*(power_out + (turn_out/4));
+
+  last_left_speed = left_out;
+  last_right_speed = right_out;
 
   drive_left(left_out);
   drive_right(right_out);
