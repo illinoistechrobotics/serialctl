@@ -11,9 +11,8 @@ int serio_init(connection_t *ctx, const char *serdev){
         bidx=0;
         ctx->device=serdev;
         ctx->fd=open(ctx->device, O_RDWR | O_NOCTTY | O_NDELAY);
-        printf("opened\n");
         if(ctx->fd == -1 || !isatty(ctx->fd) || tcgetattr(ctx->fd, &(ctx->spconfig)) < 0) {
-                printf( "failed to open port %s \n",ctx->device);
+                printf( "Failed to open port %s \n",ctx->device);
                 close(ctx->fd);
                 return -1;
         }
@@ -70,15 +69,15 @@ ssize_t serio_send(connection_t *ctx, void *data, size_t len){
         datap[1+B64_ENC_LEN(len)] = EFRAME;
         return write(ctx->fd,datap,2+B64_ENC_LEN(len));
 }
-ssize_t serio_recv(connection_t *ctx, char *buf)
+ssize_t serio_recv(connection_t *ctx, char *buf, int * overflow)
 { 
         static char ba[RECVBUF];
         char *next;
         do { 
                 if(bidx == RECVBUF-1){
                         bidx=0;
-                        printf("Input buffer overflow!\n");
                         memset(ba,0x00,RECVBUF);
+			*overflow = 1;
                 }
                 int n = read(ctx->fd, ba+bidx, RECVBUF-(bidx+1));  // read as much as possible
                 if( n==-1) return -1;    // couldn't read

@@ -30,7 +30,9 @@ int main(int argc, char ** argv){
           return 1;
 	init_ui();
         while(loop){
-          if(serio_recv(&c, msg) < 0){
+	  int overflow = 0;
+	  //TODO: printf("Input buffer overflow!\n");
+          if(serio_recv(&c, msg, &overflow) < 0){
             printf("Error reading data!\n");
             return 2;
             }
@@ -43,7 +45,7 @@ int main(int argc, char ** argv){
             return 2;
             }
         //printf("X: %i, Y: %i, CRC: %i, Resp: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
-	refresh_ui(&ctl, msg);
+	refresh_ui(&ctl, msg, overflow);
 //      usleep(150E3);
         }
         return 0;

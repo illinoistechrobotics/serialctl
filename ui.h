@@ -3,4 +3,4 @@
 #include "packet.h"
 void draw_borders(WINDOW *screen);
 int init_ui();
-void refresh_ui(packet_t * ctl, char * msg);
+void refresh_ui(packet_t * ctl, char * msg, int overflow);

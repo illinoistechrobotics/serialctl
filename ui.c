@@ -6,6 +6,7 @@ static CDKSLIDER * throttle;
 static CDKSLIDER * steer;
 int old_throttle = 128, old_steer = 128;
 
+
 static CDKSCREEN *cdk_master;
 
 static CDKLABEL *status_box;
@@ -13,6 +14,9 @@ static CDKLABEL *turbo_box;
 static CDKLABEL *precision_box;
 
 static CDKLABEL *estop_box;
+
+static CDKLABEL *overflow_notification;
+char * overflow_msg[1] = {"</B/2>Input buffer overflow!<!2>"};
 
 char * turbo_on[1] = {"</B/2>TURBO  ON<!2>"};
 char * turbo_off[1] = {"</B/C>TURBO OFF<!C>"};
@@ -79,12 +83,21 @@ int init_ui(){
   precision_box = newCDKLabel(cdk_master, 20, 8, precision_off, 1, true, false);
 
   estop_box = newCDKLabel(cdk_master, 0, 16, estop_off, 1, true, false);
+  
+  overflow_notification = newCDKLabel(cdk_master,
+				      parent_x/2 - 11, parent_y/2-1, //11 is half the width
+				      overflow_msg,
+				      1, true, false);
   return 0;
 }
 
-void refresh_ui(packet_t * ctl, char * msg){
+void refresh_ui(packet_t * ctl, char * msg, int overflow){
   //TODO: unbreak window resize
-  // draw to our windows
+  if(overflow){
+    drawCDKLabel(overflow_notification, true);
+  } else {
+    eraseCDKLabel(overflow_notification);
+  }
   char * mesg[1] = {msg};
   setCDKLabelMessage(status_box,mesg, 1);
   if(getButton(ctl,6)){
