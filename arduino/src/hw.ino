@@ -27,9 +27,11 @@ void print_speed(){
   int right_speed = read_speed(RIGHT_SPEEDSERVO_ADDR);
 
   char speedline[100];
-  snprintf(speedline, 100, "%d,%d,%d,%d", 
+  snprintf(speedline, 100, "%d,%d,%d,%d,%d,%d", 
 	   left_speed,last_left_speed,
-	   right_speed,last_right_speed);
+	   right_speed,last_right_speed,
+	   left_speed-last_left_speed,
+	   right_speed-last_right_speed);
   SerComm.println(speedline);
 
 }

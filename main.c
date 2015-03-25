@@ -18,7 +18,7 @@ int main(int argc, char ** argv){
             }
 	int data_file = -1;
 	if(argc == 4){
-	  if(-1 == (data_file = open(argv[3], O_WRONLY|O_CREAT|O_EXCL))){
+	  if(-1 == (data_file = open(argv[3], O_WRONLY|O_CREAT|O_EXCL, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))){
 	    perror("failed to open data file (does it already exist?)");
 	  }
 	}
