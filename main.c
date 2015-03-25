@@ -20,6 +20,7 @@ int main(int argc, char ** argv){
 	if(argc == 4){
 	  if(-1 == (data_file = open(argv[3], O_WRONLY|O_CREAT|O_EXCL, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))){
 	    perror("failed to open data file (does it already exist?)");
+	    return 4;
 	  }
 	}
         short loop=1;
@@ -44,25 +45,24 @@ int main(int argc, char ** argv){
           if(serio_recv(&c, msg, &overflow) < 0){
             printf("Error reading data!\n");
             return 2;
-            }
-        if(joystick_update(&ctl) != 0){
-           return 1;
-	}
-        packet_crc(&ctl); 
-        if(serio_send(&c, &ctl, sizeof(packet_t)) < 0){
+	  }
+	  if(joystick_update(&ctl) != 0){
+	    return 1;
+	  }
+	  packet_crc(&ctl); 
+	  if(serio_send(&c, &ctl, sizeof(packet_t)) < 0){
             printf("Unable to send data!\n");
             return 2;
-            }
-        //printf("X: %i, Y: %i, CRC: %i, Resp: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
-	if(data_file != -1){
-	  char output_buffer[100];
-	  int size = snprintf(output_buffer, 100, "%s\n", msg);
-	  if(size > 0){
-	    write(data_file,output_buffer,size);
 	  }
-	}
-	refresh_ui(&ctl, msg, overflow);
-//      usleep(150E3);
+	  //printf("X: %i, Y: %i, CRC: %i, Resp: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
+	  if(data_file != -1){
+	    char output_buffer[100];
+	    int size = snprintf(output_buffer, 100, "%s\n", msg);
+	    if(size > 0){
+	      write(data_file,output_buffer,size);
+	    }
+	  }
+	  refresh_ui(&ctl, msg, overflow);
         }
         return 0;
 }
