@@ -12,7 +12,7 @@ void packet_crc(packet_t *p){
 
 int main(int argc, char ** argv){
         char msg[RECVBUF];
-        if(argc != 3 || argc != 4){
+        if(!(argc != 3 || argc != 4)){
             printf("Usage: ./serialctl <serial port> <joystick_num> [data_file]\n");
             return 3;
             }
@@ -25,15 +25,18 @@ int main(int argc, char ** argv){
         short loop=1;
         connection_t c;
         packet_t ctl;
-        if(serio_init(&c, argv[1]))
-	  printf("Unable to open serial port");
-            return 2;
-        if(joystick_init(atoi(argv[2])) != 0)
-	  printf("Unable to open joystick");
+        if(serio_init(&c, argv[1])){
+	  printf("Unable to open serial port\n");
+	  return 2;
+	}
+        if(joystick_init(atoi(argv[2])) != 0){
+	  printf("Unable to open joystick\n");
           return 1;
-        if(joystick_wait_safe() != 0)
-	  printf("Unable to get safe values from the joystick");
+	}
+        if(joystick_wait_safe() != 0){
+	  printf("Unable to get safe values from the joystick\n");
           return 1;
+	}
 	init_ui();
         while(loop){
 	  int overflow = 0;
@@ -44,7 +47,7 @@ int main(int argc, char ** argv){
             }
         if(joystick_update(&ctl) != 0){
            return 1;
-            }
+	}
         packet_crc(&ctl); 
         if(serio_send(&c, &ctl, sizeof(packet_t)) < 0){
             printf("Unable to send data!\n");

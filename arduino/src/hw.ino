@@ -11,18 +11,16 @@ void init_pins(){
 }
 int read_speed(char address){
   Wire.requestFrom(address,sizeof(int));
-  int timeout = millis();
-  while(Wire.available() <2 && millis() - timeout < 100){};
-  if(millis() - timeout > 100){
-    SerComm.println("Speed read timeout");
-    return 0;
-  } else {
-    byte buff[sizeof(int)];
-    for(int i = 0; i < sizeof(int); ++i){
-      buff[i] = Wire.read();
+  byte buff[sizeof(int)];
+  for(int i = 0; i < sizeof(int); ++i){
+    unsigned long timeout = millis();
+    while((!Wire.available()) && millis() - timeout < 100){};
+    if(millis() - timeout > 100){
+      SerComm.println("Speed read timeout");
     }
-    return *((int*) buff);
+    buff[i] = Wire.read();
   }
+  return *((int*) buff);
 }
 void print_speed(){
   int left_speed = read_speed(LEFT_SPEEDSERVO_ADDR);
