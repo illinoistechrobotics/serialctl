@@ -12,10 +12,16 @@ void packet_crc(packet_t *p){
 
 int main(int argc, char ** argv){
         char msg[RECVBUF];
-        if(argc != 3){
-            printf("Usage: ./serialctl <serial port> <joystick_num>\n");
+        if(argc != 3 || argc != 4){
+            printf("Usage: ./serialctl <serial port> <joystick_num> [data_file]\n");
             return 3;
             }
+	int data_file = -1;
+	if(argc == 4){
+	  if(-1 == (data_file = open(argv[3], O_WRONLY|O_CREAT|O_EXCL))){
+	    perror("failed to open data file (does it already exist?)");
+	  }
+	}
         short loop=1;
         connection_t c;
         packet_t ctl;
@@ -45,6 +51,13 @@ int main(int argc, char ** argv){
             return 2;
             }
         //printf("X: %i, Y: %i, CRC: %i, Resp: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
+	if(data_file != -1){
+	  char output_buffer[100];
+	  int size = snprintf(output_buffer, 100, "%s\n", msg);
+	  if(size > 0){
+	    write(data_file,output_buffer,size);
+	  }
+	}
 	refresh_ui(&ctl, msg, overflow);
 //      usleep(150E3);
         }
