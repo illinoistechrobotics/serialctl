@@ -55,14 +55,14 @@ void serio_close(connection_t *ctx){
 }
 
 ssize_t serio_send(connection_t *ctx, void *data, size_t len){
-        int rv;
+        size_t rv;
         char datap[2+B64_ENC_LEN(len)];
         if(ctx->fd==-1 || len==0 || data==NULL){
                 return -3;
         }
         //Add 2 bytes overhead, encode and send
         datap[0] = SFRAME;
-        rv = base64_encode(datap+1,data,len);
+        rv = base64_encode(datap+1,(char *)data,len);
         if(B64_ENC_LEN(len) != rv){
                 return -2;
         }
