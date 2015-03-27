@@ -27,7 +27,7 @@ void print_speed(){
   int right_speed = read_speed(RIGHT_SPEEDSERVO_ADDR);
 
   char speedline[100];
-  snprintf(speedline, 100, "%d,%d,%d,%d,%ul", 
+  snprintf(speedline, 100, "%d,%d,%d,%d,%lu", 
 	   left_speed,last_left_speed,
 	   right_speed,last_right_speed,
 	   millis());
