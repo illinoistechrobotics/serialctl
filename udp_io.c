@@ -15,7 +15,6 @@ int udpio_init(ip_connection_t *c, const char *port){
         char* pp;
         char parsedarg[64];
         unsigned int nport;
-
         bzero(parsedarg,64);
         strncpy(parsedarg,port,63);
 
@@ -23,6 +22,10 @@ int udpio_init(ip_connection_t *c, const char *port){
                 pp[0]=0x00;
                 pp++;
                 nport = atoi(pp);
+                if(nport <= 0 ){
+                        printf("Invalid port number\n");
+                        return 1;
+                }
                 printf("IP = %s, PORT = %i\n", parsedarg, nport);
                 c->sockfd=socket(AF_INET,SOCK_DGRAM,0);
                 bzero(&(c->servaddr),sizeof(struct sockaddr_in));
@@ -30,6 +33,7 @@ int udpio_init(ip_connection_t *c, const char *port){
                 (c->servaddr).sin_addr.s_addr=inet_addr(parsedarg);
                 (c->servaddr).sin_port=htons(nport);
                 fcntl(c->sockfd, F_SETFL, fcntl(c->sockfd, F_GETFL) | O_NONBLOCK);
+                sendto(c->sockfd,"[",1,0,(struct sockaddr *)&(c->servaddr),sizeof(c->servaddr));
         } else {
 
                 printf("Error initializing UDP communication!");
@@ -42,7 +46,8 @@ int udpio_init(ip_connection_t *c, const char *port){
 ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
 { 
         static char ba[RECVBUF];
-        char *next;
+        static unsigned int fc=0;
+        char *next, *t;
         do { 
                 if(iidx == RECVBUF-1){
                         iidx=0;
@@ -50,27 +55,43 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
                         memset(ba,0x00,RECVBUF);
                 }
                 int n = recv(ctx->sockfd, ba+iidx, RECVBUF-(iidx+1), 0);  // read as much as possible
-                if( n==-1 && errno != EWOULDBLOCK) return -1;    // couldn't read
+                if( n==-1 && errno != EWOULDBLOCK){
+                        return -1;    // couldn't read
+                }
                 if( n==0 || (n==-1 && errno == EWOULDBLOCK)) {
+                        if(fc > 100){
+                                printf("Sending noop, no data for 500ms!\n");
+                                sendto(ctx->sockfd,"[",1,0,(struct sockaddr *)&(ctx->servaddr),sizeof(ctx->servaddr));
+                                fc=0;
+                        }
+                        else{
+                                fc++;
+                        }
                         usleep( 5 * 1000 ); // wait 5 msec try again
                         continue;
                 }
-                #ifdef DEBUG
+
+#ifdef DEBUG
                 printf("read(): %i, iidx: %i\n",n, iidx);
-                #endif
+#endif
                 iidx += n;
                 ba[iidx]=0x00;
-        } while(strchr(ba,'\n') == NULL);
-        buf[0]=0x00;
-        next = strchr(ba,'\n');
+                next=strchr(ba,'\n'); 
+        } while(next == NULL);
+        //Clobber newline and hop over it
         next[0] = 0x00;
         next++;
         //Heartbeat or data?
-        #ifdef DEBUG
+#ifdef DEBUG
         printf("%x\n",ba[0]);
-        #endif
+#endif
         if(ba[0] != '$'){
                 strcpy(buf,ba);
+                if((t = strchr(buf,'\r')) != NULL){
+                        t[0]=0x00;
+                }
+        } else {
+                buf[0]=0x00;
         }
         //Move rest including null to front
         memmove(ba,next,strlen(next)+1);
@@ -78,7 +99,6 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
         iidx = strlen(ba);
         return strlen(buf);
 }
-
 ssize_t udpio_send(ip_connection_t *c, void *data, size_t len){
         int rv;
         char datap[2+B64_ENC_LEN(len)];

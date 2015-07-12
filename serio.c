@@ -73,7 +73,7 @@ ssize_t serio_send(connection_t *ctx, void *data, size_t len){
 ssize_t serio_recv(connection_t *ctx, char *buf)
 { 
         static char ba[RECVBUF];
-        char *next;
+        char *next, *t;
         do { 
                 if(bidx == RECVBUF-1){
                         bidx=0;
@@ -91,9 +91,9 @@ ssize_t serio_recv(connection_t *ctx, char *buf)
                 #endif
                 bidx += n;
                 ba[bidx]=0x00;
-        } while(strchr(ba,'\n') == NULL);
-        buf[0]=0x00;
-        next = strchr(ba,'\n');
+                next=strchr(ba,'\n'); 
+        } while(next == NULL);
+        //Clobber newline and hop over it
         next[0] = 0x00;
         next++;
         //Heartbeat or data?
@@ -101,7 +101,12 @@ ssize_t serio_recv(connection_t *ctx, char *buf)
         printf("%x\n",ba[0]);
         #endif
         if(ba[0] != '$'){
-                strcpy(buf,ba);
+            strcpy(buf,ba);
+            if((t = strchr(buf,'\r')) != NULL){
+                t[0]=0x00;
+            }
+        } else {
+            buf[0]=0x00;
         }
         //Move rest including null to front
         memmove(ba,next,strlen(next)+1);

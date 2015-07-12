@@ -30,8 +30,8 @@ int run_udp(const char *port){
                         printf("Unable to send data!\n");
                         return 2;
                 }
-                printf("UDP:[X: %i, Y: %i, CRC: %i, Resp: %s]\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
-                //        usleep(150E3);
+                printf("UDP: [X: %i, Y: %i, CRC: %i, Resp: %s]\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
+                        usleep(150E3);
         }
         return 0;
 }
@@ -55,8 +55,7 @@ int run_serial(const char *port){
                         printf("Unable to send data!\n");
                         return 2;
                 }
-                printf("Serial:[X: %i, Y: %i, CRC: %i, Resp: %s]\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
-                //        usleep(150E3);
+                printf("Serial: [X: %i, Y: %i, CRC: %i, Resp: %s]\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
         }
         return 0;
 }
