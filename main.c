@@ -26,7 +26,7 @@ int main(int argc, char ** argv){
         short loop=1;
         connection_t c;
         packet_t ctl;
-        if(serio_init(&c, argv[1])){
+        if(serio_init(&c, argv[1]) != 0){
 	  printf("Unable to open serial port\n");
 	  return 2;
 	}
