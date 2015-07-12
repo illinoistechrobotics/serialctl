@@ -61,7 +61,7 @@ int joystick_wait_safe(){
                 if(abs(SDL_JoystickGetAxis(jstick, 1)) > 2){
                     unsafe=1;
                     }
-                 if(abs(SDL_JoystickGetAxis(jstick, 3)) > 2){
+                 if(abs(SDL_JoystickGetAxis(jstick, 2)) > 2){
                     unsafe=1;
                     }
                 for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 15)); i++){
