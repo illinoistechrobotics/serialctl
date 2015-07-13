@@ -2,7 +2,8 @@
 #include <netinet/in.h>
 #define RECVBUF 256
 typedef struct{
-int sockfd;
+int c_sockfd;
+int s_sockfd;
 struct sockaddr_in servaddr;
 struct sockaddr_in cliaddr;
 }ip_connection_t;

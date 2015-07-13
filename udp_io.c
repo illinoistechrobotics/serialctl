@@ -18,27 +18,41 @@ int udpio_init(ip_connection_t *c, const char *port){
         bzero(parsedarg,64);
         strncpy(parsedarg,port,63);
 
-        if((pp=strchr(parsedarg, ':')) != NULL){
-                pp[0]=0x00;
-                pp++;
-                nport = atoi(pp);
-                if(nport <= 0 ){
-                        printf("Invalid port number\n");
-                        return 1;
-                }
-                printf("IP = %s, PORT = %i\n", parsedarg, nport);
-                c->sockfd=socket(AF_INET,SOCK_DGRAM,0);
-                bzero(&(c->servaddr),sizeof(struct sockaddr_in));
-                (c->servaddr).sin_family = AF_INET;
-                (c->servaddr).sin_addr.s_addr=inet_addr(parsedarg);
-                (c->servaddr).sin_port=htons(nport);
-                fcntl(c->sockfd, F_SETFL, fcntl(c->sockfd, F_GETFL) | O_NONBLOCK);
-                sendto(c->sockfd,"[",1,0,(struct sockaddr *)&(c->servaddr),sizeof(c->servaddr));
-        } else {
-
-                printf("Error initializing UDP communication!");
+        if((pp=strchr(parsedarg, ':')) == NULL){
+                printf("Missing port number!");
                 return 1;
         }
+
+        pp[0]=0x00;
+        pp++;
+        nport = atoi(pp);
+        if(nport <= 0 ){
+                printf("Invalid port number\n");
+                return 1;
+        }
+        printf("IP = %s, PORT = %i\n", parsedarg, nport);
+        //Client socket
+        c->c_sockfd=socket(AF_INET,SOCK_DGRAM,0);
+        bzero(&(c->cliaddr),sizeof(struct sockaddr_in));
+        (c->cliaddr).sin_family = AF_INET;
+        (c->cliaddr).sin_addr.s_addr=inet_addr(parsedarg);
+        (c->cliaddr).sin_port=htons(nport);
+        fcntl(c->c_sockfd, F_SETFL, fcntl(c->c_sockfd, F_GETFL) | O_NONBLOCK);
+        //Recieve/server socket
+        c->s_sockfd=socket(AF_INET,SOCK_DGRAM,0);
+        bzero(&(c->servaddr),sizeof(struct sockaddr_in));
+        (c->servaddr).sin_family = AF_INET;
+        (c->servaddr).sin_addr.s_addr=htonl(INADDR_ANY);
+        (c->servaddr).sin_port=htons(nport);
+        if (bind((c->s_sockfd), (struct sockaddr *)&(c->servaddr), sizeof(struct sockaddr_in)) < 0) {
+                perror("bind failed");
+                return 1;
+        }
+        //nonblocking sender
+        fcntl(c->s_sockfd, F_SETFL, fcntl(c->c_sockfd, F_GETFL) | O_NONBLOCK);
+
+
+        sendto(c->c_sockfd,"[",1,0,(struct sockaddr *)&(c->cliaddr),sizeof(c->cliaddr));
 
         return 0;
 }
@@ -54,14 +68,14 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
                         printf("Input buffer overflow!\n");
                         memset(ba,0x00,RECVBUF);
                 }
-                int n = recv(ctx->sockfd, ba+iidx, RECVBUF-(iidx+1), 0);  // read as much as possible
+                int n = recv(ctx->s_sockfd, ba+iidx, RECVBUF-(iidx+1), 0);  // read as much as possible
                 if( n==-1 && errno != EWOULDBLOCK){
                         return -1;    // couldn't read
                 }
                 if( n==0 || (n==-1 && errno == EWOULDBLOCK)) {
                         if(fc > 100){
                                 printf("Sending noop, no data for 500ms!\n");
-                                sendto(ctx->sockfd,"[",1,0,(struct sockaddr *)&(ctx->servaddr),sizeof(ctx->servaddr));
+                                sendto(ctx->c_sockfd,"[",1,0,(struct sockaddr *)&(ctx->cliaddr),sizeof(ctx->cliaddr));
                                 fc=0;
                         }
                         else{
@@ -112,5 +126,5 @@ ssize_t udpio_send(ip_connection_t *c, void *data, size_t len){
                 return -2;
         }
         datap[1+B64_ENC_LEN(len)] = EFRAME;
-        return sendto(c->sockfd,datap,2+B64_ENC_LEN(len),0,(struct sockaddr *)&(c->servaddr),sizeof(c->servaddr));
+        return sendto(c->c_sockfd,datap,2+B64_ENC_LEN(len),0,(struct sockaddr *)&(c->cliaddr),sizeof(c->cliaddr));
 }
