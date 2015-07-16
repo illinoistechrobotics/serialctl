@@ -65,6 +65,14 @@ void setup() {
   drive_right(0);
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
+  //Dont send data until we recieve something
+  while(1){
+    if(SerComm.available()){
+        if(SerComm.read()='[')
+            break;
+        }
+        wdt_reset();
+  }
 }
 void loop(){
   //Every line sent to the computer gets us a new state
