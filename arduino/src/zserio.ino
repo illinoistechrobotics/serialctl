@@ -59,12 +59,12 @@ void comm_parse() {
         incoming=tmp;
       } else{
         cs=COMM_INVALID;
-       // SerComm.println("Invalid");
+        SerComm.println("Invalid");
       }
     }
   }
   
-  if(millis()-ptime > 120){
+  if(millis()-ptime > 250){
     //Been too long, copy safe state over active one
     memcpy(astate,&safe,sizeof(packet_t));
     cs=COMM_WAIT;

@@ -79,7 +79,7 @@ void loop(){
   wdt_reset();
   print_data();
   comm_parse();
-  if(getButton(5)){
+/*  if(getButton(5)){
     //arm up
     digitalWrite(ARM_UP,HIGH);
     } else {
@@ -103,10 +103,11 @@ if(getButton(1) && (millis()-last_s > 500)){
     grip=(grip+1)%2;
     digitalWrite(MANIP_GRIP,grip);
   }
+*/
  tank_drive();
   
   //limits data rate
-  delay(75);
+  delay(25);
 }
 void tank_drive(){
   int power_out = 0;
@@ -134,7 +135,7 @@ void tank_drive(){
     left_out=left_out*2;
     right_out=right_out*2;
     }
-    if(getButton(6)){
+   if(getButton(6)){
     left_out=left_out*2;
     right_out=right_out*2;
     }

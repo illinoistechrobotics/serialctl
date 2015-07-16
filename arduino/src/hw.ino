@@ -4,20 +4,20 @@
 #include <Servo.h>
 Servo fl, fr, rl, rr;
 void init_pins(){
-        pinMode(MANIP_GRIP, OUTPUT);
-        pinMode(MANIP_KICK, OUTPUT);
-        pinMode(ARM_UP,OUTPUT);
-        pinMode(ARM_DOWN,OUTPUT);
-        digitalWrite(MANIP_GRIP,LOW);
-        digitalWrite(MANIP_KICK,LOW);
-        digitalWrite(ARM_UP,LOW);
-        digitalWrite(ARM_DOWN,LOW);
-        talon_init();
+//        pinMode(MANIP_GRIP, OUTPUT);
+//        pinMode(MANIP_KICK, OUTPUT);
+//        pinMode(ARM_UP,OUTPUT);
+//       pinMode(ARM_DOWN,OUTPUT);
+//        digitalWrite(MANIP_GRIP,LOW);
+//        digitalWrite(MANIP_KICK,LOW);
+//        digitalWrite(ARM_UP,LOW);
+//        digitalWrite(ARM_DOWN,LOW);
+        victor_init();
 }
 void print_data(){
-        SerComm.println("Roslund");
+        SerComm.println("ITR Scale Roslund");
 }
-void talon_init(){
+void victor_init(){
         fl.attach(FRONT_LEFT);
         fr.attach(FRONT_RIGHT);
         rl.attach(REAR_LEFT);
