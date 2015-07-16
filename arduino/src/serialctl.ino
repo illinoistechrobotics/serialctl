@@ -68,7 +68,7 @@ void setup() {
   //Dont send data until we recieve something
   while(1){
     if(SerComm.available()){
-        if(SerComm.read()='[')
+        if(SerComm.read()=='[')
             break;
         }
         wdt_reset();
