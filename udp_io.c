@@ -82,14 +82,10 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
                                 fc++;
                         }
                         usleep( 5 * 1000 ); // wait 5 msec try again
-                        continue;
+                } else {
+                        iidx += n;
+                        ba[iidx]=0x00;
                 }
-
-#ifdef DEBUG
-                printf("read(): %i, iidx: %i\n",n, iidx);
-#endif
-                iidx += n;
-                ba[iidx]=0x00;
                 next=strchr(ba,'\n'); 
         } while(next == NULL);
         //Clobber newline and hop over it
