@@ -35,7 +35,7 @@ void drive_left(int power){
 }
 
 void drive_right(int power){
-        power = map(constrain(power,-127,127),-127,127,1000,2000);
+        power = map(constrain(power,-127,127),127,-127,1000,2000);
         fr.writeMicroseconds(power);
         rr.writeMicroseconds(power);
 }
