@@ -33,8 +33,8 @@ int serio_init(connection_t *ctx, const char *serdev){
         (ctx->spconfig).c_cc[VMIN]  = 1;
         (ctx->spconfig).c_cc[VTIME]  = 0;
 
-        cfsetispeed(&(ctx->spconfig), B115200);
-        cfsetospeed(&(ctx->spconfig), B115200);
+        cfsetispeed(&(ctx->spconfig), B57600);
+        cfsetospeed(&(ctx->spconfig), B57600);
         tcsetattr(ctx->fd,TCSANOW,&(ctx->spconfig));
         opts = fcntl(ctx->fd,F_GETFL);
         if (opts < 0) {

@@ -77,13 +77,13 @@ int init_ui(){
     drawCDKSlider(steer, true);
 
     //This is the jenkest, but I'm using a big string to get the label big enough :)
-  char *mesg[1] = {"                                                                                                                                                                                                                                       "};
+  char *mesg[1] = {"</B/2>No data recieved                                                                                                                                                                                                                       <!2>"};
   status_box = newCDKLabel(cdk_master, 0, parent_y-3, mesg, 1, true, false);
   turbo_box = newCDKLabel(cdk_master, 0, 8, turbo_off, 1, true, false);
   precision_box = newCDKLabel(cdk_master, 20, 8, precision_off, 1, true, false);
-
-  estop_box = newCDKLabel(cdk_master, 0, 16, estop_off, 1, true, false);
-  
+  estop_box = newCDKLabel(cdk_master, 0, 16, estop_off, 1, true, false); 
+  drawCDKLabel(estop_box,true);
+  drawCDKLabel(status_box,true);
   overflow_notification = newCDKLabel(cdk_master,
 				      parent_x/2 - 11, parent_y/2-1, //11 is half the width
 				      overflow_msg,
