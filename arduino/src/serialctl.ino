@@ -98,7 +98,7 @@ void fire_fsm(){
    } else if(fire == (1750/TICK_RATE)){
    //T = 1.5 seconds, retract and spin down
       feed.write(180);
-   } else if(fire == (3000/TICK_RATE)){
+   } else if(fire == (2500/TICK_RATE)){
       //Reset
       fire=0;
       spinner.writeMicroseconds(1500);
@@ -164,10 +164,12 @@ void tank_drive(){
     left_out=left_out*2;
     right_out=right_out*2;
     }
+/*
    if(getButton(6)){
     left_out=left_out*2;
     right_out=right_out*2;
     }
+*/
   drive_left(left_out);
   drive_right(right_out);
 }
