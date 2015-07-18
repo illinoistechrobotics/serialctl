@@ -4,14 +4,8 @@
 #include <Servo.h>
 Servo fl, fr, rl, rr;
 void init_pins(){
-//        pinMode(MANIP_GRIP, OUTPUT);
-//        pinMode(MANIP_KICK, OUTPUT);
-//        pinMode(ARM_UP,OUTPUT);
-//       pinMode(ARM_DOWN,OUTPUT);
-//        digitalWrite(MANIP_GRIP,LOW);
-//        digitalWrite(MANIP_KICK,LOW);
-//        digitalWrite(ARM_UP,LOW);
-//        digitalWrite(ARM_DOWN,LOW);
+        pinMode(LASER_PIN, OUTPUT);
+        digitalWrite(LASER_PIN,LOW);
         victor_init();
 }
 void print_data(){
