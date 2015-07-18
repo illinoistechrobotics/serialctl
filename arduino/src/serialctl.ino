@@ -18,12 +18,14 @@
 #include "zserio.h"
 #include <Servo.h>
 #include "globals.h"
+#include "Servo.h"
+
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-int grip;
+int laser, armpos, fire;
 long last_p,last_s=0,usec;
-
+Servo arm, feed, spinner;
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
@@ -59,10 +61,18 @@ void setup() {
   SerComm.begin(57600);
   comm_init();
   init_pins();
-  grip=0;
+  laser=0;
+  fire=0;
+  armpos=1500;
   last_p = millis();
   drive_left(0);
   drive_right(0);
+  arm.attach(ARM_PIN);
+  arm.writeMicroseconds(1500);
+  feed.attach(FEED_PIN);
+  feed.writeMicroseconds(2300);
+  spinner.attach(SPINNER_PIN);
+  spinner.writeMicroseconds(1500); 
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
   //Dont send data until we recieve something
@@ -74,40 +84,56 @@ void setup() {
         wdt_reset();
   }
 }
+void fire_fsm(){
+   if(fire==0)
+      return;
+   //Increase state counter
+   fire++;
+   //Start spinners
+   spinner.writeMicroseconds(1400);
+   //T = 1 second, FIRE!!
+   if(fire == (1000/TICK_RATE)){
+      feed.writeMicroseconds(700);
+   } else if(fire == (1500/TICK_RATE)){
+   //T = 1.5 seconds, retract and spin down
+      spinner.writeMicroseconds(1500);
+      feed.writeMicroseconds(2300);
+   } else if(fire == (2000/TICK_RATE)){
+      //Reset
+      fire=0;
+   }
+}
+
 void loop(){
   //Every line sent to the computer gets us a new state
   wdt_reset();
   print_data();
   comm_parse();
-/*  if(getButton(5)){
+  if(getButton(7)){
     //arm up
-    digitalWrite(ARM_UP,HIGH);
-    } else {
-    digitalWrite(ARM_UP,LOW);
+    armpos+=10;
   }
-if(getButton(7)){
+if(getButton(5)){
     //arm down
-    digitalWrite(ARM_DOWN,HIGH);
-    } else {
-    digitalWrite(ARM_DOWN,LOW);
+    armpos-=10;
   }
-if(getButton(2)){
-    //kick
-    digitalWrite(MANIP_KICK,HIGH);
-    } else {
-    digitalWrite(MANIP_KICK,LOW);
-  }
-if(getButton(1) && (millis()-last_s > 500)){
-    //grip
+armpos = constrain(armpos,1000,2000);
+arm.writeMicroseconds(armpos);
+if(getButton(1) && fire==0){
+  fire=1;
+}
+fire_fsm();
+if(getButton(3) && (millis()-last_s > 500)){
+    //laser
     last_s=millis();
-    grip=(grip+1)%2;
-    digitalWrite(MANIP_GRIP,grip);
+    laser=(laser+1)%2;
+    digitalWrite(LASER_PIN,laser);
   }
-*/
+
  tank_drive();
   
   //limits data rate
-  delay(25);
+  delay(TICK_RATE);
 }
 void tank_drive(){
   int power_out = 0;
