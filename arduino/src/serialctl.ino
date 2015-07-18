@@ -157,8 +157,8 @@ void tank_drive(){
       turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
     }
   }
-  int left_out =     (power_out + (turn_out/2))/2;
-  int right_out = (power_out - (turn_out/2))/2;
+  int left_out =     (power_out + (turn_out))/2;
+  int right_out = (power_out - (turn_out))/2;
    if(getButton(4)){
     left_out=left_out*2;
     right_out=right_out*2;
