@@ -24,7 +24,7 @@ packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
 int laser, armpos, fire;
-long last_p,last_s=0,usec;
+long last_s=0;
 Servo arm, feed, spinner;
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
@@ -63,8 +63,7 @@ void setup() {
   init_pins();
   laser=0;
   fire=0;
-  armpos=1500;
-  last_p = millis();
+  armpos=1000;
   drive_left(0);
   drive_right(0);
   arm.attach(ARM_PIN);
@@ -85,22 +84,24 @@ void setup() {
   }
 }
 void fire_fsm(){
-   if(fire==0)
+   if(fire==0){
+      spinner.writeMicroseconds(1500);
       return;
+   }
    //Increase state counter
    fire++;
    //Start spinners
-   spinner.writeMicroseconds(1400);
+   spinner.writeMicroseconds(1650);
    //T = 1 second, FIRE!!
    if(fire == (1000/TICK_RATE)){
-      feed.writeMicroseconds(700);
-   } else if(fire == (1500/TICK_RATE)){
+      feed.write(0);
+   } else if(fire == (1750/TICK_RATE)){
    //T = 1.5 seconds, retract and spin down
-      spinner.writeMicroseconds(1500);
-      feed.writeMicroseconds(2300);
-   } else if(fire == (2000/TICK_RATE)){
+      feed.write(180);
+   } else if(fire == (3000/TICK_RATE)){
       //Reset
       fire=0;
+      spinner.writeMicroseconds(1500);
    }
 }
 
@@ -111,11 +112,11 @@ void loop(){
   comm_parse();
   if(getButton(7)){
     //arm up
-    armpos+=10;
+    armpos+=2;
   }
 if(getButton(5)){
     //arm down
-    armpos-=10;
+    armpos-=2;
   }
 //Limit value before setting
 armpos = constrain(armpos,1000,2000);
@@ -157,8 +158,8 @@ void tank_drive(){
       turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
     }
   }
-  int left_out =     (power_out + (turn_out))/2;
-  int right_out = (power_out - (turn_out))/2;
+  int left_out =     (power_out + (turn_out/2))/2;
+  int right_out = (power_out - (turn_out/2))/2;
    if(getButton(4)){
     left_out=left_out*2;
     right_out=right_out*2;
