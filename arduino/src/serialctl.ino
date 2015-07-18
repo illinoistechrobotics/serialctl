@@ -68,7 +68,7 @@ void setup() {
   drive_left(0);
   drive_right(0);
   arm.attach(ARM_PIN);
-  arm.writeMicroseconds(1500);
+  arm.writeMicroseconds(armpos);
   feed.attach(FEED_PIN);
   feed.writeMicroseconds(2300);
   spinner.attach(SPINNER_PIN);
@@ -117,8 +117,10 @@ if(getButton(5)){
     //arm down
     armpos-=10;
   }
+//Limit value before setting
 armpos = constrain(armpos,1000,2000);
 arm.writeMicroseconds(armpos);
+
 if(getButton(1) && fire==0){
   fire=1;
 }
