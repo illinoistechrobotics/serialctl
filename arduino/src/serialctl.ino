@@ -91,7 +91,7 @@ void fire_fsm(){
    //Increase state counter
    fire++;
    //Start spinners
-   spinner.writeMicroseconds(1650);
+   spinner.writeMicroseconds(1700);
    //T = 1 second, FIRE!!
    if(fire == (1000/TICK_RATE)){
       feed.write(0);
