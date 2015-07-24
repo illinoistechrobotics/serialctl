@@ -2,6 +2,7 @@
 #include "packet.h"
 #include "globals.h"
 #include <Servo.h>
+Servo spinner, arm, winch;
 /*
   This file is where to implement the hardware specific code
   defined in hw.h
@@ -92,4 +93,30 @@ void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned
      digitalWrite(bli,LOW);
      analogWrite(ali, abs(power));
    }
+}
+
+void wd_setup(){
+  #ifdef WATCHDOG_
+  wdt_enable(WDTO_250MS);  //Set 250ms WDT 
+  wdt_reset();             //watchdog timer reset 
+  #endif
+}
+
+void hw_init(){
+  wd_setup();
+  spinner.attach(SPINNER_PIN);
+  spinner.writeMicroseconds(0);
+  arm.attach(ARM_PIN);
+  arm.writeMicroseconds(1500);
+  winch.attach(WINCH_PIN);
+  winch.writeMicroseconds(1500);
+  pinMode(43, INPUT);
+  pinMode(42, INPUT);
+  digitalWrite(43, HIGH);
+  digitalWrite(42, HIGH);
+  pinMode(13, OUTPUT);
+  drive_left(0);
+  drive_right(0);
+  pinMode(REVERSE_PIN, OUTPUT);
+  speed=0;
 }

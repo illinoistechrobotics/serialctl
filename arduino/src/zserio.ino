@@ -8,11 +8,20 @@ char encstr[2 + B64_ENC_LEN(sizeof(packet_t))];
 unsigned int recvcount;
 long ptime;
 void comm_init() {
+  //Initialize safe to safe values!!
+  safe.stickX = 127;
+  safe.stickY = 127;
+  safe.btnhi = 0;
+  safe.btnlo = 0;
+  safe.cksum = 0b1000000010001011;
+  SerComm.begin(115200);
   ptime = 0;
   cs = COMM_WAIT;
   astate = &pA;
   incoming = &pB;
   recvcount = 0;
+  //copy safe values over the current state
+  memcpy(astate, &safe, sizeof(packet_t));
 }
 void comm_parse() {
   packet_t *tmp;

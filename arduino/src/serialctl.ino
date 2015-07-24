@@ -16,30 +16,14 @@
 #include "packet.h"
 #include "hw.h"
 #include "zserio.h"
-#include <Servo.h>
 #include "globals.h"
-Servo spinner, arm, winch;
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-int speed,av;
+int speed = 0, av;
 long last_p,last_s=0,usec;
 
-#define SerComm Serial1
-#define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
-#define ntohs(x) htons(x)
-#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
-#define ntohl(x) htonl(x)
-#define ALI1 7
-#define BLI1 8
-#define AHI1 22
-#define BHI1 23
-#define ALI2 11
-#define BLI2 12
-#define AHI2 24
-#define BHI2 25
-#define drive_right(x) drive_osmc(x,1,ALI1,BLI1,AHI1,BHI1)
-#define drive_left(x) drive_osmc(x,1,ALI2,BLI2,AHI2,BHI2)
+
 #define DEADBAND_HALF_WIDTH 5
 
 #define WATCHDOG_
@@ -57,44 +41,17 @@ int getButton(int num){
         }
 }
 void setup() {
-  #ifdef WATCHDOG_
-  wdt_enable(WDTO_250MS);  //Set 250ms WDT 
-  wdt_reset();             //watchdog timer reset 
-  #endif
-  spinner.attach(SPINNER_PIN);
-  spinner.writeMicroseconds(0);
-  arm.attach(ARM_PIN);
-  arm.writeMicroseconds(1500);
-  winch.attach(WINCH_PIN);
-  winch.writeMicroseconds(1500);
-  //Initialize safe to safe values!!
-  safe.stickX = 127;
-  safe.stickY = 127;
-  safe.btnhi = 0;
-  safe.btnlo = 0;
-  safe.cksum = 0b1000000010001011;
-  SerComm.begin(115200);
+  hw_init();
   comm_init();
   init_pins();
   last_p = millis();
-  pinMode(REVERSE_PIN, OUTPUT);
-  pinMode(43, INPUT);
-  pinMode(42, INPUT);
-  digitalWrite(43, HIGH);
-  digitalWrite(42, HIGH);
-  pinMode(13, OUTPUT);
-  drive_left(0);
-  drive_right(0);
-  speed=0;
-  //copy safe values over the current state
-  memcpy(astate, &safe, sizeof(packet_t));
 }
 void loop(){
   //Every line sent to the computer gets us a new state
   wdt_reset();
   print_data();
   comm_parse();
-//arm
+  //arm
   av=1500;
   //check for invalid states
   if((getButton(5) ^ getButton(7))){
