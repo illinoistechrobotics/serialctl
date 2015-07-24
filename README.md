@@ -26,7 +26,7 @@ in Fenrir's code.
 
 ##Communications
 
-Communication works over three underlying communications protocols: a USB serial connection, an X-Bee serial link, or WiFi and UDP (alpha).
+Communication works over three underlying communications protocols: a USB serial connection, an X-Bee serial link, or WiFi and UDP (beta).
 
 Its wire format is a base64 encoded struct, with ints for two axes of joystick(s), and a packed int bitfield representation of the buttons. It also has a CRC.
 
