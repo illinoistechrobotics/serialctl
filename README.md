@@ -12,7 +12,7 @@ The branches of the repository contain the source needed for each robot ITR runs
 
 The PC code for `serialctl` acts as the interface between the input device (typically a 'PS2 style' game controller), the communications channel, and a display. It has a simple data flow. The code reads the state of the game controller, packs it into a struct, transmits it over the comm channel, and writes the state to the display.
 
-The PC code is currently most sophisticated in the Fenrir branch, the display has an ncurses 'GUI' and data logging from the robot.
+The PC code is currently most sophisticated in the Fenrir and master branch, the display has an ncurses 'GUI' and data logging from the robot.
 
 It is either run by: 
 
@@ -22,7 +22,7 @@ or
 
 `serialctl /path/to/serial joysticknumber [data_file_to_save]` 
 
-in Fenrir's code.
+in Fenrir and master code.
 
 ##Communications
 
