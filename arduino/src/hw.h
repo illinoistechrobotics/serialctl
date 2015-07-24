@@ -1,5 +1,12 @@
 #pragma once
 
+/*
+ * This file is where robot specific hardware code should be defined.
+ * For example, below is the code to interface with the pneumatics and
+ * Open Source Motor Controller (OSMC) on Goliath
+ *
+ */
+
 #define P_SENSOR A2
 #define CURRENT_OFFSET -2.5
 #define PRESSURE_OFFSET 161

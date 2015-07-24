@@ -2,6 +2,10 @@
 #include "packet.h"
 #include "globals.h"
 #include <Servo.h>
+/*
+  This file is where to implement the hardware specific code
+  defined in hw.h
+*/
 void init_pins(){
 //Main motors
 osmc_init();

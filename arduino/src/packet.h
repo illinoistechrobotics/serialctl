@@ -9,10 +9,13 @@ enum comm_state {
   COMM_COMPLETE,
   COMM_VALID,
   COMM_INVALID };
-typedef struct{
-uint8_t stickX;
-uint8_t stickY;
-uint8_t btnhi;
-uint8_t btnlo;
-uint16_t cksum;
+typedef struct p_t_struct{
+  #ifdef __cplusplus
+p_t_struct(): stickX(127), stickY(127), btnhi(0), btnlo(0), cksum(0){}
+  #endif
+  uint8_t stickX;
+  uint8_t stickY;
+  uint8_t btnhi;
+  uint8_t btnlo;
+  uint16_t cksum;
 } packet_t;
