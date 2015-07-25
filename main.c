@@ -12,7 +12,7 @@ void packet_crc(packet_t *p){
 
 int main(int argc, char ** argv){
         char msg[RECVBUF];
-        if(!(argc != 3 || argc != 4)){
+        if(!(argc == 3 || argc == 4)){
             printf("Usage: ./serialctl <serial port> <joystick_num> [data_file]\n");
             return 3;
             }
