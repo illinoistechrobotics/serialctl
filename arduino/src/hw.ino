@@ -9,6 +9,9 @@ void init_pins(){
         victor_init();
 }
 void print_data(){
+	SerComm.print(leftMotorDebug);
+	SerComm.print(", ");
+	SerComm.print(rightMotorDebug);
         SerComm.println("ITR Scale Roslund");
 }
 void victor_init(){

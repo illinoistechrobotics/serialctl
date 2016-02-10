@@ -4,6 +4,7 @@ extern packet_t pA, pB, safe;
 extern packet_t *astate, *incoming;
 extern comm_state cs;
 extern long last_p;
+extern char leftMotorDebug[5], rightMotorDebug[5];
 #define SerComm Serial
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
