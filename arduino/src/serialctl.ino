@@ -53,6 +53,7 @@ SoftwareSerial left(2,3);
 SoftwareSerial right(4,5);
 char rightMotorDebug[5];
 char leftMotorDebug[5];
+int leftOutDebug;
 
 void setup() {
   #ifdef WATCHDOG_
@@ -171,7 +172,8 @@ void tank_drive(){
   }
   int left_out =     (power_out + (turn_out/2))/2;
   int right_out = (power_out - (turn_out/2))/2;
-   
+ 
+  leftOutDebug = left_out;
   write_serial_motors(&left, left_out);
   //write_serial_motors(&right, right_out);
  
@@ -187,7 +189,7 @@ uint8_t bytemap(uint8_t x, uint8_t in_min, uint8_t in_max, uint8_t out_min, uint
 void write_serial_motors(SoftwareSerial *controller, int speed) {
 	char controlStr[5];
 	strcpy(controlStr, "1f0\r");
-	controlStr[2] = (uint8_t)map(speed,-127,127,'0','9');
+	controlStr[2] = (uint8_t)map(speed,-128,127,'0','9');
 	controller->println(controlStr);
 	strcpy(leftMotorDebug, controlStr);
 	leftMotorDebug[3] = '-';

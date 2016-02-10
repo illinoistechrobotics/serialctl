@@ -12,6 +12,10 @@ void print_data(){
 	SerComm.print(leftMotorDebug);
 	SerComm.print(", ");
 	SerComm.print(rightMotorDebug);
+	SerComm.print(", LeftOut: ");
+	char tmp[10];
+	itoa(leftOutDebug, tmp, 10);
+	SerComm.print(tmp);
         SerComm.println("ITR Scale Roslund");
 }
 void victor_init(){
