@@ -1,4 +1,4 @@
- //    serialctl
+//    serialctl
 //
 //    This program is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #include <Servo.h>
 #include "globals.h"
 #include "Servo.h"
+#include <SoftwareSerial.h>
 
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
@@ -47,6 +48,10 @@ int getButton(int num){
                 return 0;
         }
 }
+
+SoftwareSerial left (2,3);
+SoftwareSerial right(4,5);
+
 void setup() {
   #ifdef WATCHDOG_
   wdt_enable(WDTO_250MS);  //Set 250ms WDT 
@@ -72,7 +77,11 @@ void setup() {
   feed.writeMicroseconds(2300);
   spinner.attach(SPINNER_PIN);
   spinner.writeMicroseconds(1500); 
-  //copy safe values over the current state
+//start software serial
+ left.begin(57600);
+ right.begin(57600);
+
+ //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
   //Dont send data until we recieve something
   while(1){
@@ -164,12 +173,25 @@ void tank_drive(){
     left_out=left_out*2;
     right_out=right_out*2;
     }
-/*
+
    if(getButton(6)){
     left_out=left_out*2;
     right_out=right_out*2;
     }
-*/
-  drive_left(left_out);
-  drive_right(right_out);
+
+  write_serial_motors(&left, left_out);
+  write_serial_motors(&right, right_out);
+ 
+  //drive_left(left_out);
+  //drive_right(right_out);
+}
+
+// Speed is 0 to 255 where 127 is stopped.
+void write_serial_motors(SoftwareSerial *controller, int speed) {
+	char controlStr[5];
+	strcpy("1f0\r", controlStr);
+	controlStr[2] = map(speed,0,255,'0','9');
+	controller->println(controlStr);
+	controlStr[0] = '2';
+	controller->println(controlStr);
 }
