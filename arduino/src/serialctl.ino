@@ -63,8 +63,10 @@ void setup() {
 	wdt_reset();             //watchdog timer reset 
 	#endif
 	//Initialize safe to safe values!!
-	safe.stickX = 127;
-	safe.stickY = 127;
+	safe.stickRX = 128;
+	safe.stickRY = 128;
+	safe.stickLX = 128;
+	safe.stickLY = 128;
 	safe.btnhi = 0;
 	safe.btnlo = 0;
 	safe.cksum = 0b1000000010001011;
@@ -158,17 +160,32 @@ void loop(){
 	delay(TICK_RATE);
 }
 
-void tank_drive(){
-	int zeroed_power = ((int)(astate->stickX) - 128);
-	int zeroed_turn =  ((int)(astate->stickY) - 128);
+void arcade_drive() {
+	int zeroed_power = ((int)(astate->stickRX) - 128);
+	int zeroed_turn =  ((int)(astate->stickLY) - 128);
 
-	// Square inputs
-	zeroed_power = (zeroed_power * abs(zeroed_power)) / 128;
-	zeroed_turn =  (zeroed_turn * abs(zeroed_turn)) / 128;
+	// Square Inputs
+	zeroed_power = (zeroed_power * abs(zeroed_power)) / 127;
+	zeroed_turn =  (zeroed_turn * abs(zeroed_turn)) / 127;
 
 	int left_out = (zeroed_power + (zeroed_turn));
 	int right_out = -1 * (zeroed_power - (zeroed_turn));
 
+	write_motors(left_out, right_out);
+}
+
+void tank_drive(){
+	int left_out = ((int)(astate->stickLY) - 128);
+	int right_out = -1 * ((int)(astate->stickRY) - 128);
+	
+	// Square inputs
+	left_out = (left_out * abs(left_out)) / 127;
+	right_out = (right_out * abs(right_out)) / 127;
+	
+	write_motors(left_out, right_out);
+}
+
+void write_motors(int left_out, int right_out) {
 	leftOutDebug = left_out;
 	write_serial_motors(&left, left_out, '1');
 	write_serial_motors(&right, right_out, '1');

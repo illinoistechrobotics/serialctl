@@ -8,8 +8,10 @@ enum comm_state {
   COMM_VALID,
   COMM_INVALID };
 typedef struct{
-uint8_t stickX;
-uint8_t stickY;
+uint8_t stickRX;
+uint8_t stickRY;
+uint8_t stickLX;
+uint8_t stickLY;
 uint8_t btnhi;
 uint8_t btnlo;
 uint16_t cksum;
