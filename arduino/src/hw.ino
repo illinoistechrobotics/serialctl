@@ -75,7 +75,44 @@ void drive_right(int speed){
   Wire.write((byte *) &promoted, 4);
   Wire.endTransmission();
 }
-void tank_drive(){
+
+void tank_drive() {
+  if(getButton(7)){
+    estop_state = false;
+  }
+  if(getButton(5)){
+    estop_state = true;
+  }
+  if(estop_state){
+    estop();
+    return;
+  }
+
+  int left_power = ((int)(astate->stickLY) - 128);
+  int right_power = ((int)(astate->StickRY) - 128);
+
+  int multiplier;
+  if(getButton(6)){ //turbo
+    multiplier = 4;
+  }
+  else if(getButton(4)){ //precise
+    multiplier = 1;
+  } else {
+    multiplier = 2;
+  }
+
+  // Square Inputs
+  left_power = (left_power * abs(left_power)) * multiplier / 127;
+  right_power = -1 * (right_power * abs(right_power)) * multiplier / 127;
+
+  last_left_speed = left_power;
+  last_right_speed = right_power;
+
+  drive_left(left_power);
+  drive_right(right_power);
+}
+
+void arcade_drive(){
   if(getButton(7)){
     estop_state = false;
   }
@@ -88,8 +125,8 @@ void tank_drive(){
   }
   int power_out = 0;
   int turn_out  = 0;
-  int zeroed_power =    ((int)(astate->stickX) - 127);
-  int zeroed_turn =     -1*((int)(astate->stickY) - 127);
+  int zeroed_power =    ((int)(astate->stickRY) - 128);
+  int zeroed_turn =     -1*((int)(astate->stickLX) - 128);
   
   if(abs(zeroed_power) > DEADBAND_HALF_WIDTH){
     if(zeroed_power>0){

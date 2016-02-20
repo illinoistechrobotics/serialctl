@@ -35,8 +35,10 @@ int joystick_update(packet_t *ctl){
                 return -1;
         SDL_JoystickUpdate();
         //populate controller struct
-        ctl->stickX = (SDL_JoystickGetAxis(jstick, 1)/256)+128;
-        ctl->stickY = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
+        ctl->stickRX = (SDL_JoystickGetAxis(jstick, 0)/256)+128;
+        ctl->stickRY = (SDL_JoystickGetAxis(jstick, 1)/256)+128;
+        ctl->stickLX = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
+        ctl->stickLY = (SDL_JoystickGetAxis(jstick, 3)/256)+128;
         ctl->btnlo = 0;
         ctl->btnhi = 0;
         for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 15)); i++){
