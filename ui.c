@@ -2,9 +2,9 @@
 #include "ui.h"
 static int parent_x, parent_y;
 
-static CDKSLIDER * throttle;
-static CDKSLIDER * steer;
-int old_throttle = 128, old_steer = 128;
+static CDKSLIDER * leftY;
+static CDKSLIDER * rightY;
+int old_leftY = 128, old_rightY = 128;
 
 
 static CDKSCREEN *cdk_master;
@@ -49,7 +49,7 @@ int init_ui(){
   getmaxyx(stdscr, parent_y, parent_x);
   cdk_master = initCDKScreen(stdscr);
 
-  throttle = newCDKSlider(
+  leftY = newCDKSlider(
 			  cdk_master,0,0,
 			  "Throttle","",
 			  A_REVERSE | COLOR_PAIR (29) | ' ',
@@ -61,7 +61,7 @@ int init_ui(){
 			  1,
 			  true,
 			  false);
-  steer = newCDKSlider(
+  rightY = newCDKSlider(
 		       cdk_master,0,4,
 		       "Steer","",
 		       A_REVERSE | COLOR_PAIR (29) | ' ',
@@ -73,8 +73,8 @@ int init_ui(){
 		       1,
 		       true,
 		       false);
-    drawCDKSlider(throttle, true);
-    drawCDKSlider(steer, true);
+    drawCDKSlider(leftY, true);
+    drawCDKSlider(rightY, true);
 
     //This is the jenkest, but I'm using a big string to get the label big enough :)
   char *mesg[1] = {"</B/2>No data recieved                                                                                                                                                                                                                       <!2>"};
@@ -122,15 +122,15 @@ void refresh_ui(packet_t * ctl, char * msg, int overflow){
     setCDKLabelMessage(estop_box,estop_off, 1);
   }
 
-  if(ctl->stickX != old_throttle){
-    old_throttle = ctl->stickX;
-    setCDKSliderValue(throttle, ctl->stickX);
-    drawCDKSlider(throttle, true);
+  if(ctl->stickLY != old_leftY){
+    old_leftY = ctl->stickLY;
+    setCDKSliderValue(leftY, ctl->stickLY);
+    drawCDKSlider(leftY, true);
   }
 
-  if(ctl->stickY != old_steer){
-    old_steer = ctl->stickY;
-    setCDKSliderValue(steer, ctl->stickY);
-    drawCDKSlider(steer, true);
+  if(ctl->stickRY != old_rightY){
+    old_rightY = ctl->stickRY;
+    setCDKSliderValue(rightY, ctl->stickRY);
+    drawCDKSlider(rightY, true);
   }
 }

@@ -54,7 +54,7 @@ int main(int argc, char ** argv){
             printf("Unable to send data!\n");
             return 2;
 	  }
-	  printf("R: %3u, %3u, L: %3u, %3u, CRC: %4x, Resp: %s\n", ctl.stickRX, ctl.stickRY, ctl.stickLX, ctl.stickLY, ctl.cksum, msg);
+	  //printf("R: %3u, %3u, L: %3u, %3u, CRC: %4x, Resp: %s\n", ctl.stickRX, ctl.stickRY, ctl.stickLX, ctl.stickLY, ctl.cksum, msg);
 	  if(data_file != -1){
 	    char output_buffer[100];
 	    int size = snprintf(output_buffer, 100, "%s\n", msg);

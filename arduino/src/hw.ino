@@ -89,7 +89,7 @@ void tank_drive() {
   }
 
   int left_power = ((int)(astate->stickLY) - 128);
-  int right_power = ((int)(astate->StickRY) - 128);
+  int right_power = ((int)(astate->stickRY) - 128);
 
   int multiplier;
   if(getButton(6)){ //turbo
@@ -112,6 +112,7 @@ void tank_drive() {
   drive_right(right_power);
 }
 
+// Not currently used
 void arcade_drive(){
   if(getButton(7)){
     estop_state = false;
