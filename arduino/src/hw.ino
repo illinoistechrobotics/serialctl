@@ -27,7 +27,7 @@ void print_speed(){
   int right_speed = read_speed(RIGHT_SPEEDSERVO_ADDR);
 
   char speedline[100];
-  snprintf(speedline, 100, "%d,%d,%d,%d,%lu", 
+  snprintf(speedline, 100, "% 4d, % 4d, % 4d, % 4d, %lu", 
 	   left_speed,last_left_speed,
 	   right_speed,last_right_speed,
 	   millis());
@@ -61,14 +61,14 @@ void estop(){
   Wire.write(5);
   Wire.endTransmission();
 }
-void drive_left(int speed){
+void drive_left(double speed){
   double promoted = speed;
   Wire.beginTransmission(LEFT_SPEEDSERVO_ADDR);
   Wire.write(0);
   Wire.write((byte *) &promoted, 4);
-  Wire.endTransmission();
+  Wire.endTransmi.build/mega2560/firmware.hexssion();
 }
-void drive_right(int speed){
+void drive_right(double speed){
   double promoted = speed;
   Wire.beginTransmission(RIGHT_SPEEDSERVO_ADDR);
   Wire.write(0);
@@ -88,25 +88,31 @@ void tank_drive() {
     return;
   }
 
-  int left_power = ((int)(astate->stickLY) - 128);
-  int right_power = ((int)(astate->stickRY) - 128);
+  double left_power = ((double)(astate->stickLY) - 128);
+  double right_power = ((double)(astate->stickRY) - 128);
+  if (left_power > 0) {
+    left_power *= (128.0 / 127.0);
+  }
+  if (right_power > 0) {
+    right_power *= (128.0 / 127.0);
+  }
 
-  int multiplier;
+  double multiplier;
   if(getButton(6)){ //turbo
     multiplier = 4;
   }
   else if(getButton(4)){ //precise
-    multiplier = 1;
+    multiplier = 0.5;
   } else {
-    multiplier = 2;
+    multiplier = 1;
   }
 
   // Square Inputs
-  left_power = (left_power * abs(left_power)) * multiplier / 127;
-  right_power = -1 * (right_power * abs(right_power)) * multiplier / 127;
+  left_power *= -1 * multiplier;
+  right_power *= multiplier;
 
-  last_left_speed = left_power;
-  last_right_speed = right_power;
+  last_left_speed = (int)left_power;
+  last_right_speed = (int)right_power;
 
   drive_left(left_power);
   drive_right(right_power);
@@ -126,8 +132,8 @@ void arcade_drive(){
   }
   int power_out = 0;
   int turn_out  = 0;
-  int zeroed_power =    ((int)(astate->stickRY) - 128);
-  int zeroed_turn =     -1*((int)(astate->stickLX) - 128);
+  int zeroed_power =    ((int)(astate->stickLY) - 128);
+  int zeroed_turn =     -1*((int)(astate->stickRX) - 128);
   
   if(abs(zeroed_power) > DEADBAND_HALF_WIDTH){
     if(zeroed_power>0){

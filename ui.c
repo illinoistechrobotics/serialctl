@@ -51,7 +51,7 @@ int init_ui(){
 
   leftY = newCDKSlider(
 			  cdk_master,0,0,
-			  "Throttle","",
+			  "Left","",
 			  A_REVERSE | COLOR_PAIR (29) | ' ',
 			  0,
 			  128,
@@ -63,7 +63,7 @@ int init_ui(){
 			  false);
   rightY = newCDKSlider(
 		       cdk_master,0,4,
-		       "Steer","",
+		       "Right","",
 		       A_REVERSE | COLOR_PAIR (29) | ' ',
 		       0,
 		       128,
