@@ -92,8 +92,8 @@ void setup() {
 	// Set the motors to those safe values
 	tank_drive();
 	// Dont send data until we recieve something
-	pinMode(13, OUTPUT);
-	digitalWrite(13, HIGH);
+	pinMode(12, OUTPUT);
+	digitalWrite(12, HIGH);
 	while(1){
 		if(SerComm.available()){
 			if(SerComm.read()=='[')
@@ -101,7 +101,7 @@ void setup() {
 		}
 		wdt_reset();
 	}
-	digitalWrite(13, LOW);
+	digitalWrite(12, LOW);
 }
 
 void fire_fsm(){
