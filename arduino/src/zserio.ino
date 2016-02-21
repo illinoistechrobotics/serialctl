@@ -45,13 +45,13 @@ void comm_parse() {
     }
     
     if(cs==COMM_COMPLETE){
-      //SerComm.println("Comm recieve");
+      // SerComm.println("Comm recieve");
       //Base64 decode
       base64_decode((char *)incoming, encstr, B64_ENC_LEN(sizeof(packet_t)));
       //Evaluate CRC16 and flip pointers if valid
       crc = compute_crc((char *)incoming, sizeof(packet_t)-sizeof(uint16_t));
       if(crc == ntohs(incoming->cksum)){
-        //SerComm.println("vaild");
+        // SerComm.println("vaild");
         cs=COMM_VALID;
         ptime=millis();
         tmp=astate;

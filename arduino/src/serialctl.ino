@@ -92,6 +92,11 @@ void setup() {
 	// Set the motors to those safe values
 	tank_drive();
 	// Dont send data until we recieve something
+	pinMode(13, OUTPUT);
+	pinMode(12, OUTPUT);
+	digitalWrite(13, HIGH);
+	int lastTime = millis();
+	int ledState = 0;
 	while(1){
 		if(SerComm.available()){
 			if(SerComm.read()=='[')
@@ -99,6 +104,8 @@ void setup() {
 		}
 		wdt_reset();
 	}
+	digitalWrite(13, LOW);
+	pinMode(12, OUTPUT);
 }
 
 void fire_fsm(){
@@ -156,7 +163,7 @@ void loop(){
 	tank_drive();
 
 	
-	//limits data rate
+	// //limits data rate
 	delay(TICK_RATE);
 }
 

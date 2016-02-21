@@ -86,31 +86,12 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
                         sendto(ctx->c_sockfd,"[",1,0,(struct sockaddr *)&(ctx->cliaddr),sizeof(ctx->cliaddr));
                 }
                 else {
-                        recv(ctx->s_sockfd, ba+iidx, RECVBUF-(iidx+1), 0);
+                        n = recv(ctx->s_sockfd, ba+iidx, RECVBUF-(iidx+1), 0); // read as much as possible
                         if (n > 0) {
                                 iidx += n;
                                 ba[iidx]=0x00;
                         } 
                 }
-                // n = recv(ctx->s_sockfd, ba+iidx, RECVBUF-(iidx+1), 0);  // read as much as possible
-                // if( n==-1 && errno != EWOULDBLOCK){
-                //         return -1;    // couldn't read
-                // }
-                // if( n==0 || (n==-1 && errno == EWOULDBLOCK)) {
-                //         if(fc > 100){
-                //                 printf("Sending noop, no data for 500ms!\n");
-                //                 sendto(ctx->c_sockfd,"[",1,0,(struct sockaddr *)&(ctx->cliaddr),sizeof(ctx->cliaddr));
-                //                 fc=0;
-                //         }
-                //         else{
-                //                 fc++;
-                //         }
-                //         usleep( 5 * 1000 ); // wait 5 msec try again
-                // } else {
-                //         fc = 0;
-                //         iidx += n;
-                //         ba[iidx]=0x00;
-                // }
                 next=strchr(ba,'\n'); 
         } while(next == NULL);
         //Clobber newline and hop over it
