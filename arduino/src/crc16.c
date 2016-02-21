@@ -10,12 +10,13 @@
  * return crc; // must be 0
  * 
  */
+
 // C implemtation for computer
 uint16_t compute_crc(char *data, int len){
-        uint16_t crc = 0xffff;
-        int i;
-        for(i=0; i<len; i++){
-                crc=_crc16_update(crc,data[i]);
-        }
-        return crc;
+	uint16_t crc = 0xffff;
+	int i;
+	for(i=0; i<len; i++){
+		crc=_crc16_update(crc,data[i]);
+	}
+	return crc;
 }
