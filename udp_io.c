@@ -9,6 +9,9 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/select.h>
+#include <sys/time.h>
+
 int iidx;
 int udpio_init(ip_connection_t *c, const char *port){
         char* pp;
@@ -58,8 +61,11 @@ int udpio_init(ip_connection_t *c, const char *port){
 
 ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
 { 
+        fd_set rfds;
+        struct timeval tv;
+        int n;
         static char ba[RECVBUF];
-        static unsigned int fc=0;
+        // static unsigned int fc=0;
         char *next, *t;
         do { 
                 if(iidx == RECVBUF-1){
@@ -67,25 +73,44 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
                         printf("Input buffer overflow!\n");
                         memset(ba,0x00,RECVBUF);
                 }
-                int n = recv(ctx->s_sockfd, ba+iidx, RECVBUF-(iidx+1), 0);  // read as much as possible
-                if( n==-1 && errno != EWOULDBLOCK){
-                        return -1;    // couldn't read
+                FD_ZERO(&rfds);
+                FD_SET(ctx->s_sockfd, &rfds);
+                tv.tv_sec = 0;
+                tv.tv_usec = 500E3;
+                n = select((ctx->s_sockfd)+1, &rfds, 0, 0, &tv);
+                if (n == -1) {
+                        return -1; // Couldn't read
                 }
-                if( n==0 || (n==-1 && errno == EWOULDBLOCK)) {
-                        if(fc > 100){
-                                printf("Sending noop, no data for 500ms!\n");
-                                sendto(ctx->c_sockfd,"[",1,0,(struct sockaddr *)&(ctx->cliaddr),sizeof(ctx->cliaddr));
-                                fc=0;
-                        }
-                        else{
-                                fc++;
-                        }
-                        usleep( 5 * 1000 ); // wait 5 msec try again
-                } else {
-                        fc = 0;
-                        iidx += n;
-                        ba[iidx]=0x00;
+                if (n == 0) {
+                        printf("Sending noop, no data for 500ms!\n");
+                        sendto(ctx->c_sockfd,"[",1,0,(struct sockaddr *)&(ctx->cliaddr),sizeof(ctx->cliaddr));
                 }
+                else {
+                        recv(ctx->s_sockfd, ba+iidx, RECVBUF-(iidx+1), 0);
+                        if (n > 0) {
+                                iidx += n;
+                                ba[iidx]=0x00;
+                        } 
+                }
+                // n = recv(ctx->s_sockfd, ba+iidx, RECVBUF-(iidx+1), 0);  // read as much as possible
+                // if( n==-1 && errno != EWOULDBLOCK){
+                //         return -1;    // couldn't read
+                // }
+                // if( n==0 || (n==-1 && errno == EWOULDBLOCK)) {
+                //         if(fc > 100){
+                //                 printf("Sending noop, no data for 500ms!\n");
+                //                 sendto(ctx->c_sockfd,"[",1,0,(struct sockaddr *)&(ctx->cliaddr),sizeof(ctx->cliaddr));
+                //                 fc=0;
+                //         }
+                //         else{
+                //                 fc++;
+                //         }
+                //         usleep( 5 * 1000 ); // wait 5 msec try again
+                // } else {
+                //         fc = 0;
+                //         iidx += n;
+                //         ba[iidx]=0x00;
+                // }
                 next=strchr(ba,'\n'); 
         } while(next == NULL);
         //Clobber newline and hop over it
