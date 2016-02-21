@@ -31,7 +31,6 @@ int run_udp(const char *port){
                         return 2;
                 }
                 printf("UDP: [R: %3u, %3u, L: %3u, %3u, CRC: %4x, Resp: %s]\n", ctl.stickRX, ctl.stickRY, ctl.stickLX, ctl.stickLY, ctl.cksum, msg);
-                        usleep(150E3);
         }
         return 0;
 }

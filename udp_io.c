@@ -6,7 +6,6 @@
 #include <fcntl.h>
 #include "base64.h"
 #include "crc16.h"
-#include <fcntl.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <string.h>
@@ -83,6 +82,7 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
                         }
                         usleep( 5 * 1000 ); // wait 5 msec try again
                 } else {
+                        fc = 0;
                         iidx += n;
                         ba[iidx]=0x00;
                 }
