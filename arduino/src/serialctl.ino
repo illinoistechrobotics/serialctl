@@ -1,3 +1,4 @@
+
  //    serialctl
 //
 //    This program is free software; you can redistribute it and/or modify
@@ -73,15 +74,15 @@ void loop(){
   comm_parse();
   if(getButton(5)){
     //arm up
-    digitalWrite(ARM_UP,HIGH);
+    startarm(127);
     } else {
-    digitalWrite(ARM_UP,LOW);
+    stoparm();
   }
 if(getButton(7)){
     //arm down
-    digitalWrite(ARM_DOWN,HIGH);
-    } else {
-    digitalWrite(ARM_DOWN,LOW);
+  startarm(-127);
+ } else {
+  stoparm();
   }
 if(getButton(2)){
     //kick
