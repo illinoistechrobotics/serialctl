@@ -58,14 +58,17 @@ int joystick_wait_safe(){
                 usleep(1E5);
                 SDL_JoystickUpdate();
                 }
-                if(abs(SDL_JoystickGetAxis(jstick, 1)) > 2){
+                if(abs(SDL_JoystickGetAxis(jstick, 1)) > 256){
+                    printf("Axis 1 is at %i\n",SDL_JoystickGetAxis(jstick, 1));
                     unsafe=1;
                     }
-                 if(abs(SDL_JoystickGetAxis(jstick, 2)) > 2){
+                 if(abs(SDL_JoystickGetAxis(jstick, 2)) > 256){
+                    printf("Axis 2 is at %i\n",SDL_JoystickGetAxis(jstick, 2));
                     unsafe=1;
                     }
                 for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 15)); i++){
                                 if(SDL_JoystickGetButton(jstick,i) != 0){
+                                printf("Button %i is down\n",i);
                                 unsafe=1;
                                 }
                 }

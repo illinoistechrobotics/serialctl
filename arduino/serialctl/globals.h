@@ -21,7 +21,8 @@ extern int speed;
 #define drive_right(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
 #define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
-#define SPINNER_PIN 2
-#define ARM_PIN 3
-#define WINCH_PIN 4
-#define REVERSE_PIN 41
+
+#define FAILTIME 80
+
+#define A 2
+#define B 3

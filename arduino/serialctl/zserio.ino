@@ -64,7 +64,7 @@ void comm_parse() {
     }
   }
   
-  if(millis()-ptime > 80){
+  if(millis()-ptime > FAILTIME){
     //Been too long, copy safe state over active one
     memcpy(astate,&safe,sizeof(packet_t));
     cs=COMM_WAIT;

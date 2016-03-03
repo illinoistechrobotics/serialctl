@@ -15,7 +15,7 @@ uint16_t compute_crc(char *data, int len){
         uint16_t crc = 0xffff;
         int i;
         for(i=0; i<len; i++){
-                crc=crc16_update(crc,data[i]);
+                crc=_crc16_update(crc,data[i]);
         }
         return crc;
 }
