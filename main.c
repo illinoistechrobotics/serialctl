@@ -30,7 +30,7 @@ int run_udp(const char *port){
 			printf("Unable to send data!\n");
 			return 2;
 		}
-		printf("UDP: [R: %3u, %3u, L: %3u, %3u, CRC: %4x, Resp: %s]\n", ctl.stickRX, ctl.stickRY, ctl.stickLX, ctl.stickLY, ctl.cksum, msg);
+		printf("UDP: [L: %3u, %3u, R: %3u, %3u, CRC: %4x, Resp: %s]\n", ctl.stickLX, ctl.stickLY, ctl.stickRX, ctl.stickRY, ctl.cksum, msg);
 	}
 	return 0;
 }

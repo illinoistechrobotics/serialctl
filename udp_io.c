@@ -67,7 +67,8 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
 	static char ba[RECVBUF];
 	// static unsigned int fc=0;
 	char *next, *t;
-	do { 
+	next = strchr(ba, '\n');
+	while(next == NULL) { 
 		if(iidx == RECVBUF-1){
 			iidx=0;
 			printf("Input buffer overflow!\n");
@@ -93,7 +94,7 @@ ssize_t udpio_recv(ip_connection_t *ctx, char *buf)
 			} 
 		}
 		next=strchr(ba,'\n'); 
-	} while(next == NULL);
+	}
 	//Clobber newline and hop over it
 	next[0] = 0x00;
 	next++;
