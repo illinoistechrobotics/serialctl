@@ -20,20 +20,31 @@ void init_pins() {
   }
   count = 0;
   attachInterrupt(digitalPinToInterrupt(A), isrA, RISING);
+  //Gen purpose I/O
+  pinMode(13, OUTPUT);
+  digitalWrite(GRIP_VALVE, LOW);
+  pinMode(GRIP_VALVE, OUTPUT);
 }
 void print_data() {
   float i1, i2;
   i1 = (analogRead(CURRENT_LEFT) - 512.0 - CURRENT_OFFSET) / 1.28;
   i2 = (analogRead(CURRENT_RIGHT) - 512.0 - CURRENT_OFFSET) / 1.28;
+  if(comm_ok==0){
+    //Print failsafe notice
+    SerComm.print("-FS- ");
+  }
   SerComm.print("I(L):");
   SerComm.print(i1);
-  SerComm.print("A   I(C):");
+  SerComm.print("A, I(R):");
   SerComm.print(i2);
   SerComm.print("A, ");
-  SerComm.print("H: ");
+  SerComm.print("H:");
   SerComm.print(homed, DEC);
-  SerComm.print(", C: ");
+  SerComm.print(", X(arm):");
   SerComm.print(count);
+  SerComm.print(", P(air):");
+  SerComm.print(psi);
+  SerComm.print("PSI");
   SerComm.println();
 }
 

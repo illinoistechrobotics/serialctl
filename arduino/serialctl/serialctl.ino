@@ -23,7 +23,7 @@ packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
 int speed, av;
-long last_p, last_s = 0, usec;
+long last_f = 0, last_s = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(128, SABERTOOTH34);
 char homed = 0;
@@ -41,8 +41,6 @@ char homed = 0;
 #define BLI2 12
 #define AHI2 24
 #define BHI2 25
-#define drive_right(x) drive_osmc(x,1,ALI1,BLI1,AHI1,BHI1)
-#define drive_left(x) drive_osmc(x,1,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
 
 #define WATCHDOG_
@@ -74,22 +72,38 @@ void setup() {
   SerComm.begin(115200);
   comm_init();
   init_pins();
-  last_p = millis();
-
-  pinMode(13, OUTPUT);
+  last_f = millis();
+  last_s = millis();
   drive_left(0);
   drive_right(0);
-  speed = 0;
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
-  
+
   arm_setup();
 }
 void loop() {
-  //Every line sent to the computer gets us a new state
+  //Main loop runs at full speed
   wdt_reset();
-  print_data();
   comm_parse();
+  //Fast loop
+  if (millis() - last_f >= 40) {
+    //Runs at ~25 iterations/sec
+    //Every line sent to the computer gets us a new state
+    fast_loop();
+    print_data();
+    last_f = millis();
+  }
+  //Slow loop
+  //Runs this every ~500ms
+  if (millis() - last_s >= 500) {
+    slow_loop();
+    last_s = millis();
+  }
+  
+  tank_drive();
+}
+void fast_loop() {
+  //About 25 iterations per sec
   //arm
   //check for invalid states
   if ((getButton(5) ^ getButton(7))) {
@@ -108,13 +122,13 @@ void loop() {
   if ((getButton(0) ^ getButton(2))) {
     //both up and down buttons at same time is invalid
     if (getButton(0)) {
-      ST12.motor(2, -127);
+      //close gripper
+      digitalWrite(GRIP_VALVE,LOW);
     }
     else if (getButton(2)) {
-      ST12.motor(2, 127);
+      //open gripper
+      digitalWrite(GRIP_VALVE,HIGH);
     }
-  } else {
-    ST12.motor(2, 0);
   }
   // Home arm
   if ((homed == 0 || homed == 3) && getButton(8)) {
@@ -128,56 +142,20 @@ void loop() {
     else move_arm(0);
   }
   arm_loop();
-  /*
-  //write out value
-  if(get_arm_interlock() == -1){
-  arm.writeMicroseconds(1500);
-  }else{
-  arm.writeMicroseconds(av);
-  }
-  //winch
-  if((getButton(0) ^ getButton(2))){
-  //both up and down buttons at same time is invalid
-  if(getButton(0)){
-      winch.writeMicroseconds(1250);
-      }
-  if(getButton(2)){
-      winch.writeMicroseconds(1750);
-      }
-  } else{
-  winch.writeMicroseconds(1500);
-  }
-
-
-  if((millis()-last_s > 100) && (getButton(3) || getButton(1))){
-      if(getButton(1)){
-  speed--;
-      }
-      if(getButton(3)){
-  speed++;
-      }
-      speed=constrain(speed,-1,1);
-      last_s = millis();
-      }
-      //SerComm.println(speed);
-  if(cs != COMM_WAIT){
-  */
+  
+  //Dispenser Wrench
   if (getButton(9)) {
     ST34.motor(2, 64);
   } else {
     ST34.motor(2, 0);
   }
-  //Runs this every 500ms
-  if (millis() - last_p >= 500) {
-    //no compressor
-
-    last_p = millis();
-  }
-  tank_drive();
-
-  //limits data rate
-  delay(30);
 }
+void slow_loop() {
+  //2x per second
+  //Compressor
+  compressor_ctl();
+}
+
 void tank_drive() {
   int power_out = 0;
   int turn_out  = 0;

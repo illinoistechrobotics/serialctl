@@ -5,6 +5,7 @@
 
 uint16_t crc;
 char encstr[2 + B64_ENC_LEN(sizeof(packet_t))];
+char comm_ok;
 unsigned int recvcount;
 long ptime;
 void comm_init() {
@@ -13,6 +14,7 @@ void comm_init() {
   astate = &pA;
   incoming = &pB;
   recvcount = 0;
+  comm_ok=0;
 }
 void comm_parse() {
   packet_t *tmp;
@@ -57,6 +59,7 @@ void comm_parse() {
         tmp=astate;
         astate=incoming;
         incoming=tmp;
+        comm_ok=1;
       } else{
         cs=COMM_INVALID;
        // SerComm.println("Invalid");
@@ -69,6 +72,6 @@ void comm_parse() {
     memcpy(astate,&safe,sizeof(packet_t));
     cs=COMM_WAIT;
     recvcount = 0;
-    SerComm.println("|-|-[FAILSAFE]-|-|");
+    comm_ok=0;
   }
 }

@@ -4,7 +4,8 @@ extern packet_t pA, pB, safe;
 extern packet_t *astate, *incoming;
 extern comm_state cs;
 extern long last_p;
-extern int speed;
+extern char comm_ok;
+extern float psi;
 #define SerComm Serial1
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
@@ -22,7 +23,7 @@ extern int speed;
 #define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
 
-#define FAILTIME 80
+#define FAILTIME 100
 
 #define A 2
 #define B 3
