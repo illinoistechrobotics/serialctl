@@ -1,9 +1,9 @@
 #define CONTROLLER ST12
 #define PIN 1
-#define POWER 40
+#define POWER 50
 #define THRESHOLD 150
 #define MIN_EXTEND 50
-#define MAX_EXTEND 20000
+#define MAX_EXTEND 42000
 
 volatile long count, last_movement;
 long lag;
