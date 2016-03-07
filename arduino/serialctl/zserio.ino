@@ -3,22 +3,21 @@
 #include "packet.h"
 #include "globals.h"
 
-uint16_t crc;
-char encstr[2 + B64_ENC_LEN(sizeof(packet_t))];
 char comm_ok;
-unsigned int recvcount;
 long ptime;
 void comm_init() {
   ptime = 0;
   cs = COMM_WAIT;
   astate = &pA;
   incoming = &pB;
-  recvcount = 0;
   comm_ok=0;
 }
 void comm_parse() {
   packet_t *tmp;
+  static char encstr[2 + B64_ENC_LEN(sizeof(packet_t))];
+  static unsigned int recvcount=0;
   char inc;
+  uint16_t crc;
   while (SerComm.available()) {
     inc = SerComm.read();
     if (inc == SFRAME) {

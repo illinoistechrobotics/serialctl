@@ -22,7 +22,6 @@
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-int speed, av;
 long last_f = 0, last_s = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(128, SABERTOOTH34);
