@@ -1,4 +1,4 @@
-#define COMPCTL ST12
+#define COMPCTL ST34
 #define COMPPIN 2
 float psi;
 void compressor_ctl(){
@@ -24,10 +24,10 @@ void compressor_ctl(){
   
   if(pumping == 1){
     //Go!
-    ST12.motor(2,127);
+    COMPCTL.motor(COMPPIN,127);
   } else{
     //Stop!
-    ST12.motor(2,0);
+    COMPCTL.motor(COMPPIN,0);
   }
 }
 

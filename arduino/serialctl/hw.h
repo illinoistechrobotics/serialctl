@@ -8,9 +8,9 @@
 #define CURRENT_LEFT A1
 #define SABERTOOTH12 Serial2
 #define SABERTOOTH34 Serial3
-#define GRIP_VALVE 41
+#define GRIP_VALVE 40
 
-#define ADC2PSI(x) ((analogRead(x)-(float)PRESSURE_OFFSET)/2.048)
+#define ADC2PSI(x) ((analogRead(x)-(float)PRESSURE_OFFSET)/1.024)
 
 void init_pins();
 void print_data();

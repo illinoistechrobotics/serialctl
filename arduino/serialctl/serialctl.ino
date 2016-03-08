@@ -27,7 +27,6 @@ Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(128, SABERTOOTH34);
 char homed = 0;
 
-#define SerComm Serial1
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
@@ -69,6 +68,7 @@ void setup() {
   safe.btnlo = 0;
   safe.cksum = 0b1000000010001011;
   SerComm.begin(115200);
+  //SerCommDbg.begin(115200);
   comm_init();
   init_pins();
   last_f = millis();
@@ -86,7 +86,6 @@ void loop() {
   comm_parse();
   //Fast loop
   if (millis() - last_f >= 40) {
-    //Runs at ~25 iterations/sec
     //Every line sent to the computer gets us a new state
     fast_loop();
     print_data();
@@ -144,9 +143,9 @@ void fast_loop() {
   
   //Dispenser Wrench
   if (getButton(9)) {
-    ST34.motor(2, 64);
+    ST12.motor(2, 64);
   } else {
-    ST34.motor(2, 0);
+    ST12.motor(2, 0);
   }
 }
 void slow_loop() {

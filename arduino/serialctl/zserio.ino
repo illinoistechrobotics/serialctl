@@ -20,24 +20,31 @@ void comm_parse() {
   uint16_t crc;
   while (SerComm.available()) {
     inc = SerComm.read();
+   // SerCommDbg.print(cs,DEC);
     if (inc == SFRAME) {
+   //   SerCommDbg.println("Sframe");
       cs = COMM_RECV;
       recvcount = 0;
+    //  SerCommDbg.print(cs,DEC);
     } else if (inc == EFRAME && cs == COMM_RECV) {
       cs = COMM_COMPLETE;
+      //SerCommDbg.println("Eframe"); 
       //length check
       if(recvcount != B64_ENC_LEN(sizeof(packet_t))){
+        //SerCommDbg.println("Length");
         cs = COMM_INVALID;
       }
       
       //Check decoded size in case of base64 error
       if(base64_dec_len(encstr, B64_ENC_LEN(sizeof(packet_t))) != sizeof(packet_t)){
+        //SerCommDbg.println("B64");
         cs = COMM_INVALID;
       }
       
     } else if (cs == COMM_RECV) {
       //populate buffer, preventing overflows from dropped start or end bytes
       if (recvcount >= B64_ENC_LEN(sizeof(packet_t))) {
+        //SerCommDbg.println("Overflow");
         cs = COMM_INVALID;
       } else {
         encstr[recvcount] = inc;
@@ -46,30 +53,31 @@ void comm_parse() {
     }
     
     if(cs==COMM_COMPLETE){
-      //SerComm.println("Comm recieve");
+      //SerCommDbg.println("Comm Complete");
       //Base64 decode
       base64_decode((char *)incoming, encstr, B64_ENC_LEN(sizeof(packet_t)));
       //Evaluate CRC16 and flip pointers if valid
       crc = compute_crc((char *)incoming, sizeof(packet_t)-sizeof(uint16_t));
       if(crc == ntohs(incoming->cksum)){
-        //SerComm.println("vaild");
+        SerCommDbg.println("vaild");
         cs=COMM_VALID;
         ptime=millis();
         tmp=astate;
         astate=incoming;
         incoming=tmp;
         comm_ok=1;
+        digitalWrite(13,HIGH);
       } else{
         cs=COMM_INVALID;
-       // SerComm.println("Invalid");
+        //SerCommDbg.println("Invalid");
       }
     }
   }
   
   if(millis()-ptime > FAILTIME){
+    digitalWrite(13,LOW);
     //Been too long, copy safe state over active one
     memcpy(astate,&safe,sizeof(packet_t));
-    cs=COMM_WAIT;
     recvcount = 0;
     comm_ok=0;
   }
