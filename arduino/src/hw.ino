@@ -101,7 +101,7 @@ void drive_left(double speed){
   Wire.beginTransmission(LEFT_SPEEDSERVO_ADDR);
   Wire.write(0);
   Wire.write((byte *) &promoted, 4);
-  Wire.endTransmi.build/mega2560/firmware.hexssion();
+  Wire.endTransmission();
 }
 void drive_right(double speed){
   double promoted = speed;
