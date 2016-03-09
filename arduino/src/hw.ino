@@ -3,11 +3,6 @@
 #include "globals.h"
 #include <Servo.h>
 Servo fl, fr, rl, rr;
-void init_pins(){
-	pinMode(LASER_PIN, OUTPUT);
-	digitalWrite(LASER_PIN,LOW);
-	victor_init();
-}
 void print_data(){
 	SerComm.print("ITR Icarus ");
 	SerComm.print(leftMotorDebug);

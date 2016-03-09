@@ -72,7 +72,6 @@ void setup() {
 	safe.cksum = 0b1000000010001011;
 	SerComm.begin(57600);
 	comm_init();
-	init_pins();
 	laser=0;
 	fire=0;
 	armpos=1000;
