@@ -17,7 +17,6 @@ extern int leftOutDebug;
 #define FRONT_RIGHT 8
 #define REAR_LEFT 11
 #define REAR_RIGHT 10
-#define ARM_PIN 13
-#define LASER_PIN 3
-#define SPINNER_PIN 2
-#define FEED_PIN 4
+#define CLAW_PIN 6
+#define CLAW_OPEN_MICROSECS 1500
+#define CLAW_CLOSED_MICROSECS 1000
