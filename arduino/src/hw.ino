@@ -6,8 +6,12 @@
 #define RIGHT_SPEEDSERVO_ADDR 2
 boolean estop_state = false;
 int last_left_speed, last_right_speed;
+int current_manipulator_direction = 0;
 void init_pins(){
   Wire.begin();
+  pinMode(MANIPULATOR_FORWARD_PIN, OUTPUT);
+  pinMode(MANIPULATOR_REVERSE_PIN, OUTPUT);
+  set_manipulator_dir(0);
 }
 int read_speed(char address){
   Wire.requestFrom(address,sizeof(int));
@@ -61,6 +65,37 @@ void estop(){
   Wire.write(5);
   Wire.endTransmission();
 }
+
+void run_manipulator() {
+  if (getButton(2) && current_manipulator_direction >= 0) { // Manipulator Down
+    set_manipulator_dir(-1);
+  }
+  else if (getButton(3) && current_manipulator_direction <= 0) { // Manipulator Up
+    set_manipulator_dir(1);
+  }
+  else if (current_manipulator_direction != 0) { // Stop Manipulator
+    set_manipulator_dir(0);
+  }
+}
+
+void set_manipulator_dir(int direction) {
+  if (direction < 0) {
+    current_manipulator_direction = -1;
+    digitalWrite(MANIPULATOR_FORWARD_PIN, LOW);
+    digitalWrite(MANIPULATOR_REVERSE_PIN, HIGH);
+  }
+  else if (direction > 0) {
+    current_manipulator_direction = 1;
+    digitalWrite(MANIPULATOR_FORWARD_PIN, HIGH);
+    digitalWrite(MANIPULATOR_REVERSE_PIN, LOW);
+  }
+  else {
+    current_manipulator_direction = 0;
+    digitalWrite(MANIPULATOR_FORWARD_PIN, LOW);
+    digitalWrite(MANIPULATOR_REVERSE_PIN, LOW);
+  }
+}
+
 void drive_left(double speed){
   double promoted = speed;
   Wire.beginTransmission(LEFT_SPEEDSERVO_ADDR);
