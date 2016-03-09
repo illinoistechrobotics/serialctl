@@ -67,13 +67,13 @@ void estop(){
 }
 
 void run_manipulator() {
-  if (current_manipulator_direction >= 0 && getButton(2) && !getButton(3)) { // Manipulator Down
+  if (getButton(1) && !getButton(3)) { // Manipulator Down
     set_manipulator_dir(-1);
   }
-  else if (current_manipulator_direction <= 0 && !getButton(2) && getButton(3)) { // Manipulator Up
+  else if (!getButton(1) && getButton(3)) { // Manipulator Up
     set_manipulator_dir(1);
   }
-  else if (current_manipulator_direction != 0 && ((!getButton(2) && !getButton(3)) || (getButton(2) && getButton(3)))) { // Stop Manipulator
+  else if (((!getButton(1) && !getButton(3)) || (getButton(1) && getButton(3)))) { // Stop Manipulator
     set_manipulator_dir(0);
   }
 }
