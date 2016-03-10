@@ -15,6 +15,10 @@ void init_pins(){
         talon_init();
 }
 void print_data(){
+    if(comm_ok==0){
+    //Print failsafe notice
+    SerComm.print("-FS- ");
+  }
         SerComm.println("Roslund");
 }
 void talon_init(){
