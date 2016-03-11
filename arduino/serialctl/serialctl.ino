@@ -106,10 +106,10 @@ void fast_loop() {
   //check for invalid states
   if ((getButton(5) ^ getButton(7))) {
     //both up and down buttons at same time is invalid
-    if (getButton(5)) {
+    if (getButton(7)) {
       ST34.motor(1, -127);
     }
-    else if (getButton(7)) {
+    else if (getButton(5)) {
       ST34.motor(1, 127);
     }
   } else {
@@ -119,11 +119,11 @@ void fast_loop() {
   //check for invalid states
   if ((getButton(0) ^ getButton(2))) {
     //both up and down buttons at same time is invalid
-    if (getButton(0)) {
+    if (getButton(2)) {
       //close gripper
       digitalWrite(GRIP_VALVE,LOW);
     }
-    else if (getButton(2)) {
+    else if (getButton(0)) {
       //open gripper
       digitalWrite(GRIP_VALVE,HIGH);
     }

@@ -1,7 +1,6 @@
 #include "hw.h"
 #include "packet.h"
 #include "globals.h"
-#include <Servo.h>
 void init_pins() {
   //Main motors
   osmc_init();
@@ -19,6 +18,8 @@ void init_pins() {
     ST34.motor(2, 0);
   }
   count = 0;
+  pinMode(A,INPUT);
+  pinMode(B,INPUT);
   attachInterrupt(digitalPinToInterrupt(A), isrA, RISING);
   //Gen purpose I/O
   pinMode(13, OUTPUT);
@@ -70,8 +71,8 @@ void osmc_init() {
   fast_pwm();
 }
 void fast_pwm() {
-  TCCR1B = (TCCR1B & 0b11111000) | 0x04;
-  TCCR4B = (TCCR4B & 0b11111000) | 0x04;
+  TCCR1B = (TCCR1B & 0b11111000) | 0x03;
+  TCCR4B = (TCCR4B & 0b11111000) | 0x03;
 }
 // OSMC motor controller stuff
 // Low side outputs must be PWM capable and NOT 5 or 6 (on Uno)
