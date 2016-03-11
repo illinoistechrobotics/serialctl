@@ -50,7 +50,7 @@ int getButton(int num){
 		return 0;
 	}
 }
-SPINNER_PINSPINNER_PIN
+
 SoftwareSerial left(2,3);
 SoftwareSerial right(4,5);
 char rightMotorDebug[5];
