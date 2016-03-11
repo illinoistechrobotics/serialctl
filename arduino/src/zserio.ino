@@ -78,7 +78,6 @@ void comm_parse() {
     digitalWrite(13,LOW);
     //Been too long, copy safe state over active one
     memcpy(astate,&safe,sizeof(packet_t));
-    recvcount = 0;
     comm_ok=0;
   }
 }
