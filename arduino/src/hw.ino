@@ -2,19 +2,15 @@
 #include "packet.h"
 #include "globals.h"
 #include <Servo.h>
-Servo fl, fr, rl, rr;
+Servo fl, fr, rl, rr, arm;
 void init_pins(){
-        pinMode(MANIP_GRIP, OUTPUT);
-        pinMode(MANIP_KICK, OUTPUT);
-        pinMode(ARM_UP,OUTPUT);
-        pinMode(ARM_DOWN,OUTPUT);
-        digitalWrite(MANIP_GRIP,LOW);
-        digitalWrite(MANIP_KICK,LOW);
-        digitalWrite(ARM_UP,LOW);
-        digitalWrite(ARM_DOWN,LOW);
+        arm.attach(ARM_PIN);
         talon_init();
 }
 void print_data(){
+        if( comm_ok==0){
+                SerComm.print("--FS-- ");
+        }
         SerComm.println("Roslund");
 }
 void talon_init(){
@@ -27,6 +23,17 @@ void talon_init(){
         rr.writeMicroseconds(1500);
         rl.writeMicroseconds(1500);
 }
+void move_arm(char cmd){
+   switch(cmd){
+      case -1:
+         arm.writeMicroseconds(1000);
+      case 1:
+         arm.writeMicroseconds(2000);
+      default:
+         arm.writeMicroseconds(1500);
+   }
+}
+
 
 void drive_left(int power){
         power = map(constrain(power,-127,127),-127,127,1000,2000);
