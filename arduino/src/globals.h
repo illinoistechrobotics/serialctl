@@ -16,3 +16,5 @@ extern int speed;
 #define ARM_PIN 3
 #define WINCH_PIN 4
 #define REVERSE_PIN 41
+#define MANIPULATOR_FORWARD_PIN 6
+#define MANIPULATOR_REVERSE_PIN 7

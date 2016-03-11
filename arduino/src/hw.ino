@@ -6,8 +6,12 @@
 #define RIGHT_SPEEDSERVO_ADDR 2
 boolean estop_state = false;
 int last_left_speed, last_right_speed;
+int current_manipulator_direction = 0;
 void init_pins(){
   Wire.begin();
+  pinMode(MANIPULATOR_FORWARD_PIN, OUTPUT);
+  pinMode(MANIPULATOR_REVERSE_PIN, OUTPUT);
+  set_manipulator_dir(0);
 }
 int read_speed(char address){
   Wire.requestFrom(address,sizeof(int));
@@ -27,7 +31,7 @@ void print_speed(){
   int right_speed = read_speed(RIGHT_SPEEDSERVO_ADDR);
 
   char speedline[100];
-  snprintf(speedline, 100, "%d,%d,%d,%d,%lu", 
+  snprintf(speedline, 100, "% 4d, % 4d, % 4d, % 4d, %lu", 
 	   left_speed,last_left_speed,
 	   right_speed,last_right_speed,
 	   millis());
@@ -61,21 +65,96 @@ void estop(){
   Wire.write(5);
   Wire.endTransmission();
 }
-void drive_left(int speed){
+
+void run_manipulator() {
+  if (getButton(1) && !getButton(3)) { // Manipulator Down
+    set_manipulator_dir(-1);
+  }
+  else if (!getButton(1) && getButton(3)) { // Manipulator Up
+    set_manipulator_dir(1);
+  }
+  else if (((!getButton(1) && !getButton(3)) || (getButton(1) && getButton(3)))) { // Stop Manipulator
+    set_manipulator_dir(0);
+  }
+}
+
+void set_manipulator_dir(int direction) {
+  if (direction < 0) {
+    current_manipulator_direction = -1;
+    digitalWrite(MANIPULATOR_FORWARD_PIN, LOW);
+    digitalWrite(MANIPULATOR_REVERSE_PIN, HIGH);
+  }
+  else if (direction > 0) {
+    current_manipulator_direction = 1;
+    digitalWrite(MANIPULATOR_FORWARD_PIN, HIGH);
+    digitalWrite(MANIPULATOR_REVERSE_PIN, LOW);
+  }
+  else {
+    current_manipulator_direction = 0;
+    digitalWrite(MANIPULATOR_FORWARD_PIN, LOW);
+    digitalWrite(MANIPULATOR_REVERSE_PIN, LOW);
+  }
+}
+
+void drive_left(double speed){
   double promoted = speed;
   Wire.beginTransmission(LEFT_SPEEDSERVO_ADDR);
   Wire.write(0);
   Wire.write((byte *) &promoted, 4);
   Wire.endTransmission();
 }
-void drive_right(int speed){
+void drive_right(double speed){
   double promoted = speed;
   Wire.beginTransmission(RIGHT_SPEEDSERVO_ADDR);
   Wire.write(0);
   Wire.write((byte *) &promoted, 4);
   Wire.endTransmission();
 }
-void tank_drive(){
+
+void tank_drive() {
+  if(getButton(7)){
+    estop_state = false;
+  }
+  if(getButton(5)){
+    estop_state = true;
+  }
+  if(estop_state){
+    estop();
+    return;
+  }
+
+  double left_power = ((double)(astate->stickLY) - 128);
+  double right_power = ((double)(astate->stickRY) - 128);
+  if (left_power > 0) {
+    left_power *= (128.0 / 127.0);
+  }
+  if (right_power > 0) {
+    right_power *= (128.0 / 127.0);
+  }
+
+  double multiplier;
+  if(getButton(6)){ //turbo
+    multiplier = 4;
+  }
+  else if(getButton(4)){ //precise
+    multiplier = 0.5;
+  } else {
+    multiplier = 1;
+  }
+
+  // Square Inputs
+  left_power *= -1 * multiplier;
+  right_power *= multiplier;
+
+  last_left_speed = (int)left_power;
+  last_right_speed = (int)right_power;
+
+  drive_left(left_power);
+  drive_right(right_power);
+}
+
+// Not currently used
+void arcade_drive(){
   if(getButton(7)){
     estop_state = false;
   }
@@ -88,8 +167,8 @@ void tank_drive(){
   }
   int power_out = 0;
   int turn_out  = 0;
-  int zeroed_power =    ((int)(astate->stickX) - 127);
-  int zeroed_turn =     -1*((int)(astate->stickY) - 127);
+  int zeroed_power =    ((int)(astate->stickLY) - 128);
+  int zeroed_turn =     -1*((int)(astate->stickRX) - 128);
   
   if(abs(zeroed_power) > DEADBAND_HALF_WIDTH){
     if(zeroed_power>0){

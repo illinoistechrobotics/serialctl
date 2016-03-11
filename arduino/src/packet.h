@@ -11,10 +11,12 @@ enum comm_state {
   COMM_INVALID };
 typedef struct p_t_struct{
   #ifdef __cplusplus
-p_t_struct(): stickX(127), stickY(127), btnhi(0), btnlo(0), cksum(0){}
+p_t_struct(): stickRX(128), stickRY(128), stickLX(128), stickLY(128), btnhi(0), btnlo(0), cksum(0){}
   #endif
-  uint8_t stickX;
-  uint8_t stickY;
+  uint8_t stickRX;
+  uint8_t stickRY;
+  uint8_t stickLX;
+  uint8_t stickLY;
   uint8_t btnhi;
   uint8_t btnlo;
   uint16_t cksum;
