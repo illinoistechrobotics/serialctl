@@ -1,6 +1,6 @@
 #pragma once
 #define P_SENSOR A2
-#define CURRENT_OFFSET -2.5
+#define CURRENT_OFFSET -4
 #define PRESSURE_OFFSET 161
 #define MIN_PRESS 60    
 #define MAX_PRESS 80

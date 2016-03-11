@@ -59,7 +59,7 @@ void comm_parse() {
       //Evaluate CRC16 and flip pointers if valid
       crc = compute_crc((char *)incoming, sizeof(packet_t)-sizeof(uint16_t));
       if(crc == ntohs(incoming->cksum)){
-        SerCommDbg.println("vaild");
+//        SerCommDbg.println("vaild");
         cs=COMM_VALID;
         ptime=millis();
         tmp=astate;
@@ -78,7 +78,6 @@ void comm_parse() {
     digitalWrite(13,LOW);
     //Been too long, copy safe state over active one
     memcpy(astate,&safe,sizeof(packet_t));
-    recvcount = 0;
     comm_ok=0;
   }
 }
