@@ -20,3 +20,4 @@ extern int leftOutDebug;
 #define CLAW_PIN 6
 #define CLAW_OPEN_MICROSECS 1500
 #define CLAW_CLOSED_MICROSECS 1000
+#define MOTOR_CONTROLLER_BAUD 9600

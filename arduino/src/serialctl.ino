@@ -51,8 +51,8 @@ int getButton(int num){
 	}
 }
 
-SoftwareSerial left(2,3);
-SoftwareSerial right(4,5);
+SoftwareSerial right(2,3);
+SoftwareSerial left(4,5);
 char rightMotorDebug[5];
 char leftMotorDebug[5];
 int leftOutDebug;
@@ -70,7 +70,7 @@ void setup() {
 	safe.btnhi = 0;
 	safe.btnlo = 0;
 	safe.cksum = 0b1000000010001011;
-	SerComm.begin(57600);
+	SerComm.begin(9600);
 	comm_init();
 	laser=0;
 	fire=0;
@@ -78,8 +78,8 @@ void setup() {
 	claw.attach(CLAW_PIN);
 	closeClaw();
 	// Start software serial
-	left.begin(115200);
-	right.begin(115200);
+	left.begin(MOTOR_CONTROLLER_BAUD);
+	right.begin(MOTOR_CONTROLLER_BAUD);
 	// Copy safe values over the current state
 	memcpy(astate, &safe, sizeof(packet_t));
 	// Set the motors to those safe values
@@ -134,15 +134,15 @@ void arcade_drive() {
 	zeroed_power = (zeroed_power * abs(zeroed_power)) / 127;
 	zeroed_turn =  (zeroed_turn * abs(zeroed_turn)) / 127;
 
-	int left_out = (zeroed_power + (zeroed_turn));
-	int right_out = -1 * (zeroed_power - (zeroed_turn));
+	int left_out = -1 * (zeroed_power + (zeroed_turn));
+	int right_out = (zeroed_power - (zeroed_turn));
 
 	write_motors(left_out, right_out);
 }
 
 void tank_drive(){
-	int left_out = ((int)(astate->stickLY) - 128);
-	int right_out = -1 * ((int)(astate->stickRY) - 128);
+	int left_out = -1 * ((int)(astate->stickLY) - 128);
+	int right_out = ((int)(astate->stickRY) - 128);
 	
 	// Square inputs
 	left_out = (left_out * abs(left_out)) / 127;
