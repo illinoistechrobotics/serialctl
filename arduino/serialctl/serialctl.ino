@@ -87,6 +87,7 @@ void loop() {
   //Fast loop
   if (millis() - last_f >= 40) {
     //Every line sent to the computer gets us a new state
+    tank_drive();
     fast_loop();
     print_data();
     last_f = millis();
@@ -97,8 +98,6 @@ void loop() {
     slow_loop();
     last_s = millis();
   }
-  
-  tank_drive();
 }
 void fast_loop() {
   //About 25 iterations per sec
@@ -190,6 +189,7 @@ void tank_drive() {
       right_out = -1 * power_out + (turn_out);
     }
   } else if (getButton(4)) { //precision mode
+    /*
     if (abs(power_out) > 75) {
       left_out  =    power_out / 2 + (turn_out / 2);
       right_out = -1 * power_out / 2 + (turn_out / 2);
@@ -197,9 +197,10 @@ void tank_drive() {
       left_out  =    power_out / 2 + (turn_out / 8);
       right_out = -1 * power_out / 2 + (turn_out / 8);
     } else {
+    */
       left_out  /= 2;
       right_out /= 2;
-    }
+    //}
   } else {
     if (abs(power_out) > 75) {
       left_out  =    power_out + (turn_out);
