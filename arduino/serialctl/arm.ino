@@ -14,6 +14,7 @@ void arm_setup() {
 }
 
 void arm_loop() {
+  if(comm_ok){
   switch (homed) {
     case 1:
       CONTROLLER.motor(PIN, -POWER);
@@ -30,6 +31,9 @@ void arm_loop() {
       break;
     default:
       break;
+  }
+  } else {
+    arm_safe();
   }
 }
 
