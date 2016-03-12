@@ -113,10 +113,10 @@ void loop(){
 	print_data();
 	comm_parse();
 
-	if (getButton(6) && clawState == 0) {
+	if (getButton(5) && clawState == 0) {
 		openClaw();
 	}
-	else if (!getButton(6) && clawState == 1) {
+	else if (!getButton(5) && clawState != 0) {
 		closeClaw();
 	}
 	tank_drive();
@@ -176,7 +176,7 @@ void write_serial_motors(SoftwareSerial *controller, int speed, int motorID) {
 	if (speed > 127) {
 		speed = 127;
 	}
-	controlStr[2] = (uint8_t)map(speed, 0, 127, '0', '9');
+	controlStr[2] = (uint8_t)map(speed, 0, 127, '0', '8');
 	controller->print(controlStr);
 	if (controller == &left) {
 		strcpy(leftMotorDebug, controlStr);
