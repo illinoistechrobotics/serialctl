@@ -134,15 +134,15 @@ void arcade_drive() {
 	zeroed_power = (zeroed_power * abs(zeroed_power)) / 127;
 	zeroed_turn =  (zeroed_turn * abs(zeroed_turn)) / 127;
 
-	int left_out = -1 * (zeroed_power + (zeroed_turn));
-	int right_out = (zeroed_power - (zeroed_turn));
+	int left_out =  (zeroed_power + (zeroed_turn));
+	int right_out = -1* (zeroed_power - (zeroed_turn));
 
 	write_motors(left_out, right_out);
 }
 
 void tank_drive(){
-	int left_out = -1 * ((int)(astate->stickLY) - 128);
-	int right_out = ((int)(astate->stickRY) - 128);
+	int left_out =  ((int)(astate->stickLY) - 128);
+	int right_out = -1* ((int)(astate->stickRY) - 128);
 	
 	// Square inputs
 	left_out = (left_out * abs(left_out)) / 127;
