@@ -7,6 +7,10 @@ void init_pins(){
         arm.attach(ARM_PIN);
         arm.writeMicroseconds(1500);
         talon_init();
+        pinMode(MANI_INTAKE, OUTPUT);
+        pinMode(MANI_OUTPUT, OUTPUT);
+        digitalWrite(MANI_INTAKE, LOW);
+        digitalWrite(MANI_OUTPUT, LOW);
 }
 void print_data(){
    if(comm_ok==0){
@@ -14,6 +18,15 @@ void print_data(){
     SerComm.print("-FS- ");
   }
         SerComm.println("Roslund");
+}
+uint8_t getButton(int num){
+        if(num<=7){
+                return (astate->btnlo >> num) & 0x01;
+        } else if(num>7 && num <= 15){
+                return (astate->btnhi >> (num - 8)) & 0x01;
+        } else {
+                return 0;
+        }
 }
 void talon_init(){
         fl.attach(FRONT_LEFT);
@@ -37,7 +50,24 @@ void move_arm(int8_t cmd){
          arm.writeMicroseconds(1500);
    }
 }
-
+void manipulator()
+{
+   if (getButton(0) && !getButton(2))
+   {
+      digitalWrite(MANI_INTAKE, HIGH);
+      digitalWrite(MANI_OUTPUT, LOW);
+   }
+   else if (!getButton(0) && getButton(2))
+   {
+      digitalWrite(MANI_INTAKE, LOW);
+      digitalWrite(MANI_OUTPUT, HIGH);
+   }
+   else
+   {
+      digitalWrite(MANI_INTAKE, LOW);
+      digitalWrite(MANI_OUTPUT, LOW);
+   }
+}
 
 void drive_left(int power){
         power = map(constrain(power,-127,127),-127,127,1000,2000);
