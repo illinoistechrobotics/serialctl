@@ -18,4 +18,4 @@ extern long last_p;
 #define ARM_PIN 13
 #define LASER_PIN 3
 #define SPINNER_PIN 2
-#define FEED_PIN 4
+#define FEED_PIN 5
