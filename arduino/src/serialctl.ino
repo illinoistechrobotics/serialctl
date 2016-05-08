@@ -63,7 +63,7 @@ void setup() {
   init_pins();
   laser=0;
   fire=0;
-  armpos=1000;
+  armpos=2000;
   drive_left(0);
   drive_right(0);
   arm.attach(ARM_PIN);
