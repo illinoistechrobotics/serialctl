@@ -119,7 +119,7 @@ if(getButton(5)){
     armpos-=2;
   }
 //Limit value before setting
-armpos = constrain(armpos,1000,2000);
+armpos = constrain(armpos,1500,2000);
 arm.writeMicroseconds(armpos);
 
 if(getButton(1) && fire==0){
