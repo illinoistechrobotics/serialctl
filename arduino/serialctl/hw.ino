@@ -11,7 +11,10 @@ void init_pins(){
   Wire.begin();
   pinMode(MANIPULATOR_FORWARD_PIN, OUTPUT);
   pinMode(MANIPULATOR_REVERSE_PIN, OUTPUT);
-  set_manipulator_dir(0);
+  pinMode(0, OUTPUT);
+  pinMode(1, OUTPUT); 
+
+ set_manipulator_dir(0);
 }
 int read_speed(char address){
   Wire.requestFrom(address,sizeof(int));
@@ -76,6 +79,21 @@ void run_manipulator() {
   else if (((!getButton(1) && !getButton(3)) || (getButton(1) && getButton(3)))) { // Stop Manipulator
     set_manipulator_dir(0);
   }
+ if (getButton(0) && !getButton(2))
+ {
+  digitalWrite(0, LOW);
+  digitalWrite(1, HIGH);
+ }
+else if (!getButton(0) && getButton(2))
+ {
+  digitalWrite(0, HIGH);
+  digitalWrite(1, LOW);
+ }
+else
+ {
+  digitalWrite(0, LOW);
+  digitalWrite(1, LOW);
+ }
 }
 
 void set_manipulator_dir(int direction) {
