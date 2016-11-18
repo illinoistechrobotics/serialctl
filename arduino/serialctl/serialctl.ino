@@ -47,7 +47,7 @@ void loop(){
   wdt_reset();
   print_data();
   comm_parse();
-  run_manipulator();  
+  //run_manipulator();  
   tank_drive();
   // arcade_drive();
 
