@@ -152,12 +152,12 @@ void tank_drive() {
 
   double multiplier;
   if(getButton(6)){ //turbo
-    multiplier = 4;
+    multiplier = 1;
   }
   else if(getButton(4)){ //precise
-    multiplier = 0.5;
+    multiplier = 0.125;
   } else {
-    multiplier = 1;
+    multiplier = 0.25;
   }
 
   // Square Inputs
