@@ -49,7 +49,7 @@ static int power_constraint = 0;
 #ifdef WATCHDOG_
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
 #endif
-int getButton(int num) {
+unsigned int getButton(unsigned int num) {
   if (num <= 7) {
     return (astate->btnlo >> num) & 0x01;
   } else if (num > 7 && num <= 15) {
@@ -58,6 +58,11 @@ int getButton(int num) {
     return 0;
   }
 }
+unsigned int getDPad() {
+  // four bits: left down right up
+  return (astate->btnhi >> 4);
+}
+boolean 
 void setup() {
 #ifdef WATCHDOG_
   wdt_enable(WDTO_250MS);  //Set 250ms WDT
@@ -210,7 +215,7 @@ void tank_drive() {
 
   //apply turbo mode
   if (getButton(6)) {
-    power_constraint = min(abs(power_out), 255 - abs(turn_out));
+    power_constraint = min(abs(power_out * 2), 255 - abs(turn_out));
     if (abs(power_out) > 75) {
       power_out = constrain(power_out * 2, -power_constraint, power_constraint);
       left_out  =  power_out + (turn_out);

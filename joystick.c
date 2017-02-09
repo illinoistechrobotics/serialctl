@@ -22,6 +22,8 @@ int joystick_init(int id){
                         printf("Number of Axes: %d\n", SDL_JoystickNumAxes(jstick));
                         printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(jstick));
                         printf("Number of Balls: %d\n", SDL_JoystickNumBalls(jstick));
+                        printf("Number of Hats (D-Pads): %d\n", SDL_JoystickNumHats(jstick));
+
                 } else {
                         printf("Couldn't open Joystick %i\n",id);
                         return -1;
@@ -34,43 +36,49 @@ int joystick_update(packet_t *ctl){
         if(SDL_JoystickGetAttached(jstick) == SDL_FALSE)
                 return -1;
         SDL_JoystickUpdate();
-        //populate controller struct
+
+ //populate controller struct
         ctl->stickX = (SDL_JoystickGetAxis(jstick, 1)/256)+128;
         ctl->stickY = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
         ctl->btnlo = 0;
         ctl->btnhi = 0;
-        for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 15)); i++){
+        for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 12)); i++){ //16 bits available - 4 for dpad
                 if(i<8){
                         ctl->btnlo |= (SDL_JoystickGetButton(jstick,i) << i);
                 } else if(i>=8 && i<15){
                         ctl->btnhi |= (SDL_JoystickGetButton(jstick,i) << (i-8));
                 }
         }
+        ctl->btnhi |= (SDL_JoystickGetHat(jstick,0) << 4);
         return 0;
 }
 int joystick_wait_safe(){
         int i, unsafe;
-        do{
-        unsafe=0;
-        if(SDL_JoystickGetAttached(jstick) == SDL_FALSE)
+        do {
+                unsafe=0;
+                if (SDL_JoystickGetAttached(jstick) == SDL_FALSE)
                 return -1;
-         for(i=0;i<8;i++){
-                usleep(1E5);
-                SDL_JoystickUpdate();
+                for(i=0;i<8;i++){
+                        usleep(1E5);
+                        SDL_JoystickUpdate();
                 }
-                if(abs(SDL_JoystickGetAxis(jstick, 1)) > 256){
-                    printf("Axis 1 is at %i\n",SDL_JoystickGetAxis(jstick, 1));
-                    unsafe=1;
-                    }
-                 if(abs(SDL_JoystickGetAxis(jstick, 2)) > 256){
-                    printf("Axis 2 is at %i\n",SDL_JoystickGetAxis(jstick, 2));
-                    unsafe=1;
-                    }
+                for(i=0;i<SDL_JoystickNumAxes(jstick);i++){
+                        if(abs(SDL_JoystickGetAxis(jstick, 1)) > 256){
+                               printf("Axis %i is at %i\n", i, SDL_JoystickGetAxis(jstick, i));
+                               unsafe=1;
+                        }
+                }
                 for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 15)); i++){
-                                if(SDL_JoystickGetButton(jstick,i) != 0){
+                        if(SDL_JoystickGetButton(jstick,i) != 0){
                                 printf("Button %i is down\n",i);
                                 unsafe=1;
-                                }
+                        }
+                }
+                for(i=0; (i<SDL_JoystickNumHats(jstick)); i++){
+                        if(SDL_JoystickGetButton(jstick,i) != 0){
+                                printf("Hat %i is not centered\n",i);
+                                unsafe=1;
+                        }
                 }
                 printf("Waiting for safe stick position\n");
         }while(unsafe);
