@@ -54,7 +54,7 @@ int init_ui(){
   getmaxyx(stdscr, parent_y, parent_x);
   cdk_master = initCDKScreen(stdscr);
 
-  leftY = newCDKSlider(
+  Y = newCDKSlider(
 			  cdk_master,0,0,
 			  "Left","",
 			  A_REVERSE | COLOR_PAIR (29) | ' ',
@@ -66,7 +66,7 @@ int init_ui(){
 			  1,
 			  true,
 			  false);
-  rightY = newCDKSlider(
+  X = newCDKSlider(
 		       cdk_master,0,4,
 		       "Right","",
 		       A_REVERSE | COLOR_PAIR (29) | ' ',
@@ -78,8 +78,8 @@ int init_ui(){
 		       1,
 		       true,
 		       false);
-    drawCDKSlider(leftY, true);
-    drawCDKSlider(rightY, true);
+    drawCDKSlider(Y, true);
+    drawCDKSlider(X, true);
 
     //This is the jenkest, but I'm using a big string to get the label big enough :)
   char *mesg[1] = {"</B/2>No data recieved                                                                                                                                                                                                                       <!2>"};
