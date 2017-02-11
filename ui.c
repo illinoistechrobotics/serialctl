@@ -2,10 +2,15 @@
 #include "ui.h"
 static int parent_x, parent_y;
 
-static CDKSLIDER * leftY;
-static CDKSLIDER * rightY;
-int old_leftY = 128, old_rightY = 128;
+// Code taken from Fenrir branch
+//
+//static CDKSLIDER * leftY;
+//static CDKSLIDER * rightY;
+//int old_leftY = 128, old_rightY = 128;
 
+static CDKSLIDER * Y;
+static CDKSLIDER * X;
+int old_Y = 128, old_X = 128;
 
 static CDKSCREEN *cdk_master;
 
@@ -122,7 +127,9 @@ void refresh_ui(packet_t * ctl, char * msg, int overflow){
     setCDKLabelMessage(estop_box,estop_off, 1);
   }
 
-  if(ctl->stickLY != old_leftY){
+// Code taken from Fenrir branch
+//
+/*  if(ctl->stickLY != old_leftY){
     old_leftY = ctl->stickLY;
     setCDKSliderValue(leftY, ctl->stickLY);
     drawCDKSlider(leftY, true);
@@ -132,5 +139,17 @@ void refresh_ui(packet_t * ctl, char * msg, int overflow){
     old_rightY = ctl->stickRY;
     setCDKSliderValue(rightY, ctl->stickRY);
     drawCDKSlider(rightY, true);
+  }*/
+
+  if(ctl->stickY != old_Y) {
+    old_Y = ctl->stickY;
+    setCDKSliderValue(Y, ctl->stickY);
+    drawCDKSlider(Y, true);
+  }
+
+  if(ctl->stickX != old_X){
+    old_X = ctl->stickX;
+    setCDKSliderValue(X, ctl->stickX);
+    drawCDKSlider(X, true);
   }
 }
