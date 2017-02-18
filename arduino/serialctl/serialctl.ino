@@ -130,8 +130,8 @@ void loop() {
 void fast_loop() {
   //About 25 iterations per sec
   //Serial Input for PID configuration
-  if (Serial.available()) {
-    int incomingByte = Serial.read();
+  if (SerCommDbg.available()) {
+    int incomingByte = SerCommDbg.read();
     switch(incomingByte) {
       case 'L':
       case 'l':
@@ -171,27 +171,27 @@ void fast_loop() {
       case '$':
         serialInputBuffer[serialInputBufferIndex] = '\0';
         *currentPIDValueToUpdate = strtod(serialInputBuffer, NULL);
-        Serial.print("Setting ");
+        SerCommDbg.print("Setting ");
         if (currentPIDValueToUpdate == &pidLeftP) {
-          Serial.print("Left P ");
+          SerCommDbg.print("Left P ");
         }
         if (currentPIDValueToUpdate == &pidLeftI) {
-          Serial.print("Left I ");
+          SerCommDbg.print("Left I ");
         }
         if (currentPIDValueToUpdate == &pidLeftD) {
-          Serial.print("Left D ");
+          SerCommDbg.print("Left D ");
         }
         if (currentPIDValueToUpdate == &pidRightP) {
-          Serial.print("Right P ");
+          SerCommDbg.print("Right P ");
         }
         if (currentPIDValueToUpdate == &pidRightI) {
-          Serial.print("Right I ");
+          SerCommDbg.print("Right I ");
         }
         if (currentPIDValueToUpdate == &pidRightD) {
-          Serial.print("Right D ");
+          SerCommDbg.print("Right D ");
         }
-        Serial.print("to ");
-        Serial.println(*currentPIDValueToUpdate);
+        SerCommDbg.print("to ");
+        SerCommDbg.println(*currentPIDValueToUpdate);
         serialInputBufferIndex = 0;
         break;
       case ' ':
