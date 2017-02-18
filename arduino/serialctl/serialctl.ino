@@ -27,6 +27,14 @@ Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(128, SABERTOOTH34);
 char homed = 0;
 
+// PID Tuning
+double pidLeftP = 0, pidLeftI = 0, pidLeftD = 0, pidRightP = 0, pidRightI = 0, pidRightD = 0;
+#define SERIAL_BUFFER_SIZE 20
+char serialInputBuffer[SERIAL_BUFFER_SIZE];
+char serialInputBufferIndex = 0;
+char currentPIDValueIsLeft = 1;
+double *currentPIDValueToUpdate = &pidLeftP;
+
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
@@ -67,6 +75,7 @@ void setup() {
   safe.btnhi = 0;
   safe.btnlo = 0;
   safe.cksum = 0b1000000010001011;
+  Serial.begin(115200);
   SerComm.begin(115200);
   //SerCommDbg.begin(115200);
   comm_init();
@@ -101,6 +110,82 @@ void loop() {
 }
 void fast_loop() {
   //About 25 iterations per sec
+  //Serial Input for PID configuration
+  if (Serial.available()) {
+    int incomingByte = Serial.read();
+    switch(incomingByte) {
+      case 'L':
+      case 'l':
+        currentPIDValueIsLeft = 1;
+        break;
+      case 'R':
+      case 'r':
+        currentPIDValueIsLeft = 0;
+        break;
+      case 'P':
+      case 'p':
+        if (currentPIDValueIsLeft) {
+          currentPIDValueToUpdate = &pidLeftP;
+        }
+        else {
+          currentPIDValueToUpdate = &pidRightP;
+        }
+        break;
+      case 'I':
+      case 'i':
+        if (currentPIDValueIsLeft) {
+          currentPIDValueToUpdate = &pidLeftI;
+        }
+        else {
+          currentPIDValueToUpdate = &pidRightI;
+        }
+        break;
+      case 'D':
+      case 'd':
+        if (currentPIDValueIsLeft) {
+          currentPIDValueToUpdate = &pidLeftD;
+        }
+        else {
+          currentPIDValueToUpdate = &pidRightD;
+        }
+        break;
+      case '$':
+        serialInputBuffer[serialInputBufferIndex] = '\0';
+        *currentPIDValueToUpdate = strtod(serialInputBuffer, NULL);
+        Serial.print("Setting ");
+        if (currentPIDValueToUpdate == &pidLeftP) {
+          Serial.print("Left P ");
+        }
+        if (currentPIDValueToUpdate == &pidLeftI) {
+          Serial.print("Left I ");
+        }
+        if (currentPIDValueToUpdate == &pidLeftD) {
+          Serial.print("Left D ");
+        }
+        if (currentPIDValueToUpdate == &pidRightP) {
+          Serial.print("Right P ");
+        }
+        if (currentPIDValueToUpdate == &pidRightI) {
+          Serial.print("Right I ");
+        }
+        if (currentPIDValueToUpdate == &pidRightD) {
+          Serial.print("Right D ");
+        }
+        Serial.print("to ");
+        Serial.println(*currentPIDValueToUpdate);
+        serialInputBufferIndex = 0;
+        break;
+      case ' ':
+        break;
+      default:
+        if (serialInputBufferIndex < SERIAL_BUFFER_SIZE - 1) {
+          serialInputBuffer[serialInputBufferIndex] = incomingByte;
+          serialInputBufferIndex++;
+        }
+        break;
+    }
+  }
+
   //arm
   //check for invalid states
   if ((getButton(5) ^ getButton(7))) {
