@@ -22,10 +22,12 @@
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-long last_f = 0, last_s = 0, usec;
+long last_f = 0, last_s = 0, t_start = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(128, SABERTOOTH34);
 char homed = 0;
+static uint8_t reset_counter = 0;
+static int power_constraint = 0;
 
 // PID Tuning
 double pidLeftP = 0, pidLeftI = 0, pidLeftD = 0, pidRightP = 0, pidRightI = 0, pidRightD = 0;
@@ -48,6 +50,7 @@ double *currentPIDValueToUpdate = &pidLeftP;
 #define AHI2 24
 #define BHI2 25
 #define DEADBAND_HALF_WIDTH 5
+#define RESET_BUTTON 9
 
 #define WATCHDOG_
 
@@ -75,19 +78,35 @@ void setup() {
   safe.btnhi = 0;
   safe.btnlo = 0;
   safe.cksum = 0b1000000010001011;
-  Serial.begin(115200);
-  SerComm.begin(115200);
-  //SerCommDbg.begin(115200);
+  SerComm.begin(57600);
+  SerCommDbg.begin(115200);
   comm_init();
   init_pins();
   last_f = millis();
   last_s = millis();
   drive_left(0);
   drive_right(0);
+  t_start = millis();
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
 
-  arm_setup();
+  //arm_setup();
+
+#ifdef WATCHDOG_
+  wdt_disable();  //long delay follows
+#endif
+  //wait at least ten seconds (TC of filters)
+  //before measuring offset (variable delay so
+  //as not to waste time spent homing arm)
+  if ((t_start = millis() - t_start) < 10000) {
+    delay(10000 - t_start);
+  }
+  measure_offset();
+#ifdef WATCHDOG_
+  wdt_enable(WDTO_250MS);  //Set 250ms WDT
+  wdt_reset();             //watchdog timer reset
+#endif
+  
 }
 void loop() {
   //Main loop runs at full speed
@@ -213,8 +232,8 @@ void fast_loop() {
     }
   }
   // Home arm
-  if ((homed == 0 || homed == 3) && getButton(8)) {
-    homed = 1;
+/*  if ((homed == 0 || homed == 3) && getButton(8)) {
+   homed = 1;
   }
   if (homed == 3) {
     if (getButton(3) ^ getButton(1)) {
@@ -230,13 +249,13 @@ void fast_loop() {
     ST12.motor(2, 64);
   } else {
     ST12.motor(2, 0);
-  }
-}
+  }*/
+} 
 void slow_loop() {
   //2x per second
   //Compressor
-  compressor_ctl();
-}
+ // compressor_ctl();
+} 
 
 void tank_drive() {
   int power_out = 0;
@@ -261,11 +280,25 @@ void tank_drive() {
   int left_out =     power_out + (turn_out / 8);
   int right_out = -1 * power_out + (turn_out / 8);
 
+  if (getButton(9)) {
+    if (reset_counter == 10) {
+      drive_left(0);
+      drive_right(0);
+      wdt_enable(WDTO_15MS);
+      while (1);	
+    }
+  }
+  else
+    reset_counter = 0;     	
+  
+
   //apply turbo mode
   if (getButton(6)) {
+    power_constraint = min(abs(power_out), 255 - abs(turn_out));
     if (abs(power_out) > 75) {
-      left_out  =    power_out * 2 + (turn_out);
-      right_out = -1 * power_out * 2 + (turn_out);
+      power_out = constrain(power_out * 2, -power_constraint, power_constraint);
+      left_out  =  power_out + (turn_out);
+      right_out = -1 * power_out + (turn_out);
     } else if (abs(power_out) >  20) {
       left_out  =    power_out * 2 + (turn_out / 4);
       right_out = -1 * power_out * 2 + (turn_out / 4);
@@ -295,7 +328,10 @@ void tank_drive() {
       right_out = -1 * power_out + (turn_out / 4);
     }
   }
-
+  SerCommDbg.print("L");
+  SerCommDbg.print(left_out);
+  SerCommDbg.print(" R");
+  SerCommDbg.println(right_out);
   drive_left(left_out);
   drive_right(right_out);
 }

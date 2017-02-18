@@ -26,10 +26,29 @@ void init_pins() {
   digitalWrite(GRIP_VALVE, LOW);
   pinMode(GRIP_VALVE, OUTPUT);
 }
+
+void measure_offset() {
+  //can only be called once--
+  //should be during setup() after drive is stopped
+  if (offset_measured) return;
+  int n = 10;
+  current_offset_left = current_offset_right = 0;
+  for (int i = 0; i < n; i++) {
+    current_offset_left += analogRead(CURRENT_LEFT);
+    current_offset_right += analogRead(CURRENT_RIGHT);
+    delay(10);
+  }
+  current_offset_left /= n;
+  current_offset_left -= 512;
+  current_offset_right /= n;
+  current_offset_right -= 512;
+  offset_measured = 1;
+}
+
 void print_data() {
   float i1, i2;
-  i1 = (analogRead(CURRENT_LEFT) - 512.0 - CURRENT_OFFSET) / 1.28;
-  i2 = (analogRead(CURRENT_RIGHT) - 512.0 - CURRENT_OFFSET) / 1.28;
+  i1 = (analogRead(CURRENT_LEFT) - 512.0 - current_offset_left) / 1.28;
+  i2 = (analogRead(CURRENT_RIGHT) - 512.0 - current_offset_right) / 1.28;
   if(comm_ok==0){
     //Print failsafe notice
     SerComm.print("-FS- ");
@@ -43,9 +62,9 @@ void print_data() {
   SerComm.print(homed, DEC);
   SerComm.print(", X(arm):");
   SerComm.print(count);
-  SerComm.print(", P(air):");
-  SerComm.print(psi);
-  SerComm.print("PSI");
+  //SerComm.print(", P(air):");
+  //SerComm.print(psi);
+  //SerComm.print("PSI");
   SerComm.println();
 }
 
@@ -92,6 +111,7 @@ void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned
       digitalWrite(ahi, LOW);
       digitalWrite(bhi, LOW);
     }
+    return;
   }
   //Forward!
   if (power > 0) {

@@ -1,6 +1,5 @@
 #pragma once
 #define P_SENSOR A2
-#define CURRENT_OFFSET -4
 #define PRESSURE_OFFSET 161
 #define MIN_PRESS 60    
 #define MAX_PRESS 80
@@ -12,7 +11,11 @@
 
 #define ADC2PSI(x) ((analogRead(x)-(float)PRESSURE_OFFSET)/1.024)
 
+float current_offset_left, current_offset_right;
+int offset_measured = 0;
+
 void init_pins();
+void measure_offset();
 void print_data();
 void osmc_init();
 void fast_pwm();
