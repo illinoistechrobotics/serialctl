@@ -13,6 +13,7 @@
 
 float current_offset_left, current_offset_right;
 int offset_measured = 0;
+float psi;
 
 void init_pins();
 void measure_offset();

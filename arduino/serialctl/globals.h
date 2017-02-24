@@ -6,8 +6,12 @@ extern comm_state cs;
 extern long last_p;
 extern char comm_ok;
 extern float psi;
+extern double pidLeftP, pidLeftI, pidLeftD, pidRightP, pidRightI, pidRightD;
 #define SerComm Serial1
 #define SerCommDbg Serial
+#define PID_SERIAL_BUFFER_SIZE 20
+#define RESET_BUTTON 9
+
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
 #define ntohs(x) htons(x)
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )

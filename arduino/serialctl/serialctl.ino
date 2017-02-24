@@ -19,6 +19,8 @@
 #include "hw.h"
 #include "zserio.h"
 #include "globals.h"
+#include "PIDUtil.h"
+
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
@@ -28,29 +30,6 @@ Sabertooth ST34(128, SABERTOOTH34);
 char homed = 0;
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
-
-// PID Tuning
-double pidLeftP = 0, pidLeftI = 0, pidLeftD = 0, pidRightP = 0, pidRightI = 0, pidRightD = 0;
-#define SERIAL_BUFFER_SIZE 20
-char serialInputBuffer[SERIAL_BUFFER_SIZE];
-char serialInputBufferIndex = 0;
-char currentPIDValueIsLeft = 1;
-double *currentPIDValueToUpdate = &pidLeftP;
-
-#define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
-#define ntohs(x) htons(x)
-#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
-#define ntohl(x) htonl(x)
-#define ALI1 7
-#define BLI1 8
-#define AHI1 22
-#define BHI1 23
-#define ALI2 11
-#define BLI2 12
-#define AHI2 24
-#define BHI2 25
-#define DEADBAND_HALF_WIDTH 5
-#define RESET_BUTTON 9
 
 #define WATCHDOG_
 
@@ -80,13 +59,14 @@ void setup() {
   safe.cksum = 0b1000000010001011;
   SerComm.begin(57600);
   SerCommDbg.begin(115200);
-  comm_init();
-  init_pins();
+  comm_init(); //Initialize the communication FSM
+  init_pins(); //Initilaize pins and motor controllers (refer to hw.ino)
+  PIDLoadTunings(); //Load the PID tunings from the EEPROM
   last_f = millis();
   last_s = millis();
-  drive_left(0);
-  drive_right(0);
-  t_start = millis();
+  drive_left(0);  //Ensure both motors are stopped
+  drive_right(0); 
+  t_start = millis(); //Save the start time
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
 
@@ -106,7 +86,6 @@ void setup() {
   wdt_enable(WDTO_250MS);  //Set 250ms WDT
   wdt_reset();             //watchdog timer reset
 #endif
-  
 }
 void loop() {
   //Main loop runs at full speed
@@ -129,81 +108,7 @@ void loop() {
 }
 void fast_loop() {
   //About 25 iterations per sec
-  //Serial Input for PID configuration
-  if (SerCommDbg.available()) {
-    int incomingByte = SerCommDbg.read();
-    switch(incomingByte) {
-      case 'L':
-      case 'l':
-        currentPIDValueIsLeft = 1;
-        break;
-      case 'R':
-      case 'r':
-        currentPIDValueIsLeft = 0;
-        break;
-      case 'P':
-      case 'p':
-        if (currentPIDValueIsLeft) {
-          currentPIDValueToUpdate = &pidLeftP;
-        }
-        else {
-          currentPIDValueToUpdate = &pidRightP;
-        }
-        break;
-      case 'I':
-      case 'i':
-        if (currentPIDValueIsLeft) {
-          currentPIDValueToUpdate = &pidLeftI;
-        }
-        else {
-          currentPIDValueToUpdate = &pidRightI;
-        }
-        break;
-      case 'D':
-      case 'd':
-        if (currentPIDValueIsLeft) {
-          currentPIDValueToUpdate = &pidLeftD;
-        }
-        else {
-          currentPIDValueToUpdate = &pidRightD;
-        }
-        break;
-      case '$':
-        serialInputBuffer[serialInputBufferIndex] = '\0';
-        *currentPIDValueToUpdate = strtod(serialInputBuffer, NULL);
-        SerCommDbg.print("Setting ");
-        if (currentPIDValueToUpdate == &pidLeftP) {
-          SerCommDbg.print("Left P ");
-        }
-        if (currentPIDValueToUpdate == &pidLeftI) {
-          SerCommDbg.print("Left I ");
-        }
-        if (currentPIDValueToUpdate == &pidLeftD) {
-          SerCommDbg.print("Left D ");
-        }
-        if (currentPIDValueToUpdate == &pidRightP) {
-          SerCommDbg.print("Right P ");
-        }
-        if (currentPIDValueToUpdate == &pidRightI) {
-          SerCommDbg.print("Right I ");
-        }
-        if (currentPIDValueToUpdate == &pidRightD) {
-          SerCommDbg.print("Right D ");
-        }
-        SerCommDbg.print("to ");
-        SerCommDbg.println(*currentPIDValueToUpdate);
-        serialInputBufferIndex = 0;
-        break;
-      case ' ':
-        break;
-      default:
-        if (serialInputBufferIndex < SERIAL_BUFFER_SIZE - 1) {
-          serialInputBuffer[serialInputBufferIndex] = incomingByte;
-          serialInputBufferIndex++;
-        }
-        break;
-    }
-  }
+  PIDTuner();
 
   //arm
   //check for invalid states
