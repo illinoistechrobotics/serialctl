@@ -28,5 +28,10 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define drive_right(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
 #define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
+#define JOYSTICK_PAD_UP 12
+#define JOYSTICK_PAD_RIGHT 13
+#define JOYSTICK_PAD_DOWN 14
+#define JOYSTICK_PAD_LEFT 15
+
 
 #define FAILTIME 100
