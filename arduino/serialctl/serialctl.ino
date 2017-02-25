@@ -35,7 +35,7 @@ static int power_constraint = 0;
 #ifdef WATCHDOG_
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
 #endif
-int getButton(int num) {
+unsigned int getButton(unsigned int num) {
   if (num <= 7) {
     return (astate->btnlo >> num) & 0x01;
   } else if (num > 7 && num <= 15) {
@@ -44,6 +44,23 @@ int getButton(int num) {
     return 0;
   }
 }
+unsigned int getDPad() {
+  // four bits: left down right up
+  return (astate->btnhi >> 4);
+}
+
+void setMotor(int motorID, int output) {
+  if (motorID <= 0) {
+    return;
+  }
+  else if (motorID <= 2) {
+    ST12.motor(motorID, output);
+  }
+  else if (motorID <= 4) {
+    ST34.motor(motorID - 2, output);
+  }
+}
+
 void setup() {
 #ifdef WATCHDOG_
   wdt_enable(WDTO_250MS);  //Set 250ms WDT
@@ -117,15 +134,26 @@ void fast_loop() {
   if ((getButton(5) ^ getButton(7))) {
     //both up and down buttons at same time is invalid
     if (getButton(7)) {
-      ST34.motor(1, -127);
+      setMotor(LOWER_ARM_MOTOR, -127);
     }
     else if (getButton(5)) {
-      ST34.motor(1, 127);
+      setMotor(LOWER_ARM_MOTOR, 127);
     }
   } else {
-    ST34.motor(1, 0);
+    setMotor(LOWER_ARM_MOTOR, 0);
   }
   
+  if (getButton(JOYSTICK_PAD_UP) ^ getButton(JOYSTICK_PAD_DOWN)) {
+    if (getButton(JOYSTICK_PAD_UP)) {
+      setMotor(UPPER_ARM_MOTOR, 127);
+    }
+    else if (getButton(JOYSTICK_PAD_DOWN)) {
+      setMotor(UPPER_ARM_MOTOR, -127);
+    }
+  }
+  else {
+    setMotor(UPPER_ARM_MOTOR, 0);
+  }
 } 
 void slow_loop() {
   //2x per second
@@ -162,11 +190,11 @@ void tank_drive() {
       drive_left(0);
       drive_right(0);
       wdt_enable(WDTO_15MS);
-      while (1);	
+      while (1);
     }
   }
   else
-    reset_counter = 0;     	
+    reset_counter = 0;
   
    if(getButton(4)){
     leftSet = power_out;
@@ -182,7 +210,7 @@ void tank_drive() {
   }
   //apply turbo mode
   if (getButton(6)) {
-    power_constraint = min(abs(power_out), 255 - abs(turn_out));
+    power_constraint = min(abs(power_out * 2), 255 - abs(turn_out));
     if (abs(power_out) > 75) {
       power_out = constrain(power_out * 2, -power_constraint, power_constraint);
       left_out  =  power_out + (turn_out);

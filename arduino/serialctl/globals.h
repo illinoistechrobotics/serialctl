@@ -29,4 +29,14 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
 
+// Inputs
+#define JOYSTICK_PAD_UP 12
+#define JOYSTICK_PAD_RIGHT 13
+#define JOYSTICK_PAD_DOWN 14
+#define JOYSTICK_PAD_LEFT 15
+
+// Outputs
+#define LOWER_ARM_MOTOR 3 // Sabertooth 2 Output 1
+#define UPPER_ARM_MOTOR 4 // Sabertooth 2 Output 2
+
 #define FAILTIME 100
