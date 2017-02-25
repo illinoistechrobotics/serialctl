@@ -1,6 +1,7 @@
 #include "hw.h"
 #include "packet.h"
 #include "globals.h"
+
 void init_pins() {
   //Main motors
   osmc_init();
@@ -18,9 +19,9 @@ void init_pins() {
     ST34.motor(2, 0);
   }
   count = 0;
-  //pinMode(A,INPUT);
-  //pinMode(B,INPUT);
-  //attachInterrupt(digitalPinToInterrupt(A), isrA, RISING);
+  pinMode(A,INPUT);
+  pinMode(B,INPUT);
+  attachInterrupt(digitalPinToInterrupt(A), isrA, RISING);
   //Gen purpose I/O
   pinMode(13, OUTPUT);
   digitalWrite(GRIP_VALVE, LOW);

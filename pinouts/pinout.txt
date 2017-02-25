@@ -1,0 +1,14 @@
+Arm:
+	Spinner:
+		ESC throttle -> 2 [PWM]
+		ESC reverse relay -> 41
+	Linear Actuator:
+	       Victor -> 3 [PWM]
+	       Limit switch
+
+
+RS485 is on serial3 and the data direction pin is 3a
+
+Encoders are on IIC:
+    LHS (IIC Address 5) -ve direction is forward/CW
+    RHS (IIC Address 6) +ve direction is forward/CW

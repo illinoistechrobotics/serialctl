@@ -1,3 +1,5 @@
+#include <PID_v2.h>
+
 #include <Sabertooth.h>
 
 //    serialctl
@@ -19,30 +21,16 @@
 #include "hw.h"
 #include "zserio.h"
 #include "globals.h"
+#include "PIDUtil.h"
+
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
 long last_f = 0, last_s = 0, t_start = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
-Sabertooth ST34(128, SABERTOOTH34);
-char homed = 0;
+Sabertooth ST34(129, SABERTOOTH12);
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
-
-#define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
-#define ntohs(x) htons(x)
-#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
-#define ntohl(x) htonl(x)
-#define ALI1 7
-#define BLI1 8
-#define AHI1 22
-#define BHI1 23
-#define ALI2 11
-#define BLI2 12
-#define AHI2 24
-#define BHI2 25
-#define DEADBAND_HALF_WIDTH 5
-#define RESET_BUTTON 9
 
 #define WATCHDOG_
 
@@ -77,13 +65,13 @@ void setup() {
   safe.cksum = 0b1000000010001011;
   SerComm.begin(57600);
   SerCommDbg.begin(115200);
-  comm_init();
-  init_pins();
+  comm_init(); //Initialize the communication FSM
+  init_pins(); //Initilaize pins and motor controllers (refer to hw.ino)
   last_f = millis();
   last_s = millis();
-  drive_left(0);
-  drive_right(0);
-  t_start = millis();
+  drive_left(0);  //Ensure both motors are stopped
+  drive_right(0); 
+  t_start = millis(); //Save the start time
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
 
@@ -103,7 +91,6 @@ void setup() {
   wdt_enable(WDTO_250MS);  //Set 250ms WDT
   wdt_reset();             //watchdog timer reset
 #endif
-  
 }
 void loop() {
   //Main loop runs at full speed
@@ -117,6 +104,8 @@ void loop() {
     print_data();
     last_f = millis();
   }
+  //Compute the PIDs if needed
+  PIDDrive();
   //Slow loop
   //Runs this every ~500ms
   if (millis() - last_s >= 500) {
@@ -126,6 +115,8 @@ void loop() {
 }
 void fast_loop() {
   //About 25 iterations per sec
+  PIDTuner();
+
   //arm
   //check for invalid states
   if ((getButton(5) ^ getButton(7))) {
@@ -139,38 +130,7 @@ void fast_loop() {
   } else {
     ST34.motor(1, 0);
   }
-  //Gripper
-  //check for invalid states
-  if ((getButton(0) ^ getButton(2))) {
-    //both up and down buttons at same time is invalid
-    if (getButton(2)) {
-      //close gripper
-      digitalWrite(GRIP_VALVE,LOW);
-    }
-    else if (getButton(0)) {
-      //open gripper
-      digitalWrite(GRIP_VALVE,HIGH);
-    }
-  }
-  // Home arm
-/*  if ((homed == 0 || homed == 3) && getButton(8)) {
-   homed = 1;
-  }
-  if (homed == 3) {
-    if (getButton(3) ^ getButton(1)) {
-      if (getButton(3)) move_arm(1);
-      else if (getButton(1)) move_arm(-1);
-    }
-    else move_arm(0);
-  }
-  arm_loop();
   
-  //Dispenser Wrench
-  if (getButton(9)) {
-    ST12.motor(2, 64);
-  } else {
-    ST12.motor(2, 0);
-  }*/
 } 
 void slow_loop() {
   //2x per second
@@ -200,7 +160,8 @@ void tank_drive() {
   }
   int left_out =     power_out + (turn_out / 8);
   int right_out = -1 * power_out + (turn_out / 8);
-
+  
+ //System reset logic
   if (getButton(9)) {
     if (reset_counter == 10) {
       drive_left(0);
@@ -212,7 +173,18 @@ void tank_drive() {
   else
     reset_counter = 0;     	
   
-
+  if(getButton(4)){
+    leftSet = power_out;
+    rightSet = power_out;
+    leftPID.SetMode(AUTOMATIC);
+    rightPID.SetMode(AUTOMATIC);
+    
+    //PID outputs directly to motors at a rate of PID_SAMPLE_TIME
+    return;
+  } else{
+    leftPID.SetMode(MANUAL);
+    rightPID.SetMode(MANUAL);
+  }
   //apply turbo mode
   if (getButton(6)) {
     power_constraint = min(abs(power_out * 2), 255 - abs(turn_out));
@@ -228,6 +200,7 @@ void tank_drive() {
       right_out = -1 * power_out + (turn_out);
     }
   } else if (getButton(4)) { //precision mode
+    
     /*
     if (abs(power_out) > 75) {
       left_out  =    power_out / 2 + (turn_out / 2);
@@ -237,8 +210,8 @@ void tank_drive() {
       right_out = -1 * power_out / 2 + (turn_out / 8);
     } else {
     */
-      left_out  /= 2;
-      right_out /= 2;
+      //left_out  /= 2;
+      //right_out /= 2;
     //}
   } else {
     if (abs(power_out) > 75) {
@@ -249,10 +222,39 @@ void tank_drive() {
       right_out = -1 * power_out + (turn_out / 4);
     }
   }
+  // Debug printing
   SerCommDbg.print("L");
   SerCommDbg.print(left_out);
   SerCommDbg.print(" R");
   SerCommDbg.println(right_out);
+  // Drive motors!
   drive_left(left_out);
   drive_right(right_out);
 }
+
+/* Gripper
+  //check for invalid states
+  if ((getButton(0) ^ getButton(2))) {
+    //both up and down buttons at same time is invalid
+    if (getButton(2)) {
+      //close gripper
+      digitalWrite(GRIP_VALVE,LOW);
+    }
+    else if (getButton(0)) {
+      //open gripper
+      digitalWrite(GRIP_VALVE,HIGH);
+    }
+  }
+  // Home arm
+/*  if ((homed == 0 || homed == 3) && getButton(8)) {
+   homed = 1;
+  }
+  if (homed == 3) {
+    if (getButton(3) ^ getButton(1)) {
+      if (getButton(3)) move_arm(1);
+      else if (getButton(1)) move_arm(-1);
+    }
+    else move_arm(0);
+  }
+  arm_loop();
+  */
