@@ -50,6 +50,19 @@ unsigned int getDPad() {
   // four bits: left down right up
   return (astate->btnhi >> 4);
 }
+
+void setMotor(int motorID, int output) {
+  if (motorID <= 0) {
+    return;
+  }
+  else if (motorID <= 2) {
+    ST12.motor(motorID, output);
+  }
+  else if (motorID <= 4) {
+    ST34.motor(motorID - 2, output);
+  }
+}
+
 void setup() {
 #ifdef WATCHDOG_
   wdt_enable(WDTO_250MS);  //Set 250ms WDT
@@ -121,15 +134,26 @@ void fast_loop() {
   if ((getButton(5) ^ getButton(7))) {
     //both up and down buttons at same time is invalid
     if (getButton(7)) {
-      ST34.motor(1, -127);
+      setMotor(LOWER_ARM_MOTOR, -127);
     }
     else if (getButton(5)) {
-      ST34.motor(1, 127);
+      setMotor(LOWER_ARM_MOTOR, 127);
     }
   } else {
-    ST34.motor(1, 0);
+    setMotor(LOWER_ARM_MOTOR, 0);
   }
   
+  if (getButton(JOYSTICK_PAD_UP) ^ getButton(JOYSTICK_PAD_DOWN)) {
+    if (getButton(JOYSTICK_PAD_UP)) {
+      setMotor(UPPER_ARM_MOTOR, 127);
+    }
+    else if (getButton(JOYSTICK_PAD_DOWN)) {
+      setMotor(UPPER_ARM_MOTOR, -127);
+    }
+  }
+  else {
+    setMotor(UPPER_ARM_MOTOR, 0);
+  }
 } 
 void slow_loop() {
   //2x per second
@@ -166,11 +190,11 @@ void tank_drive() {
       drive_left(0);
       drive_right(0);
       wdt_enable(WDTO_15MS);
-      while (1);	
+      while (1);
     }
   }
   else
-    reset_counter = 0;     	
+    reset_counter = 0;
   
   if(getButton(4)){
     leftSet = power_out;
