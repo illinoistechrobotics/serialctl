@@ -1,5 +1,3 @@
-#include <PID_v2.h>
-
 #include <Sabertooth.h>
 
 //    serialctl
@@ -60,7 +58,9 @@ void setup() {
   safe.cksum = 0b1000000010001011;
   SerComm.begin(57600);
   SerCommDbg.begin(115200);
+  PIDInit(); //Initialize PID subsystem 
   comm_init(); //Initialize the communication FSM
+  setup_iic();
   init_pins(); //Initilaize pins and motor controllers (refer to hw.ino)
   last_f = millis();
   last_s = millis();
@@ -168,7 +168,7 @@ void tank_drive() {
   else
     reset_counter = 0;     	
   
-  if(getButton(4)){
+   if(getButton(4)){
     leftSet = power_out;
     rightSet = power_out;
     leftPID.SetMode(AUTOMATIC);

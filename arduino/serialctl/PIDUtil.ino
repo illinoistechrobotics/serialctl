@@ -1,4 +1,4 @@
-
+#include "PIDUtil.h"
 double pidLeftP=0, pidLeftI=0, pidLeftD=0, pidRightP=0, pidRightI=0, pidRightD=0;
 double leftIn=0, leftOut=0, leftSet=0, rightIn=0, rightOut=0, rightSet=0;
 PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, DIRECT);
@@ -15,6 +15,7 @@ void PIDDrive(){
     }
     SerCommDbg.print("PID(L): ");
     SerCommDbg.print(leftOut);
+    SerCommDbg.println();
     drive_left(leftOut);
   }
   if(rightPID.NeedsCompute()){
@@ -27,8 +28,9 @@ void PIDDrive(){
     }
     SerCommDbg.print("PID(R): ");
     SerCommDbg.print(rightOut);
+    SerCommDbg.println();
     drive_right(rightOut);
-  }
+ }
 }
 
 void PIDInit(){
@@ -44,7 +46,7 @@ void PIDInit(){
 
 void PIDRefreshTunings(){
   leftPID.SetTunings(pidLeftP, pidLeftI, pidLeftD);
-  rightPID.SetTunings(pidLeftP, pidLeftI, pidLeftD);  
+  rightPID.SetTunings(pidRightP, pidRightI, pidRightD);  
 }
 
 void PIDTuner(){
@@ -105,31 +107,33 @@ void PIDTuner(){
         serialInputBufferIndex = 0;
         break;
       case '\n':
-        serialInputBuffer[serialInputBufferIndex] = '\0';
-        *currentPIDValueToUpdate = strtod(serialInputBuffer, NULL);
-        SerCommDbg.print("Setting ");
-        if (currentPIDValueToUpdate == &pidLeftP) {
-          SerCommDbg.print("Left P ");
-        }
-        if (currentPIDValueToUpdate == &pidLeftI) {
-          SerCommDbg.print("Left I ");
-        }
-        if (currentPIDValueToUpdate == &pidLeftD) {
-          SerCommDbg.print("Left D ");
-        }
-        if (currentPIDValueToUpdate == &pidRightP) {
-          SerCommDbg.print("Right P ");
-        }
-        if (currentPIDValueToUpdate == &pidRightI) {
-          SerCommDbg.print("Right I ");
-        }
-        if (currentPIDValueToUpdate == &pidRightD) {
+        if(serialInputBufferIndex > 0){
+          serialInputBuffer[serialInputBufferIndex] = '\0';
+          *currentPIDValueToUpdate = strtod(serialInputBuffer, NULL);
+          SerCommDbg.print("Setting ");
+          if (currentPIDValueToUpdate == &pidLeftP) {
+            SerCommDbg.print("Left P ");
+          }
+          if (currentPIDValueToUpdate == &pidLeftI) {
+            SerCommDbg.print("Left I ");
+          }
+          if (currentPIDValueToUpdate == &pidLeftD) {
+            SerCommDbg.print("Left D ");
+          }
+          if (currentPIDValueToUpdate == &pidRightP) {
+            SerCommDbg.print("Right P ");
+          }
+          if (currentPIDValueToUpdate == &pidRightI) {
+            SerCommDbg.print("Right I ");
+          }
+          if (currentPIDValueToUpdate == &pidRightD) {
           SerCommDbg.print("Right D ");
+          }
+          SerCommDbg.print("to ");
+          SerCommDbg.println(*currentPIDValueToUpdate);
+          PIDRefreshTunings();
         }
-        SerCommDbg.print("to ");
-        SerCommDbg.println(*currentPIDValueToUpdate);
         serialInputBufferIndex = 0;
-        PIDRefreshTunings();
         break;
       case ' ':
         break;
@@ -155,13 +159,26 @@ void PIDWriteTunings(){
 
 void PIDLoadTunings(){
   //Load the PID tunings from the EEPROM
+  //PID library cannot recover from NaN internal state
   EEPROM.get(FS_LEFT_P_4,pidLeftP);
+  if(pidLeftP == NAN)
+    pidLeftP = 0;
   EEPROM.get(FS_LEFT_I_4,pidLeftI);
+  if(pidLeftI == NAN)
+    pidLeftI = 0;
   EEPROM.get(FS_LEFT_D_4,pidLeftD);
+  if(pidLeftD == NAN)
+    pidLeftD = 0;
   EEPROM.get(FS_RIGHT_P_4,pidRightP);
+  if(pidRightP == NAN)
+    pidRightP = 0;
   EEPROM.get(FS_RIGHT_I_4,pidRightI);
+  if(pidRightI == NAN)
+    pidRightI = 0;
   EEPROM.get(FS_RIGHT_D_4,pidRightD);
+  if(pidRightD == NAN)
+    pidRightD = 0;
+    
   PIDRefreshTunings();
-
 }
 

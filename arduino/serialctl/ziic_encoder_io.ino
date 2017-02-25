@@ -18,8 +18,10 @@ int iic_encoder_read(char addr, double *outdbl){
 
     while (Wire.available()) { // slave may send less than requested
         *recvptr = Wire.read(); // receive a byte as character
-        recvptr--;
         cnt++;
+        if(recvptr == (char*)&recvdbl)
+          break;
+        recvptr--;
     }
     if(cnt != sizeof(double)){
         //Bus fault!
