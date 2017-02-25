@@ -30,6 +30,3 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define DEADBAND_HALF_WIDTH 5
 
 #define FAILTIME 100
-
-#define A 2
-#define B 3

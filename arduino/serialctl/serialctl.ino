@@ -99,6 +99,8 @@ void loop() {
     print_data();
     last_f = millis();
   }
+  //Compute the PIDs if needed
+  PIDDrive();
   //Slow loop
   //Runs this every ~500ms
   if (millis() - last_s >= 500) {
@@ -167,8 +169,13 @@ void tank_drive() {
     reset_counter = 0;     	
   
   if(getButton(4)){
+    leftSet = power_out;
+    rightSet = power_out;
     leftPID.SetMode(AUTOMATIC);
     rightPID.SetMode(AUTOMATIC);
+    
+    //PID outputs directly to motors at a rate of PID_SAMPLE_TIME
+    return;
   } else{
     leftPID.SetMode(MANUAL);
     rightPID.SetMode(MANUAL);
@@ -189,7 +196,6 @@ void tank_drive() {
     }
   } else if (getButton(4)) { //precision mode
     
-    right_out=0;
     /*
     if (abs(power_out) > 75) {
       left_out  =    power_out / 2 + (turn_out / 2);

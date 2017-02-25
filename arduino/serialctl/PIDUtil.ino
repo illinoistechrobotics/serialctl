@@ -4,6 +4,33 @@ double leftIn=0, leftOut=0, leftSet=0, rightIn=0, rightOut=0, rightSet=0;
 PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, DIRECT);
 PID rightPID(&rightIn, &rightOut, &rightSet, pidRightP, pidRightI, pidRightD, DIRECT);
 
+void PIDDrive(){
+  if(leftPID.NeedsCompute()){
+    if(iic_encoder_read(ENCODER_LEFT_ADDR,&leftIn)){
+    //Successfully read the left encoder
+      leftPID.Compute();
+    } else {
+      //Bus fault!
+      leftOut=0;
+    }
+    SerCommDbg.print("PID(L): ");
+    SerCommDbg.print(leftOut);
+    drive_left(leftOut);
+  }
+  if(rightPID.NeedsCompute()){
+    if(iic_encoder_read(ENCODER_RIGHT_ADDR,&rightIn)){
+    //Successfully read the left encoder
+      rightPID.Compute();
+    } else {
+      //Bus fault!
+      rightOut=0;
+    }
+    SerCommDbg.print("PID(R): ");
+    SerCommDbg.print(rightOut);
+    drive_right(rightOut);
+  }
+}
+
 void PIDInit(){
     PIDLoadTunings(); //Load the PID tunings from the EEPROM
     PIDRefreshTunings();

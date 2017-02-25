@@ -3,8 +3,6 @@
 
 #define CURRENT_RIGHT A0
 #define CURRENT_LEFT A1
-#define ENCODER_LEFT_ADDR 5
-#define ENCODER_RIGHT_ADDR 6
 
 #define SABERTOOTH12 Serial2
 #define SerCommDynamixel Serial3
