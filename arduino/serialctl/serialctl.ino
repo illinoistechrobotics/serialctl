@@ -50,7 +50,6 @@ unsigned int getDPad() {
   // four bits: left down right up
   return (astate->btnhi >> 4);
 }
-boolean 
 void setup() {
 #ifdef WATCHDOG_
   wdt_enable(WDTO_250MS);  //Set 250ms WDT
