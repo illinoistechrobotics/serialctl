@@ -1,3 +1,5 @@
+#include <PID_v2.h>
+
 #include <Sabertooth.h>
 
 //    serialctl
@@ -26,8 +28,7 @@ packet_t *astate, *incoming;
 comm_state cs;
 long last_f = 0, last_s = 0, t_start = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
-Sabertooth ST34(128, SABERTOOTH34);
-char homed = 0;
+Sabertooth ST34(129, SABERTOOTH12);
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
 
@@ -61,7 +62,6 @@ void setup() {
   SerCommDbg.begin(115200);
   comm_init(); //Initialize the communication FSM
   init_pins(); //Initilaize pins and motor controllers (refer to hw.ino)
-  PIDLoadTunings(); //Load the PID tunings from the EEPROM
   last_f = millis();
   last_s = millis();
   drive_left(0);  //Ensure both motors are stopped
@@ -123,38 +123,7 @@ void fast_loop() {
   } else {
     ST34.motor(1, 0);
   }
-  //Gripper
-  //check for invalid states
-  if ((getButton(0) ^ getButton(2))) {
-    //both up and down buttons at same time is invalid
-    if (getButton(2)) {
-      //close gripper
-      digitalWrite(GRIP_VALVE,LOW);
-    }
-    else if (getButton(0)) {
-      //open gripper
-      digitalWrite(GRIP_VALVE,HIGH);
-    }
-  }
-  // Home arm
-/*  if ((homed == 0 || homed == 3) && getButton(8)) {
-   homed = 1;
-  }
-  if (homed == 3) {
-    if (getButton(3) ^ getButton(1)) {
-      if (getButton(3)) move_arm(1);
-      else if (getButton(1)) move_arm(-1);
-    }
-    else move_arm(0);
-  }
-  arm_loop();
   
-  //Dispenser Wrench
-  if (getButton(9)) {
-    ST12.motor(2, 64);
-  } else {
-    ST12.motor(2, 0);
-  }*/
 } 
 void slow_loop() {
   //2x per second
@@ -184,7 +153,8 @@ void tank_drive() {
   }
   int left_out =     power_out + (turn_out / 8);
   int right_out = -1 * power_out + (turn_out / 8);
-
+  
+ //System reset logic
   if (getButton(9)) {
     if (reset_counter == 10) {
       drive_left(0);
@@ -196,7 +166,13 @@ void tank_drive() {
   else
     reset_counter = 0;     	
   
-
+  if(getButton(4)){
+    leftPID.SetMode(AUTOMATIC);
+    rightPID.SetMode(AUTOMATIC);
+  } else{
+    leftPID.SetMode(MANUAL);
+    rightPID.SetMode(MANUAL);
+  }
   //apply turbo mode
   if (getButton(6)) {
     power_constraint = min(abs(power_out), 255 - abs(turn_out));
@@ -212,6 +188,8 @@ void tank_drive() {
       right_out = -1 * power_out + (turn_out);
     }
   } else if (getButton(4)) { //precision mode
+    
+    right_out=0;
     /*
     if (abs(power_out) > 75) {
       left_out  =    power_out / 2 + (turn_out / 2);
@@ -221,8 +199,8 @@ void tank_drive() {
       right_out = -1 * power_out / 2 + (turn_out / 8);
     } else {
     */
-      left_out  /= 2;
-      right_out /= 2;
+      //left_out  /= 2;
+      //right_out /= 2;
     //}
   } else {
     if (abs(power_out) > 75) {
@@ -233,10 +211,39 @@ void tank_drive() {
       right_out = -1 * power_out + (turn_out / 4);
     }
   }
+  // Debug printing
   SerCommDbg.print("L");
   SerCommDbg.print(left_out);
   SerCommDbg.print(" R");
   SerCommDbg.println(right_out);
+  // Drive motors!
   drive_left(left_out);
   drive_right(right_out);
 }
+
+/* Gripper
+  //check for invalid states
+  if ((getButton(0) ^ getButton(2))) {
+    //both up and down buttons at same time is invalid
+    if (getButton(2)) {
+      //close gripper
+      digitalWrite(GRIP_VALVE,LOW);
+    }
+    else if (getButton(0)) {
+      //open gripper
+      digitalWrite(GRIP_VALVE,HIGH);
+    }
+  }
+  // Home arm
+/*  if ((homed == 0 || homed == 3) && getButton(8)) {
+   homed = 1;
+  }
+  if (homed == 3) {
+    if (getButton(3) ^ getButton(1)) {
+      if (getButton(3)) move_arm(1);
+      else if (getButton(1)) move_arm(-1);
+    }
+    else move_arm(0);
+  }
+  arm_loop();
+  */

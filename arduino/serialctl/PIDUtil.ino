@@ -1,5 +1,24 @@
 
 double pidLeftP=0, pidLeftI=0, pidLeftD=0, pidRightP=0, pidRightI=0, pidRightD=0;
+double leftIn=0, leftOut=0, leftSet=0, rightIn=0, rightOut=0, rightSet=0;
+PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, DIRECT);
+PID rightPID(&rightIn, &rightOut, &rightSet, pidRightP, pidRightI, pidRightD, DIRECT);
+
+void PIDInit(){
+    PIDLoadTunings(); //Load the PID tunings from the EEPROM
+    PIDRefreshTunings();
+    leftPID.SetMode(MANUAL);
+    rightPID.SetMode(MANUAL);
+    leftPID.SetSampleTime(PID_SAMPLE_TIME);
+    rightPID.SetSampleTime(PID_SAMPLE_TIME);
+    leftPID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
+    rightPID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
+}
+
+void PIDRefreshTunings(){
+  leftPID.SetTunings(pidLeftP, pidLeftI, pidLeftD);
+  rightPID.SetTunings(pidLeftP, pidLeftI, pidLeftD);  
+}
 
 void PIDTuner(){
   //Parse the data relating to the local PID tuner
@@ -83,6 +102,7 @@ void PIDTuner(){
         SerCommDbg.print("to ");
         SerCommDbg.println(*currentPIDValueToUpdate);
         serialInputBufferIndex = 0;
+        PIDRefreshTunings();
         break;
       case ' ':
         break;
@@ -114,5 +134,7 @@ void PIDLoadTunings(){
   EEPROM.get(FS_RIGHT_P_4,pidRightP);
   EEPROM.get(FS_RIGHT_I_4,pidRightI);
   EEPROM.get(FS_RIGHT_D_4,pidRightD);
+  PIDRefreshTunings();
+
 }
 

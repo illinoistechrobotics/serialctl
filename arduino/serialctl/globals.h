@@ -5,8 +5,9 @@ extern packet_t *astate, *incoming;
 extern comm_state cs;
 extern long last_p;
 extern char comm_ok;
-extern float psi;
 extern double pidLeftP, pidLeftI, pidLeftD, pidRightP, pidRightI, pidRightD;
+extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
+
 #define SerComm Serial1
 #define SerCommDbg Serial
 #define PID_SERIAL_BUFFER_SIZE 20

@@ -1,14 +1,13 @@
 #include "hw.h"
 #include "packet.h"
 #include "globals.h"
-#define COMPCTL ST34
-#define COMPPIN 2
+
 void init_pins() {
   //Main motors
   osmc_init();
   //Linear Actuators
   SABERTOOTH12.begin(9600);
-  SABERTOOTH34.begin(9600);
+  //SABERTOOTH34.begin(9600);
   delay(10);
   //failsafes
   for (int i = 0; i < 3; i++) {
@@ -19,14 +18,9 @@ void init_pins() {
     ST12.motor(2, 0);
     ST34.motor(2, 0);
   }
-  count = 0;
-  pinMode(A,INPUT);
-  pinMode(B,INPUT);
-  attachInterrupt(digitalPinToInterrupt(A), isrA, RISING);
+
   //Gen purpose I/O
   pinMode(13, OUTPUT);
-  digitalWrite(GRIP_VALVE, LOW);
-  pinMode(GRIP_VALVE, OUTPUT);
 }
 
 void measure_offset() {
@@ -60,11 +54,7 @@ void print_data() {
   SerComm.print("A, I(R):");
   SerComm.print(i2);
   SerComm.print("A, ");
-  SerComm.print("H:");
-  SerComm.print(homed, DEC);
-  SerComm.print(", X(arm):");
-  SerComm.print(count);
-  //SerComm.print(", P(air):");
+  //SerComm.print("P(air):");
   //SerComm.print(psi);
   //SerComm.print("PSI");
   SerComm.println();
@@ -130,6 +120,8 @@ void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned
     analogWrite(ali, abs(power));
   }
 }
+/*
+ * Unused functions form previous designs
 
 void compressor_ctl(){
   static char pumping=0;
@@ -160,4 +152,4 @@ void compressor_ctl(){
     COMPCTL.motor(COMPPIN,0);
   }
 }
-
+*/
