@@ -1,17 +1,16 @@
 CC=gcc
 CFLAGS=-c -Wall -Werror -g
-LDFLAGS=-lncurses -lcdk
-SOURCES=base64.c crc16.c serio.c main.c joystick.c ui.c
+LDFLAGS=-lncurses
+SOURCES=base64.c crc16.c serio.c main.c joystick.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=main
+EXECUTABLE=serialctl
 SDL_CFLAGS := $(shell sdl2-config --cflags)
 SDL_LDFLAGS := $(shell sdl2-config --libs)
 all: $(SOURCES) $(EXECUTABLE)
-
+	    
 $(EXECUTABLE): $(OBJECTS) 
-	    $(CC) $(SDL_LDFLAGS) $(LDFLAGS) $(OBJECTS) -o $@
-
+	    $(CC) $(OBJECTS) -o $@ $(SDL_LDFLAGS) $(LDFLAGS) 
 .c.o:
-	    $(CC) $(SDL_CFLAGS) $(CFLAGS) $< -o $@
+	    $(CC) $< -o $@ $(SDL_CFLAGS) $(CFLAGS) 
 clean:
-	    rm -f *.o $(EXECUTABLE)
+	    rm *.o $(EXECUTABLE)
