@@ -205,6 +205,8 @@ void tank_drive() {
     //PID outputs directly to motors at a rate of PID_SAMPLE_TIME
     return;
   } else{
+    leftOut = 0;
+    rightOut = 0;
     leftPID.SetMode(MANUAL);
     rightPID.SetMode(MANUAL);
   }

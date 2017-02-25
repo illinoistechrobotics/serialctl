@@ -1,7 +1,7 @@
 #include "PIDUtil.h"
 double pidLeftP=0, pidLeftI=0, pidLeftD=0, pidRightP=0, pidRightI=0, pidRightD=0;
 double leftIn=0, leftOut=0, leftSet=0, rightIn=0, rightOut=0, rightSet=0;
-PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, DIRECT);
+PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, REVERSE);
 PID rightPID(&rightIn, &rightOut, &rightSet, pidRightP, pidRightI, pidRightD, DIRECT);
 
 void PIDDrive(){
