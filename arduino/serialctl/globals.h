@@ -21,10 +21,14 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define BLI1 8
 #define AHI1 22
 #define BHI1 23
+#define DENABLE1 NULL
+
 #define ALI2 11
 #define BLI2 12
 #define AHI2 24
 #define BHI2 25
+#define DENABLE2 NULL
+
 #define drive_right(x) drive_osmc(x,0,ALI1,BLI1,AHI1,BHI1)
 #define drive_left(x) drive_osmc(x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5

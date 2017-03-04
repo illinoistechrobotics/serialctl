@@ -197,8 +197,8 @@ void tank_drive() {
     reset_counter = 0;
   
    if(getButton(4)){
-    leftSet = power_out;
-    rightSet = power_out;
+    leftSet = 2*power_out;
+    rightSet = -2*power_out;
     leftPID.SetMode(AUTOMATIC);
     rightPID.SetMode(AUTOMATIC);
     

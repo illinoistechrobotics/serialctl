@@ -70,6 +70,9 @@ void osmc_init() {
   digitalWrite(BLI2, LOW);
   digitalWrite(AHI2, LOW);
   digitalWrite(BHI2, LOW);
+  digitalWrite(DENABLE1, LOW);
+  digitalWrite(DENABLE2, LOW);
+  
   pinMode(ALI1, OUTPUT);
   pinMode(AHI1, OUTPUT);
   pinMode(BLI1, OUTPUT);
@@ -78,6 +81,10 @@ void osmc_init() {
   pinMode(AHI2, OUTPUT);
   pinMode(BLI2, OUTPUT);
   pinMode(BHI2, OUTPUT);
+  pinMode(DENABLE1, OUTPUT);
+  pinMode(DENABLE2, OUTPUT);
+
+
   pinMode(13, OUTPUT);
   fast_pwm();
 }
@@ -85,6 +92,17 @@ void fast_pwm() {
   TCCR1B = (TCCR1B & 0b11111000) | 0x03;
   TCCR4B = (TCCR4B & 0b11111000) | 0x03;
 }
+
+char osmc_enablecontrol(char enabled, char enablepin, char readypin){
+  if(digitalRead(readypin)){
+    if(
+  } else{
+    //If not ready, make sure it is disabled!
+    digitalWrite(enablepin, LOW);
+    return 0;
+  }
+}
+
 // OSMC motor controller stuff
 // Low side outputs must be PWM capable and NOT 5 or 6 (on Uno)
 // Do not change timer0,
