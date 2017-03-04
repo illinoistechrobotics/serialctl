@@ -17,9 +17,8 @@ void measure_offset();
 void print_data();
 void osmc_init();
 void fast_pwm();
-void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned short bli, unsigned short ahi, unsigned short bhi);
-
-
+char try_enable_osmc(char enabled, char enablepin, char readypin, char ali, char bli, char ahi, char bhi);
+void drive_osmc(char enabled, int rawpower, char brake, char ali, char bli, char ahi, char bhi);
 
 //Unused but kept for documentation purposes
 /*

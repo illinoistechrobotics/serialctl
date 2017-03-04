@@ -93,18 +93,23 @@ void fast_pwm() {
   TCCR4B = (TCCR4B & 0b11111000) | 0x03;
 }
 
-char osmc_enablecontrol(char enabled, char enablepin, char readypin, unsigned short ali, unsigned short bli, unsigned short ahi, unsigned short bhi){
-  //If ready and current state is not enabled, wait 10 ms and enable
-  //If ready and current state is enabled, do nothing
-  //If enable signal is low/0 disable, and set all signals to zero
-  //Return the new value of the current enable/disable state
-  if(digitalRead(readypin)){
-    //Ready signal OK
-    if(enabled)
-      return 
-  } else{
-    //If not ready, make sure it is disabled!
+// returns new enable state
+char try_enable_osmc(char enabled, char enablepin, char readypin,
+                     char ali, char bli, char ahi, char bhi) {
+  // ready signal from osmc controller indicates that we are OK to provide input
+  if (digitalRead(readypin)) {
+    if (!enabled)
+      delay(10); // required in order to prevent blowout!
+      digitalWrite(enablepin, HIGH);
+    }
+    return 1;
+  }
+  else { // controller has no power; zero inputs in case we power it again
     digitalWrite(enablepin, LOW);
+    digitalWrite(ali, LOW);
+    digitalWrite(bli, LOW);
+    digitalWrite(ahi, LOW);
+    digitalWrite(bhi, LOW);
     return 0;
   }
 }
@@ -126,11 +131,11 @@ char osmc_enablecontrol(char enabled, char enablepin, char readypin, unsigned sh
  *   ALI   BLI
  *   |     |
  *   --------- GND
- * 
  */
-void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned short bli, unsigned short ahi, unsigned short bhi, unsigned short enabled) {
+void drive_osmc(char enabled, int rawpower, char brake,
+                char ali, char bli, char ahi, char bhi) {
   int power = constrain(rawpower, -255, 255);
-  if(!enabled){
+  if (!enabled) {
     digitalWrite(ali, LOW);
     digitalWrite(bli, LOW);
     digitalWrite(ahi, LOW);
@@ -166,7 +171,7 @@ void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned
   }
 }
 /*
- * Unused functions form previous designs
+ * Unused functions from previous designs
 
 void compressor_ctl(){
   static char pumping=0;

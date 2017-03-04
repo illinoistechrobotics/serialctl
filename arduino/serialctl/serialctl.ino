@@ -24,6 +24,7 @@
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
+char left_enabled = 0, right_enabled = 0;
 long last_f = 0, last_s = 0, t_start = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(129, SABERTOOTH12);
@@ -78,11 +79,11 @@ void setup() {
   PIDInit(); //Initialize PID subsystem 
   comm_init(); //Initialize the communication FSM
   setup_iic();
-  init_pins(); //Initilaize pins and motor controllers (refer to hw.ino)
+  init_pins(); //Initialize pins and motor controllers (refer to hw.ino)
   last_f = millis();
   last_s = millis();
-  drive_left(0);  //Ensure both motors are stopped
-  drive_right(0); 
+  drive_left(0,0);  //Ensure both motors are stopped
+  drive_right(0,0); 
   t_start = millis(); //Save the start time
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
@@ -108,6 +109,8 @@ void loop() {
   //Main loop runs at full speed
   wdt_reset();
   comm_parse();
+  left_enabled = try_enable_left(left_enabled);
+  right_enabled = try_enable_right(right_enabled);
   //Fast loop
   if (millis() - last_f >= 40) {
     //Every line sent to the computer gets us a new state
