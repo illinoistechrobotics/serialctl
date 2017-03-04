@@ -93,9 +93,15 @@ void fast_pwm() {
   TCCR4B = (TCCR4B & 0b11111000) | 0x03;
 }
 
-char osmc_enablecontrol(char enabled, char enablepin, char readypin){
+char osmc_enablecontrol(char enabled, char enablepin, char readypin, unsigned short ali, unsigned short bli, unsigned short ahi, unsigned short bhi){
+  //If ready and current state is not enabled, wait 10 ms and enable
+  //If ready and current state is enabled, do nothing
+  //If enable signal is low/0 disable, and set all signals to zero
+  //Return the new value of the current enable/disable state
   if(digitalRead(readypin)){
-    if(
+    //Ready signal OK
+    if(enabled)
+      return 
   } else{
     //If not ready, make sure it is disabled!
     digitalWrite(enablepin, LOW);
@@ -108,8 +114,29 @@ char osmc_enablecontrol(char enabled, char enablepin, char readypin){
 // Do not change timer0,
 // Pins 7 and 8 use timer4 in phase correct mode
 // Pins 11 and 12 use timer1 in phase correct mode
-void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned short bli, unsigned short ahi, unsigned short bhi) {
+// OSMC ALI and BLI are the low side driver inputs and must ALWAYS be low/zero when the ready signal is not provided
+// OSMC AHI and BHI are the high side driver inputs.
+/*
+ * ----------- Vdd
+ *   |     |
+ *   AHI   BHI
+ *   |     |
+ *   ---M---
+ *   |     |
+ *   ALI   BLI
+ *   |     |
+ *   --------- GND
+ * 
+ */
+void drive_osmc(int rawpower, unsigned short brake, unsigned short ali, unsigned short bli, unsigned short ahi, unsigned short bhi, unsigned short enabled) {
   int power = constrain(rawpower, -255, 255);
+  if(!enabled){
+    digitalWrite(ali, LOW);
+    digitalWrite(bli, LOW);
+    digitalWrite(ahi, LOW);
+    digitalWrite(bhi, LOW);
+    return;
+  }
   //Stop!
   if (abs(power) < 2) {
     digitalWrite(ali, LOW);
