@@ -35,7 +35,7 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define DREADY2 31
 
 #define try_enable_right(e) try_enable_osmc(e,DENABLE1,DREADY1,ALI1,BLI1,AHI1,BHI1)
-#define try_enable_left(e) try_enable_osmc(e,DENABLE2,DREADY2,ALI1,BLI1,AHI1,BHI1)
+#define try_enable_left(e) try_enable_osmc(e,DENABLE2,DREADY2,ALI2,BLI2,AHI2,BHI2)
 #define drive_right(e,x) drive_osmc(e,DENABLE1,x,0,ALI1,BLI1,AHI1,BHI1)
 #define drive_left(e,x) drive_osmc(e,DENABLE2,x,0,ALI2,BLI2,AHI2,BHI2)
 #define DEADBAND_HALF_WIDTH 5
