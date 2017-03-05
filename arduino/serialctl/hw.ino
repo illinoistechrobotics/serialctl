@@ -83,7 +83,8 @@ void osmc_init() {
   pinMode(BHI2, OUTPUT);
   pinMode(DENABLE1, OUTPUT);
   pinMode(DENABLE2, OUTPUT);
-
+  pinMode(DREADY1, INPUT);
+  pinMode(DREADY2, INPUT);
 
   pinMode(13, OUTPUT);
   fast_pwm();
@@ -99,7 +100,7 @@ char try_enable_osmc(char enabled, char enablepin, char readypin,
   // ready signal from osmc controller indicates that we are OK to provide input
   if (digitalRead(readypin)) {
     if (!enabled)
-      delay(10); // required in order to prevent blowout!
+      delay(10); //"Short" delay required in order to prevent blowout! 10ms is conservative.
       digitalWrite(enablepin, HIGH);
     }
     return 1;
