@@ -68,7 +68,12 @@ void manipulator()
       digitalWrite(MANI_OUTPUT, LOW);
    }
 }
+void manipulator_ball() {
+   
+}
+void manipulator_key() {
 
+}
 void drive_left(int power){
         power = map(constrain(power,-127,127),-127,127,1000,2000);
         fl.writeMicroseconds(power);
