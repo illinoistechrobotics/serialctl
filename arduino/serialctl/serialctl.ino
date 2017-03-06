@@ -190,7 +190,10 @@ void tank_drive() {
   
  //System reset logic
   if (getButton(9)) {
-    if (reset_counter == 10) {
+    reset_counter++;
+    if (reset_counter == 50) {
+      left_enabled = 0;
+      right_enabled = 0;
       drive_left(left_enabled,0);
       drive_right(right_enabled,0);
       wdt_enable(WDTO_15MS);
@@ -201,8 +204,8 @@ void tank_drive() {
     reset_counter = 0;
   
    if(getButton(4)){
-    leftSet = 2*power_out;
-    rightSet = -2*power_out;
+    leftSet = -2*(power_out+turn_out);
+    rightSet = -2*(power_out-turn_out);
     leftPID.SetMode(AUTOMATIC);
     rightPID.SetMode(AUTOMATIC);
     

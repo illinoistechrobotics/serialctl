@@ -49,11 +49,21 @@ void print_data() {
     //Print failsafe notice
     SerComm.print("-FS- ");
   }
-  SerComm.print("I(L):");
+  SerComm.print("L: V=");
+  if(left_enabled)
+    SerComm.print("+");
+   else
+    SerComm.print("0");
+  SerComm.print(", I=");
   SerComm.print(i1);
-  SerComm.print("A, I(R):");
+  SerComm.print("A | R: V=");
+  if(right_enabled)
+    SerComm.print("+");
+   else
+    SerComm.print("0");
+  SerComm.print(", I=");
   SerComm.print(i2);
-  SerComm.print("A, ");
+  SerComm.print("A");
   //SerComm.print("P(air):");
   //SerComm.print(psi);
   //SerComm.print("PSI");

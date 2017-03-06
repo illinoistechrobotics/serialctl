@@ -7,6 +7,7 @@ void setup() {
 
 void loop() {
   double left, right;
+  Serial.println("test:");
   if(iic_encoder_read(5,&left)){
     Serial.print("LEFT (RPM): ");
     Serial.println(left);

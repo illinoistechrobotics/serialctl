@@ -1,5 +1,4 @@
 #include <Wire.h>
-#include "iic_encoder_io.h"
 //Prepares for IIC communication with encoders
 void setup_iic(){
     Wire.begin();        // join i2c bus (address optional for master)
@@ -18,10 +17,10 @@ int iic_encoder_read(char addr, double *outdbl){
 
     while (Wire.available()) { // slave may send less than requested
         *recvptr = Wire.read(); // receive a byte as character
-        recvptr--;
         cnt++;
-        if(recvptr == &recvdbl)
+        if(recvptr == (char*)&recvdbl)
           break;
+        recvptr--;
     }
     if(cnt != sizeof(double)){
         //Bus fault!
