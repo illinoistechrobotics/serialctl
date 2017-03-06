@@ -47,7 +47,7 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define JOYSTICK_PAD_LEFT 15
 
 // Outputs
-#define LOWER_ARM_MOTOR 3 // Sabertooth 2 Output 1
-#define UPPER_ARM_MOTOR 4 // Sabertooth 2 Output 2
+#define LOWER_ARM_MOTOR 1 // Sabertooth 1 Output 1
+#define UPPER_ARM_MOTOR 2 // Sabertooth 1 Output 2
 
 #define FAILTIME 100

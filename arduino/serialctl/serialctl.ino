@@ -32,6 +32,11 @@ Sabertooth ST34(129, SABERTOOTH12);
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
 
+/* Interlock to only allow engaging PID while sticks are at zero,
+ * 0 indicates PID was not used in the last iteration, 1 indicates the PID was used in the last iteration
+ */
+static unsigned char pid_interlock=0;
+#undef PRINTMOTORS
 #define WATCHDOG_
 
 #ifdef WATCHDOG_
@@ -88,7 +93,7 @@ void setup() {
   t_start = millis(); //Save the start time
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
-
+  pid_interlock=0;
   //arm_setup();
 
 #ifdef WATCHDOG_
@@ -189,6 +194,7 @@ void tank_drive() {
   int right_out = -1 * power_out + (turn_out / 8);
   
  //System reset logic
+ #ifdef WATCHDOG_
   if (getButton(9)) {
     reset_counter++;
     if (reset_counter == 50) {
@@ -202,18 +208,23 @@ void tank_drive() {
   }
   else
     reset_counter = 0;
-  
-   if(getButton(4)){
+ #endif
+    /* Arm the PID if button 4 is down and either the sticks are currently centered or the PID is already armed */
+   if(getButton(4) && (pid_interlock || (power_out == 0 && turn_out == 0))){
     leftSet = -2*(power_out+turn_out);
     rightSet = -2*(power_out-turn_out);
     leftPID.SetMode(AUTOMATIC);
     rightPID.SetMode(AUTOMATIC);
+    /* Allow PID to stay engaged */
+    pid_interlock=1;
     
     //PID outputs directly to motors at a rate of PID_SAMPLE_TIME
     return;
   } else{
     leftOut = 0;
     rightOut = 0;
+    /* Ensure that sticks are centered before allowing the PID to engage again! Risk of mechanical damage!*/
+    pid_interlock=0;
     leftPID.SetMode(MANUAL);
     rightPID.SetMode(MANUAL);
   }
@@ -254,11 +265,13 @@ void tank_drive() {
       right_out = -1 * power_out + (turn_out / 4);
     }
   }
+  #ifdef PRINTMOTORS
   // Debug printing
   SerCommDbg.print("L");
   SerCommDbg.print(left_out);
   SerCommDbg.print(" R");
   SerCommDbg.println(right_out);
+  #endif
   // Drive motors!
   drive_left(left_enabled,left_out);
   drive_right(right_enabled,right_out);
