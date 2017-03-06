@@ -99,7 +99,7 @@ char try_enable_osmc(char enabled, char enablepin, char readypin,
                      char ali, char bli, char ahi, char bhi) {
   // ready signal from osmc controller indicates that we are OK to provide input
   if (digitalRead(readypin)) {
-    if (!enabled)
+    if (!enabled){
       delay(10); //"Short" delay required in order to prevent blowout! 10ms is conservative.
       digitalWrite(enablepin, HIGH);
     }
@@ -133,7 +133,7 @@ char try_enable_osmc(char enabled, char enablepin, char readypin,
  *   |     |
  *   --------- GND
  */
-void drive_osmc(char enabled, int rawpower, char brake,
+void drive_osmc(char enabled, char enablepin, int rawpower, char brake,
                 char ali, char bli, char ahi, char bhi) {
   int power = constrain(rawpower, -255, 255);
   if (!enabled) {
@@ -141,12 +141,14 @@ void drive_osmc(char enabled, int rawpower, char brake,
     digitalWrite(bli, LOW);
     digitalWrite(ahi, LOW);
     digitalWrite(bhi, LOW);
+    digitalWrite(enablepin, LOW);
     return;
   }
   //Stop!
   if (abs(power) < 2) {
     digitalWrite(ali, LOW);
     digitalWrite(bli, LOW);
+    delayMicroseconds(63);
     if (brake != 0) {
       digitalWrite(ahi, HIGH);
       digitalWrite(bhi, HIGH);
@@ -158,16 +160,18 @@ void drive_osmc(char enabled, int rawpower, char brake,
   }
   //Forward!
   if (power > 0) {
-    digitalWrite(ahi, HIGH);
     digitalWrite(bhi, LOW);
     digitalWrite(ali, LOW);
+    delayMicroseconds(63);
+    digitalWrite(ahi, HIGH);
     analogWrite(bli, power);
   }
   //Reverse!
   if (power < 0) {
     digitalWrite(ahi, LOW);
-    digitalWrite(bhi, HIGH);
     digitalWrite(bli, LOW);
+    delayMicroseconds(63);
+    digitalWrite(bhi, HIGH);
     analogWrite(ali, abs(power));
   }
 }

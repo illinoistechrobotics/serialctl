@@ -1,6 +1,8 @@
 #include "PIDUtil.h"
 double pidLeftP=0, pidLeftI=0, pidLeftD=0, pidRightP=0, pidRightI=0, pidRightD=0;
 double leftIn=0, leftOut=0, leftSet=0, rightIn=0, rightOut=0, rightSet=0;
+extern char comm_ok, left_enabled, right_enabled;
+
 PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, REVERSE);
 PID rightPID(&rightIn, &rightOut, &rightSet, pidRightP, pidRightI, pidRightD, DIRECT);
 
@@ -16,7 +18,7 @@ void PIDDrive(){
     SerCommDbg.print("PID(L): ");
     SerCommDbg.print(leftOut);
     SerCommDbg.println();
-    drive_left(leftOut);
+    drive_left(left_enabled,leftOut);
   }
   if(rightPID.NeedsCompute()){
     if(iic_encoder_read(ENCODER_RIGHT_ADDR,&rightIn)){
@@ -29,7 +31,7 @@ void PIDDrive(){
     SerCommDbg.print("PID(R): ");
     SerCommDbg.print(rightOut);
     SerCommDbg.println();
-    drive_right(rightOut);
+    drive_right(right_enabled,rightOut);
  }
 }
 

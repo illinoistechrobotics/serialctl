@@ -20,6 +20,7 @@
 #include "zserio.h"
 #include "globals.h"
 #include "PIDUtil.h"
+#include "iic_encoder_io.h"
 
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
@@ -190,8 +191,8 @@ void tank_drive() {
  //System reset logic
   if (getButton(9)) {
     if (reset_counter == 10) {
-      drive_left(0);
-      drive_right(0);
+      drive_left(left_enabled,0);
+      drive_right(right_enabled,0);
       wdt_enable(WDTO_15MS);
       while (1);
     }
@@ -256,8 +257,8 @@ void tank_drive() {
   SerCommDbg.print(" R");
   SerCommDbg.println(right_out);
   // Drive motors!
-  drive_left(left_out);
-  drive_right(right_out);
+  drive_left(left_enabled,left_out);
+  drive_right(right_enabled,right_out);
 }
 
 /* Gripper
