@@ -1,3 +1,4 @@
+#include <Dynamixel_Serial.h>
 #include <Sabertooth.h>
 
 //    serialctl
@@ -95,7 +96,20 @@ void setup() {
   memcpy(astate, &safe, sizeof(packet_t));
   pid_interlock=0;
   //arm_setup();
-
+  
+  /* Dynamixel Stuff */
+  Dynamixel.begin(SerCommDynamixel,DynamixelBaud,DynamixelDataDir);    // We now need to set Ardiuno to the new Baudrate speed 
+  delay(2);
+  Dynamixel.ledState(GRIP_SERVO_ID, OFF);                            // Turn Dynamixel LED off
+  delay(2);
+  Dynamixel.setMode(GRIP_SERVO_ID, WHEEL,0x0000,0x3FF);              // Turn mode to SERVO, must be WHEEL if using wheel mode
+  delay(2);
+  Dynamixel.setMaxTorque(GRIP_SERVO_ID, 0x3FF);                     // Set Dynamixel to max torque limit
+  delay(2);
+  Dynamixel.setHoldingTorque(GRIP_SERVO_ID, 0x1);
+  //pinMode(6,OUTPUT);
+  //digitalWrite(6,HIGH);
+  
 #ifdef WATCHDOG_
   wdt_disable();  //long delay follows
 #endif
@@ -113,7 +127,9 @@ void setup() {
 }
 void loop() {
   //Main loop runs at full speed
+  #ifdef WATCHDOG_
   wdt_reset();
+  #endif
   comm_parse();
   left_enabled = try_enable_left(left_enabled);
   right_enabled = try_enable_right(right_enabled);
@@ -138,7 +154,25 @@ void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
 
-  //arm
+  if (getButton(0) ^ getButton(2)) {
+    if (getButton(0)) {
+        //Dynamixel.ledState(GRIP_SERVO_ID, ON);                            // Turn Dynamixel LED on and move
+        //delay(5);
+        Dynamixel.wheel(GRIP_SERVO_ID,LEFT,0x3FF);
+
+    }
+    else if (getButton(2)) {
+        //Dynamixel.ledState(GRIP_SERVO_ID, ON);                            // Turn Dynamixel LED on and move
+        //delay(5);
+        Dynamixel.wheel(GRIP_SERVO_ID,RIGHT,0x3FF);
+    }
+  }
+  else {
+    //Dynamixel.ledState(GRIP_SERVO_ID, OFF);                            // Turn Dynamixel LED off
+    //delay(5);
+    Dynamixel.wheel(GRIP_SERVO_ID,LEFT,0x00);
+  }
+  //Secondary arm
   //check for invalid states
   if ((getButton(5) ^ getButton(7))) {
     //both up and down buttons at same time is invalid
@@ -151,7 +185,7 @@ void fast_loop() {
   } else {
     setMotor(LOWER_ARM_MOTOR, 0);
   }
-  
+  //Main arm
   if (getButton(JOYSTICK_PAD_UP) ^ getButton(JOYSTICK_PAD_DOWN)) {
     if (getButton(JOYSTICK_PAD_UP)) {
       setMotor(UPPER_ARM_MOTOR, 127);
@@ -164,7 +198,8 @@ void fast_loop() {
     setMotor(UPPER_ARM_MOTOR, 0);
   }
 } 
-void slow_loop() {
+void slow_loop() {    
+  
   //2x per second
   //Compressor
  // compressor_ctl();

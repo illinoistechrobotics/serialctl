@@ -6,7 +6,9 @@
 
 #define SABERTOOTH12 Serial2
 #define SerCommDynamixel Serial3
-#define DynamixelDataDir 3
+#define DynamixelDataDir 6
+#define DynamixelBaud 19200
+#define GRIP_SERVO_ID 1
 
 
 float current_offset_left, current_offset_right;
