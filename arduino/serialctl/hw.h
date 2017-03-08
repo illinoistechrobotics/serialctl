@@ -9,6 +9,9 @@
 #define DynamixelDataDir 6
 #define DynamixelBaud 19200
 #define GRIP_SERVO_ID 1
+#define WRIST_SERVO_ID 2
+#define WRIST_SPEED 50
+#define CLAW_SERVO_PIN 2
 
 
 float current_offset_left, current_offset_right;

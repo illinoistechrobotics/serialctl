@@ -1,3 +1,4 @@
+#include <Servo.h>
 #include <Dynamixel_Serial.h>
 #include <Sabertooth.h>
 
@@ -30,8 +31,11 @@ char left_enabled = 0, right_enabled = 0;
 long last_f = 0, last_s = 0, t_start = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(129, SABERTOOTH12);
+Servo clawServo;
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
+static int claw_pos;
+static int wrist_pos;
 
 /* Interlock to only allow engaging PID while sticks are at zero,
  * 0 indicates PID was not used in the last iteration, 1 indicates the PID was used in the last iteration
@@ -95,9 +99,13 @@ void setup() {
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
   pid_interlock=0;
+  clawServo.attach(CLAW_SERVO_PIN);
+  claw_pos=90;
+  clawServo.write(claw_pos);
   //arm_setup();
   
   /* Dynamixel Stuff */
+  // Pipe clamp
   Dynamixel.begin(SerCommDynamixel,DynamixelBaud,DynamixelDataDir);    // We now need to set Ardiuno to the new Baudrate speed 
   delay(2);
   Dynamixel.ledState(GRIP_SERVO_ID, OFF);                            // Turn Dynamixel LED off
@@ -107,9 +115,21 @@ void setup() {
   Dynamixel.setMaxTorque(GRIP_SERVO_ID, 0x3FF);                     // Set Dynamixel to max torque limit
   delay(2);
   Dynamixel.setHoldingTorque(GRIP_SERVO_ID, 0x1);
+  delay(2);
+  // Wrist
+  Dynamixel.setHoldingTorque(WRIST_SERVO_ID, 0x1);
+  delay(2);
+  Dynamixel.ledState(WRIST_SERVO_ID, OFF);                            // Turn Dynamixel LED off
+  delay(2);
+  Dynamixel.setMode(WRIST_SERVO_ID, SERVO,0x0000,0x3FF);              // Turn mode to SERVO, must be WHEEL if using wheel mode
+  delay(2);
+  Dynamixel.setMaxTorque(WRIST_SERVO_ID, 0x0FF);                     // Set Dynamixel to max torque limit
+  delay(2);
+  Dynamixel.setHoldingTorque(WRIST_SERVO_ID, 0x1);
   //pinMode(6,OUTPUT);
   //digitalWrite(6,HIGH);
-  
+  wrist_pos = 0;
+  Dynamixel.servo(WRIST_SERVO_ID,wrist_pos,WRIST_SPEED);
 #ifdef WATCHDOG_
   wdt_disable();  //long delay follows
 #endif
@@ -153,7 +173,7 @@ void loop() {
 void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
-
+  //Pipe clamp
   if (getButton(0) ^ getButton(2)) {
     if (getButton(0)) {
         //Dynamixel.ledState(GRIP_SERVO_ID, ON);                            // Turn Dynamixel LED on and move
@@ -174,17 +194,18 @@ void fast_loop() {
   }
   //Secondary arm
   //check for invalid states
-  if ((getButton(5) ^ getButton(7))) {
+  if ((getButton(3) ^ getButton(1))) {
     //both up and down buttons at same time is invalid
-    if (getButton(7)) {
+    if (getButton(3)) {
       setMotor(LOWER_ARM_MOTOR, -127);
     }
-    else if (getButton(5)) {
+    else if (getButton(1)) {
       setMotor(LOWER_ARM_MOTOR, 127);
     }
   } else {
     setMotor(LOWER_ARM_MOTOR, 0);
   }
+  
   //Main arm
   if (getButton(JOYSTICK_PAD_UP) ^ getButton(JOYSTICK_PAD_DOWN)) {
     if (getButton(JOYSTICK_PAD_UP)) {
@@ -197,6 +218,30 @@ void fast_loop() {
   else {
     setMotor(UPPER_ARM_MOTOR, 0);
   }
+  
+  //Gripper
+  if (getButton(5) ^ getButton(7)) {
+    if (getButton(5)) {
+      claw_pos+=4;
+    }
+    else if (getButton(7)) {
+      claw_pos-=4;
+    }
+    claw_pos = constrain(claw_pos,0,180);
+  }
+  clawServo.write(claw_pos);
+  
+  //Wrist rotation
+  if (getButton(JOYSTICK_PAD_LEFT) ^ getButton(JOYSTICK_PAD_RIGHT)) {
+    if (getButton(JOYSTICK_PAD_LEFT)) {
+      wrist_pos+=4;
+    }
+    else if (getButton(JOYSTICK_PAD_RIGHT)) {
+      wrist_pos-=4;
+    }
+    wrist_pos = constrain(wrist_pos,0,0x3FF);
+  }
+  Dynamixel.servo(WRIST_SERVO_ID,wrist_pos,WRIST_SPEED);
 } 
 void slow_loop() {    
   
