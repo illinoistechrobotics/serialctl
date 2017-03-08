@@ -10,7 +10,7 @@
 #define DynamixelBaud 19200
 #define GRIP_SERVO_ID 1
 #define WRIST_SERVO_ID 2
-#define WRIST_SPEED 50
+#define WRIST_SPEED 0x0FF
 #define CLAW_SERVO_PIN 2
 
 

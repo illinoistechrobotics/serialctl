@@ -123,7 +123,7 @@ void setup() {
   delay(2);
   Dynamixel.setMode(WRIST_SERVO_ID, SERVO,0x0000,0x3FF);              // Turn mode to SERVO, must be WHEEL if using wheel mode
   delay(2);
-  Dynamixel.setMaxTorque(WRIST_SERVO_ID, 0x0FF);                     // Set Dynamixel to max torque limit
+  Dynamixel.setMaxTorque(WRIST_SERVO_ID, 0x00F);                     // Set Dynamixel to low torque limit
   delay(2);
   Dynamixel.setHoldingTorque(WRIST_SERVO_ID, 0x1);
   //pinMode(6,OUTPUT);
