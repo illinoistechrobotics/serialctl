@@ -107,28 +107,29 @@ void setup() {
   /* Dynamixel Stuff */
   // Pipe clamp
   Dynamixel.begin(SerCommDynamixel,DynamixelBaud,DynamixelDataDir);    // We now need to set Ardiuno to the new Baudrate speed 
-  delay(2);
+ // delay(2);
   Dynamixel.ledState(GRIP_SERVO_ID, OFF);                            // Turn Dynamixel LED off
-  delay(2);
+  //delay(2);
   Dynamixel.setMode(GRIP_SERVO_ID, WHEEL,0x0000,0x3FF);              // Turn mode to SERVO, must be WHEEL if using wheel mode
-  delay(2);
+  //delay(2);
   Dynamixel.setMaxTorque(GRIP_SERVO_ID, 0x3FF);                     // Set Dynamixel to max torque limit
-  delay(2);
+  //delay(2);
   Dynamixel.setHoldingTorque(GRIP_SERVO_ID, 0x1);
-  delay(2);
+  //delay(2);
   // Wrist
   Dynamixel.setHoldingTorque(WRIST_SERVO_ID, 0x1);
-  delay(2);
+  //delay(2);
   Dynamixel.ledState(WRIST_SERVO_ID, OFF);                            // Turn Dynamixel LED off
-  delay(2);
+  //delay(2);
   Dynamixel.setMode(WRIST_SERVO_ID, SERVO,0x0000,0x3FF);              // Turn mode to SERVO, must be WHEEL if using wheel mode
-  delay(2);
-  Dynamixel.setMaxTorque(WRIST_SERVO_ID, 0x00F);                     // Set Dynamixel to low torque limit
-  delay(2);
+  //delay(2);
+  Dynamixel.setMaxTorque(WRIST_SERVO_ID, 0x3FF);                     // Set Dynamixel to max torque limit
+  //delay(2);
   Dynamixel.setHoldingTorque(WRIST_SERVO_ID, 0x1);
+  //delay(2);
   //pinMode(6,OUTPUT);
   //digitalWrite(6,HIGH);
-  wrist_pos = 0;
+  wrist_pos = 90;
   Dynamixel.servo(WRIST_SERVO_ID,wrist_pos,WRIST_SPEED);
 #ifdef WATCHDOG_
   wdt_disable();  //long delay follows
@@ -175,22 +176,25 @@ void fast_loop() {
   PIDTuner();
   //Pipe clamp
   if (getButton(0) ^ getButton(2)) {
-    if (getButton(0)) {
+    if (getButton(2)) {
         //Dynamixel.ledState(GRIP_SERVO_ID, ON);                            // Turn Dynamixel LED on and move
         //delay(5);
         Dynamixel.wheel(GRIP_SERVO_ID,LEFT,0x3FF);
+        //delay(2);
 
     }
-    else if (getButton(2)) {
+    else if (getButton(0)) {
         //Dynamixel.ledState(GRIP_SERVO_ID, ON);                            // Turn Dynamixel LED on and move
         //delay(5);
         Dynamixel.wheel(GRIP_SERVO_ID,RIGHT,0x3FF);
+        //delay(2);
     }
   }
   else {
     //Dynamixel.ledState(GRIP_SERVO_ID, OFF);                            // Turn Dynamixel LED off
     //delay(5);
     Dynamixel.wheel(GRIP_SERVO_ID,LEFT,0x00);
+    //delay(2);
   }
   //Secondary arm
   //check for invalid states
@@ -227,21 +231,22 @@ void fast_loop() {
     else if (getButton(7)) {
       claw_pos-=4;
     }
-    claw_pos = constrain(claw_pos,0,180);
+    claw_pos = constrain(claw_pos,90-(CLAW_MAX/2),90+(CLAW_MAX/2));
   }
   clawServo.write(claw_pos);
   
   //Wrist rotation
   if (getButton(JOYSTICK_PAD_LEFT) ^ getButton(JOYSTICK_PAD_RIGHT)) {
     if (getButton(JOYSTICK_PAD_LEFT)) {
-      wrist_pos+=4;
+      wrist_pos+=20;
     }
     else if (getButton(JOYSTICK_PAD_RIGHT)) {
-      wrist_pos-=4;
+      wrist_pos-=20;
     }
-    wrist_pos = constrain(wrist_pos,0,0x3FF);
+    wrist_pos = constrain(wrist_pos,0x01,0x3FF);
+    Dynamixel.servo(WRIST_SERVO_ID,wrist_pos,WRIST_SPEED);
   }
-  Dynamixel.servo(WRIST_SERVO_ID,wrist_pos,WRIST_SPEED);
+  
 } 
 void slow_loop() {    
   

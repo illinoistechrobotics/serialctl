@@ -12,6 +12,7 @@
 #define WRIST_SERVO_ID 2
 #define WRIST_SPEED 0x0FF
 #define CLAW_SERVO_PIN 2
+#define CLAW_MAX 75
 
 
 float current_offset_left, current_offset_right;
