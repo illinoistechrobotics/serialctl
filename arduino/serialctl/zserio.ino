@@ -15,6 +15,7 @@ void comm_init() {
   astate = &pA;
   incoming = &pB;
   recvcount = 0;
+  pinMode(13, OUTPUT);
 }
 void comm_parse() {
   packet_t *tmp;
@@ -54,6 +55,7 @@ void comm_parse() {
       crc = compute_crc((char *)incoming, sizeof(packet_t)-sizeof(uint16_t));
       if(crc == ntohs(incoming->cksum)){
         //SerComm.println("vaild");
+        digitalWrite(13, HIGH);
         cs=COMM_VALID;
         ptime=millis();
         tmp=astate;
@@ -61,16 +63,16 @@ void comm_parse() {
         incoming=tmp;
       } else{
         cs=COMM_INVALID;
+        digitalWrite(13, LOW);
        // SerComm.println("Invalid");
       }
     }
   }
   
-  if(millis()-ptime > 80){
+  if(millis()-ptime > 100){
+    digitalWrite(13, LOW);
     //Been too long, copy safe state over active one
     memcpy(astate,&safe,sizeof(packet_t));
-    cs=COMM_WAIT;
-    recvcount = 0;
     estop();
     SerComm.println("FAILSAFE");
   }

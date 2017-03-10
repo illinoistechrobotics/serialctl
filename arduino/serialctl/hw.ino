@@ -38,7 +38,7 @@ void print_speed(){
 	   left_speed,last_left_speed,
 	   right_speed,last_right_speed,
 	   millis());
-  SerComm.println(speedline);
+  SerComm.print(speedline);
 
 }
 void print_data(){
@@ -49,6 +49,7 @@ void print_data(){
       //SerComm.println("Good to roll");
       print_speed();
     }
+    SerComm.println("Fenrir");
   }
 }
 int getButton(int num){

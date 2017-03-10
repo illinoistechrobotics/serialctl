@@ -52,5 +52,5 @@ void loop(){
   // arcade_drive();
 
   //limits data rate
-  delay(75);
+  delay(33);
 }
