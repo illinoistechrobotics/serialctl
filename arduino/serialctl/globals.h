@@ -15,8 +15,8 @@ extern char comm_ok;
 #define FRONT_RIGHT 9
 #define REAR_LEFT 10
 #define REAR_RIGHT 11
-#define ARM_KEY_PIN 5
-#define ARM_BALL_PIN 7
+#define ARM_KEY_PIN 24
+#define ARM_BALL_PIN 26
 #define FAILTIME 100
 #define MANI_INTAKE 3
 #define MANI_OUTPUT 2

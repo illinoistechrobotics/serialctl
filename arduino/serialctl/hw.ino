@@ -83,14 +83,14 @@ void manipulator()
    }
 }
 void manipulator_ball() {
-  if (getButton()) {
+  /*if (getButton()) {
       
-  }  
+  }*/  
 }
 void manipulator_key() {
-  if (getButton()) {
+  /*if (getButton()) {
     
-  }
+  }*/
 }
 void drive_left(int power){
         power = map(constrain(power,-127,127),-127,127,1000,2000);
