@@ -2,10 +2,12 @@
 #include "packet.h"
 #include "globals.h"
 #include <Servo.h>
-Servo fl, fr, rl, rr, arm;
+Servo fl, fr, rl, rr, arm_key, arm_ball;
 void init_pins(){
-        arm.attach(ARM_PIN);
-        arm.writeMicroseconds(1500);
+        arm_key.attach(ARM_KEY_PIN);
+	arm_ball.attach(ARM_BALL_PIN);
+        arm_key.writeMicroseconds(1500);
+	arm_ball.writeMicroseconds(1500);
         talon_init();
         pinMode(MANI_INTAKE, OUTPUT);
         pinMode(MANI_OUTPUT, OUTPUT);
@@ -38,16 +40,28 @@ void talon_init(){
         rr.writeMicroseconds(1500);
         rl.writeMicroseconds(1500);
 }
-void move_arm(int8_t cmd){
+void move_arm_key(int8_t cmd){
    switch(cmd){
       case 1:
-         arm.writeMicroseconds(1000);
+         arm_key.writeMicroseconds(1000);
          break;
       case -1:
-         arm.writeMicroseconds(2000);
+         arm_key.writeMicroseconds(2000);
          break;
       default:
-         arm.writeMicroseconds(1500);
+         arm_key.writeMicroseconds(1500);
+   }
+}
+void move_arm_ball(int8_t cmd){
+   switch(cmd){
+      case 1:
+         arm_ball.writeMicroseconds(1000);
+         break;
+      case -1:
+         arm_ball.writeMicroseconds(2000);
+         break;
+      default:
+         arm_ball.writeMicroseconds(1500);
    }
 }
 void manipulator()
@@ -69,10 +83,14 @@ void manipulator()
    }
 }
 void manipulator_ball() {
-   
+  if (getButton()) {
+      
+  }  
 }
 void manipulator_key() {
-
+  if (getButton()) {
+    
+  }
 }
 void drive_left(int power){
         power = map(constrain(power,-127,127),-127,127,1000,2000);

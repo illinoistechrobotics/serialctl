@@ -65,14 +65,26 @@ void loop(){
         if(getButton(5) ^ getButton(7)){
                 if(getButton(5)){
                         //arm up
-                        move_arm(1);
-                } else {
+                        move_arm_key(1);
+                } else if(getButton(7)){
                         //down
-                        move_arm(-1);   
+                        move_arm_key(-1);   
                 }
         } else {
-                move_arm(0);
+                move_arm_key(0);
         }
+
+	if(getButton(6) ^ getButton(8)) {
+		if(getButton(6)) {
+			//arm up
+			move_arm_ball(1);
+		} else if(getButton(8)){
+			//down
+			move_arm_ball(-1);
+		}
+	} else {
+		move_arm_ball(0);
+	}
         /*
            if(getButton(1) && (millis()-last_s > 500)){
 //grip
@@ -81,7 +93,9 @@ grip=(grip+1)%2;
 digitalWrite(MANIP_GRIP,grip);
 }
          */
-manipulator();
+//manipulator();
+manipulator_ball();
+manipulator_key();
 tank_drive();
 
 //limits data rate
