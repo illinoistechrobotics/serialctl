@@ -9,11 +9,8 @@ Servo fl, fr, rl, rr, arm_key, arm_ball, servo_gripper;
 #define SERVO_ID_BALL_L 0x04
 #define SERVO_ID_BALL_R 0x05
 #define SERVO_ID_KEY 0x03
-#define SERVO_ControlPin_Ball_L 2
-#define SERVO_ControlPin_Ball_R 24
-#define SERVO_ControlPin_Key 26
+#define SERVO_ControlPin 2
 #define SERVO_SET_Baudrate 19200
-#define SERVO_DEF_Baudrate 1000000
 #define SERVO_PWM_PIN 13
 
 void init_pins(){
@@ -113,9 +110,9 @@ void manipulator()
    }
 }
 void manipulator_ball() {
-  if (getButton(5) ^ getButton(7)) 
+  if (getButton(5) ^ getButton(7)) {
      if (getButton(5)) {
-      Dynamixel.servo(SERVO_ID_BALL_L,0x0001,0x0100);
+      Dynamixel.servo(SERVO_ID_BALL_L,0x0001,0x0100);  // id, position, speeed
       Dynamixel.servo(SERVO_ID_BALL_R,0x0001,0x0100);
       delay(4000);
      } else if(getButton(7)) {
@@ -137,9 +134,9 @@ void manipulator_key() {
   }
   if (getButton(JOYSTICK_PAD_LEFT) ^ getButton(JOYSTICK_PAD_RIGHT)) {
     if (getButton(JOYSTICK_PAD_LEFT)) {
-      servo_gripper.write();
+      servo_gripper.write(5);
     } else if(JOYSTICK_PAD_RIGHT) {
-      servo_gripper.write();
+      servo_gripper.write(5);
     }
   }
 }

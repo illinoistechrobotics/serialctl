@@ -31,6 +31,10 @@ long last_p,last_s=0,usec;
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | ((x)<< 8 & 0x00FF0000UL) | ((x)>> 8 & 0x0000FF00UL) | ((x)>>24 & 0x000000FFUL) )
 #define ntohl(x) htonl(x)
 #define DEADBAND_HALF_WIDTH 5
+#define SERVO_ControlPin 2
+#define SERVO_ID_BALL_L 0x04
+#define SERVO_ID_BALL_R 0x05
+#define SERVO_ID_KEY 0x03
 
 #define WATCHDOG_
 
@@ -52,9 +56,9 @@ void setup() {
         SerComm.begin(57600);
         comm_init();
         init_pins();
-	      init_servos(ball_servo_L);
-	      init_servos(ball_servo_R);
-        init_servos(key_servo);
+	      init_servos(Serial1, SERVO_ControlPin, SERVO_ID_BALL_L);
+        init_servos(Serial1, SERVO_ControlPin, SERVO_ID_BALL_R);
+        init_servos(Serial1, SERVO_ControlPin, SERVO_ID_KEY);
         grip=0;
         last_p = millis();
         drive_left(0);
