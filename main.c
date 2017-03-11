@@ -42,7 +42,10 @@ int main(int argc, char ** argv){
             return 2;
             }
         printf("X: %i, Y: %i, CRC: %i, Resp: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg);
-       	refresh_ui(&ctl, msg, overflow);	
+        int tmp = strlen(msg);
+	msg[tmp] = ' ';
+	sprintf(msg + tmp, " Joystick: %x %x", ctl.btnlo, ctl.btnhi); 
+	refresh_ui(&ctl, msg, overflow);	
 //        usleep(150E3);
         }
         return 0;

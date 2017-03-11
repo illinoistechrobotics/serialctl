@@ -18,6 +18,8 @@
 #include "zserio.h"
 #include <Servo.h>
 #include "globals.h"
+#include <Dynamixel_Serial.h>
+
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
@@ -50,6 +52,9 @@ void setup() {
         SerComm.begin(57600);
         comm_init();
         init_pins();
+	      init_servos(ball_servo_L);
+	      init_servos(ball_servo_R);
+        init_servos(key_servo);
         grip=0;
         last_p = millis();
         drive_left(0);
@@ -62,11 +67,11 @@ void loop(){
         wdt_reset();
         print_data();
         comm_parse();
-        if(getButton(5) ^ getButton(7)){
-                if(getButton(5)){
+        if(getButton(0) ^ getButton(2)){
+                if(getButton(2)){
                         //arm up
                         move_arm_key(1);
-                } else if(getButton(7)){
+                } else if(getButton(0)){
                         //down
                         move_arm_key(-1);   
                 }
@@ -74,11 +79,11 @@ void loop(){
                 move_arm_key(0);
         }
 
-	if(getButton(6) ^ getButton(8)) {
-		if(getButton(6)) {
+	if(getButton(1) ^ getButton(3)) {
+		if(getButton(3)) {
 			//arm up
 			move_arm_ball(1);
-		} else if(getButton(8)){
+		} else if(getButton(1)){
 			//down
 			move_arm_ball(-1);
 		}
@@ -124,8 +129,8 @@ void tank_drive(){
         int left_out =     (power_out + (turn_out/2))/2;
         int right_out = (power_out - (turn_out/2))/2;
         if(getButton(4)){
-                left_out=left_out*2;
-                right_out=right_out*2;
+                left_out=left_out/2;
+                right_out=right_out/2;
         }
         if(getButton(6)){
                 left_out=left_out*2;

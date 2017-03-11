@@ -39,14 +39,16 @@ int joystick_update(packet_t *ctl){
         ctl->stickY = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
         ctl->btnlo = 0;
         ctl->btnhi = 0;
-        for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 15)); i++){
+	for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 12)); i++){ //16 bits available - 4 for dpad
                 if(i<8){
                         ctl->btnlo |= (SDL_JoystickGetButton(jstick,i) << i);
                 } else if(i>=8 && i<15){
                         ctl->btnhi |= (SDL_JoystickGetButton(jstick,i) << (i-8));
                 }
         }
-        return 0;
+        ctl->btnhi |= (SDL_JoystickGetHat(jstick,0) << 4);
+	// fprintf(stderr, "Joystick: %x\n", ctl->btnhi);
+	return 0;
 }
 int joystick_wait_safe(){
         int i, unsafe;

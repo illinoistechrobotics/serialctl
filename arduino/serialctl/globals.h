@@ -15,8 +15,14 @@ extern char comm_ok;
 #define FRONT_RIGHT 9
 #define REAR_LEFT 10
 #define REAR_RIGHT 11
-#define ARM_KEY_PIN 24
-#define ARM_BALL_PIN 26
+#define ARM_KEY_PIN 3
+#define ARM_BALL_PIN 4
 #define FAILTIME 100
 #define MANI_INTAKE 3
 #define MANI_OUTPUT 2
+
+// Inputs
+#define JOYSTICK_PAD_UP 12
+#define JOYSTICK_PAD_RIGHT 13
+#define JOYSTICK_PAD_DOWN 14
+#define JOYSTICK_PAD_LEFT 15
