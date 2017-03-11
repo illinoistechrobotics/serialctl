@@ -55,9 +55,17 @@ void serio_close(connection_t *ctx){
         close(ctx->fd);
 }
 
+#if RECORD
+ssize_t serio_send(connection_t *ctx, void *data, size_t len, int fd){
+#else
 ssize_t serio_send(connection_t *ctx, void *data, size_t len){
+#endif
         int rv;
+#if RECORD
+        char datap[3+B64_ENC_LEN(len)];
+#else
         char datap[2+B64_ENC_LEN(len)];
+#endif
         if(ctx->fd==-1 || len==0 || data==NULL){
                 return -3;
         }
@@ -68,7 +76,13 @@ ssize_t serio_send(connection_t *ctx, void *data, size_t len){
                 return -2;
         }
         datap[1+B64_ENC_LEN(len)] = EFRAME;
+#if RECORD
+	datap[2+B64_ENC_LEN(len)] = '\n';
+        return write(ctx->fd,datap,2+B64_ENC_LEN(len))
+            && write(fd,datap,3+B64_ENC_LEN(len));
+#else
         return write(ctx->fd,datap,2+B64_ENC_LEN(len));
+#endif
 }
 ssize_t serio_recv(connection_t *ctx, char *buf)
 { 
