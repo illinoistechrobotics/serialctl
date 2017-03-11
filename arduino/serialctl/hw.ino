@@ -30,16 +30,21 @@ int read_speed(char address){
   return *((int*) buff);
 }
 void print_speed(){
-  int left_speed = read_speed(LEFT_SPEEDSERVO_ADDR);
-  int right_speed = read_speed(RIGHT_SPEEDSERVO_ADDR);
-
   char speedline[100];
-  snprintf(speedline, 100, "% 4d, % 4d, % 4d, % 4d, %lu", 
-	   left_speed,last_left_speed,
-	   right_speed,last_right_speed,
-	   millis());
+  if (DISABLE_I2C) {
+    snprintf(speedline, 100, "% 4d, % 4d, %lu", last_left_speed, last_right_speed, millis());
+  }
+  else {
+    int left_speed = read_speed(LEFT_SPEEDSERVO_ADDR);
+    int right_speed = read_speed(RIGHT_SPEEDSERVO_ADDR);
+    
+    snprintf(speedline, 100, "% 4d, % 4d, % 4d, % 4d, %lu", 
+        left_speed,last_left_speed,
+        right_speed,last_right_speed,
+        millis());
+  }
   SerComm.print(speedline);
-
+  
 }
 void print_data(){
   if(estop_state){
@@ -60,6 +65,30 @@ int getButton(int num){
         } else {
                 return 0;
         }
+}
+double processStick(int stickInput) {
+  stickInput -= 128;
+  double topMultiplier = 128.0 / (127 - DEADBAND_HALF_WIDTH);
+  double bottomMultiplier = 128.0 / (128 - DEADBAND_HALF_WIDTH);
+  if (abs(stickInput) <= DEADBAND_HALF_WIDTH) {
+    return 0.0;
+  }
+  if (stickInput > 0) {
+    return (stickInput - DEADBAND_HALF_WIDTH) * topMultiplier;
+  }
+  else {
+    return (stickInput + DEADBAND_HALF_WIDTH) * bottomMultiplier;
+  }
+}
+double getMultiplier() {
+  if(getButton(6)){ //turbo
+    return 1;
+  }
+  else if(getButton(4)){ //precise
+    return 0.125;
+  } else {
+    return 0.25;
+  }
 }
 void estop(){
   Wire.beginTransmission(LEFT_SPEEDSERVO_ADDR);
@@ -130,7 +159,7 @@ void drive_right(double speed){
   Wire.endTransmission();
 }
 
-void tank_drive() {
+bool is_estop() {
   if(getButton(7)){
     estop_state = false;
   }
@@ -139,27 +168,20 @@ void tank_drive() {
   }
   if(estop_state){
     estop();
+    return true;
+  }
+  return false;
+}
+
+void tank_drive() {
+  if (is_estop()) {
     return;
   }
 
-  double left_power = ((double)(astate->stickLY) - 128);
-  double right_power = ((double)(astate->stickRY) - 128);
-  if (left_power > 0) {
-    left_power *= (128.0 / 127.0);
-  }
-  if (right_power > 0) {
-    right_power *= (128.0 / 127.0);
-  }
+  double left_power = processStick(astate->stickLY);
+  double right_power = processStick(astate->stickRY);
 
-  double multiplier;
-  if(getButton(6)){ //turbo
-    multiplier = 1;
-  }
-  else if(getButton(4)){ //precise
-    multiplier = 0.125;
-  } else {
-    multiplier = 0.25;
-  }
+  double multiplier = getMultiplier();
 
   // Square Inputs
   left_power *= -1 * multiplier;
@@ -172,53 +194,21 @@ void tank_drive() {
   drive_right(right_power);
 }
 
-// Not currently used
 void arcade_drive(){
-  if(getButton(7)){
-    estop_state = false;
-  }
-  if(getButton(5)){
-    estop_state = true;
-  }
-  if(estop_state){
-    estop();
+  if (is_estop()) {
     return;
   }
-  int power_out = 0;
-  int turn_out  = 0;
-  int zeroed_power =    ((int)(astate->stickLY) - 128);
-  int zeroed_turn =     -1*((int)(astate->stickRX) - 128);
   
-  if(abs(zeroed_power) > DEADBAND_HALF_WIDTH){
-    if(zeroed_power>0){
-      power_out = zeroed_power - DEADBAND_HALF_WIDTH;
-    } else {
-      power_out = zeroed_power + DEADBAND_HALF_WIDTH;
-    }
-  }
-  if(abs(zeroed_turn) > DEADBAND_HALF_WIDTH){
-    if(zeroed_turn>0){
-      turn_out = zeroed_turn - DEADBAND_HALF_WIDTH;
-    } else {
-      turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
-    }
-  }
+  double power_out = processStick(astate->stickLY);
+  double turn_out  = -1 * processStick(astate->stickRX);
 
-  int multiplier;
-  if(getButton(6)){ //turbo
-    multiplier = 4;
-  }
-  else if(getButton(4)){ //precise
-    multiplier = 1;
-  } else {
-    multiplier = 2;
-  }
+  double multiplier = getMultiplier();
 
-  int left_out =        multiplier*(power_out - (turn_out/4));
-  int right_out =    -1*multiplier*(power_out + (turn_out/4));
+  double left_out =  -1*multiplier*(power_out - (turn_out/4));
+  double right_out =    multiplier*(power_out + (turn_out/4));
 
-  last_left_speed = left_out;
-  last_right_speed = right_out;
+  last_left_speed = (int)left_out;
+  last_right_speed = (int)right_out;
 
   drive_left(left_out);
   drive_right(right_out);

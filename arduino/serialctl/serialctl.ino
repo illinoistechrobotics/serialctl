@@ -24,6 +24,7 @@ packet_t *astate, *incoming;
 comm_state cs;
 int speed,av;
 long last_p,last_s=0,usec;
+bool shouldTankDrive = false;
 
 #define WATCHDOG_
 
@@ -47,10 +48,26 @@ void loop(){
   wdt_reset();
   print_data();
   comm_parse();
-  //run_manipulator();  
-  tank_drive();
-  // arcade_drive();
+  //run_manipulator(); 
 
+  // Start + 3 -> Arcade Drive, Start + 2 -> Tank Drive
+  if (getButton(9) && (getButton(2) ^ getButton(1))) {
+    if (getButton(2)) {
+      shouldTankDrive = false;
+    }
+    else {
+      shouldTankDrive = true;
+    }
+  }
+  
+  if (shouldTankDrive) {
+    SerComm.print("Tank Drive ");
+    tank_drive();
+  }
+  else {
+    SerComm.print("Arcade Drive ");
+    arcade_drive();
+  }
   //limits data rate
   delay(33);
 }
