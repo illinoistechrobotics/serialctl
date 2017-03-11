@@ -54,7 +54,7 @@ int main(int argc, char ** argv){
 			int read = getline(&line, &blen, f);
 			if (read == -1) break; // eof
 		}
-        		if (write(c.fd, line, read - 1) < 0){ // -1 for trailing \n
+        		if (write(c.fd, line, (size_t)(read - 1)) < 0){ // -1 for trailing \n
 #else
         	if (joystick_update(&ctl) != 0) return 1;
         	packet_crc(&ctl); 
