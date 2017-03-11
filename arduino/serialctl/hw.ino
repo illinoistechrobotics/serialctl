@@ -200,12 +200,12 @@ void arcade_drive(){
   }
   
   double power_out = processStick(astate->stickLY);
-  double turn_out  = -1 * processStick(astate->stickRX);
+  double turn_out  = processStick(astate->stickRX);
 
   double multiplier = getMultiplier();
 
-  double left_out =  -1*multiplier*(power_out - (turn_out/4));
-  double right_out =    multiplier*(power_out + (turn_out/4));
+  double left_out =  -1*multiplier*(power_out - (turn_out/2));
+  double right_out =    multiplier*(power_out + (turn_out/2));
 
   last_left_speed = (int)left_out;
   last_right_speed = (int)right_out;
