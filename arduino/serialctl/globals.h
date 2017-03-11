@@ -50,4 +50,4 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define LOWER_ARM_MOTOR 1 // Sabertooth 1 Output 1
 #define UPPER_ARM_MOTOR 2 // Sabertooth 1 Output 2
 
-#define FAILTIME 100
+#define FAILTIME 200

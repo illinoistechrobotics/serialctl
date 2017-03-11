@@ -13,6 +13,9 @@
 #define WRIST_SPEED 0x0FF
 #define CLAW_SERVO_PIN 2
 #define CLAW_MAX 75
+#define LINAC_PRECISION 32
+#define SEC_LINAC_PRECISION 64
+
 
 
 float current_offset_left, current_offset_right;

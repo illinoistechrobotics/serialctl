@@ -198,13 +198,22 @@ void fast_loop() {
   }
   //Secondary arm
   //check for invalid states
+  
   if ((getButton(3) ^ getButton(1))) {
     //both up and down buttons at same time is invalid
     if (getButton(3)) {
-      setMotor(LOWER_ARM_MOTOR, -127);
+      if(getButton(4)){
+        setMotor(LOWER_ARM_MOTOR, -SEC_LINAC_PRECISION);
+      } else {
+        setMotor(LOWER_ARM_MOTOR, -127);
+      }
     }
     else if (getButton(1)) {
-      setMotor(LOWER_ARM_MOTOR, 127);
+      if(getButton(4)){
+        setMotor(LOWER_ARM_MOTOR, SEC_LINAC_PRECISION);
+      } else {
+        setMotor(LOWER_ARM_MOTOR, 127);
+      }
     }
   } else {
     setMotor(LOWER_ARM_MOTOR, 0);
@@ -213,11 +222,23 @@ void fast_loop() {
   //Main arm
   if (getButton(JOYSTICK_PAD_UP) ^ getButton(JOYSTICK_PAD_DOWN)) {
     if (getButton(JOYSTICK_PAD_UP)) {
-      setMotor(UPPER_ARM_MOTOR, 127);
+      //Up
+      if(getButton(4)){
+        //Precision
+        setMotor(UPPER_ARM_MOTOR, LINAC_PRECISION);
+      } else {
+        setMotor(UPPER_ARM_MOTOR, 127);
+      }
     }
     else if (getButton(JOYSTICK_PAD_DOWN)) {
-      setMotor(UPPER_ARM_MOTOR, -127);
-    }
+      //DOWN
+      if(getButton(4)){
+        //Precision
+        setMotor(UPPER_ARM_MOTOR, -LINAC_PRECISION);
+      } else {
+        setMotor(UPPER_ARM_MOTOR, -127);
+      }
+     }
   }
   else {
     setMotor(UPPER_ARM_MOTOR, 0);
@@ -295,17 +316,31 @@ void tank_drive() {
     reset_counter = 0;
  #endif
     /* Arm the PID if button 4 is down and either the sticks are currently centered or the PID is already armed */
-   if(getButton(4) && (pid_interlock || (power_out == 0 && turn_out == 0))){
-    leftSet = -2*(power_out+turn_out);
-    rightSet = -2*(power_out-turn_out);
-    leftPID.SetMode(AUTOMATIC);
-    rightPID.SetMode(AUTOMATIC);
-    /* Allow PID to stay engaged */
-    pid_interlock=1;
-    
+   if(getButton(4)){
+    //PID button down
+    if(pid_interlock || (power_out == 0 && turn_out == 0)){
+      //PID can engage
+      leftSet = -2*(power_out+turn_out);
+      rightSet = -2*(power_out-turn_out);
+      leftPID.SetMode(AUTOMATIC);
+      rightPID.SetMode(AUTOMATIC);
+      /* Allow PID to stay engaged */
+      pid_interlock=1;
+    } else{
+      //PID button down, but NOT safe to engage PID
+      leftOut = 0;
+      rightOut = 0;
+      /* Ensure that sticks are centered before allowing the PID to engage again! Risk of mechanical damage!*/
+      pid_interlock=0;
+      leftPID.SetMode(MANUAL);
+      rightPID.SetMode(MANUAL);
+      drive_left(left_enabled,0);
+      drive_right(right_enabled,0);
+    }  
     //PID outputs directly to motors at a rate of PID_SAMPLE_TIME
     return;
   } else{
+    //Button 4 is up, NO pid
     leftOut = 0;
     rightOut = 0;
     /* Ensure that sticks are centered before allowing the PID to engage again! Risk of mechanical damage!*/
