@@ -185,8 +185,6 @@ void drive_osmc(char enabled, char enablepin, int rawpower, char brake,
     analogWrite(ali, abs(power));
   }
 }
-/*
- * Unused functions from previous designs
 
 void compressor_ctl(){
   static char pumping=0;
@@ -217,4 +215,4 @@ void compressor_ctl(){
     COMPCTL.motor(COMPPIN,0);
   }
 }
-*/
+

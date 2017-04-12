@@ -41,10 +41,22 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define DEADBAND_HALF_WIDTH 10
 
 // Inputs
-#define JOYSTICK_PAD_UP 12
-#define JOYSTICK_PAD_RIGHT 13
-#define JOYSTICK_PAD_DOWN 14
-#define JOYSTICK_PAD_LEFT 15
+#define DIAMOND_LEFT 0
+#define DIAMOND_BOTTOM 1
+#define DIAMOND_RIGHT 2
+#define DIAMOND_UP 3
+#define SHOULDER_TOP_LEFT 4
+#define SHOULDER_TOP_RIGHT 5
+#define SHOULDER_BOTTOM_LEFT 6
+#define SHOULDER_BOTTOM_RIGHT 7
+#define SMALL_LEFT 8
+#define SMALL_RIGHT 9
+//10 and 11 are probably the stick buttons
+//but we haven't checked recently
+#define DPAD_UP 12
+#define DPAD_RIGHT 13
+#define DPAD_DOWN 14
+#define DPAD_LEFT 15
 
 // Outputs
 #define LOWER_ARM_MOTOR 1 // Sabertooth 1 Output 1

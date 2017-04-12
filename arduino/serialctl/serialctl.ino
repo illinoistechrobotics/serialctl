@@ -31,11 +31,8 @@ char left_enabled = 0, right_enabled = 0;
 long last_f = 0, last_s = 0, t_start = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(129, SABERTOOTH12);
-Servo clawServo;
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
-static int claw_pos;
-static int wrist_pos;
 
 /* Interlock to only allow engaging PID while sticks are at zero,
  * 0 indicates PID was not used in the last iteration, 1 indicates the PID was used in the last iteration
@@ -99,38 +96,8 @@ void setup() {
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
   pid_interlock=0;
-  clawServo.attach(CLAW_SERVO_PIN);
-  claw_pos=90;
-  clawServo.write(claw_pos);
-  //arm_setup();
+  arm_setup();
   
-  /* Dynamixel Stuff */
-  // Pipe clamp
-  Dynamixel.begin(SerCommDynamixel,DynamixelBaud,DynamixelDataDir);    // We now need to set Ardiuno to the new Baudrate speed 
- // delay(2);
-  Dynamixel.ledState(GRIP_SERVO_ID, OFF);                            // Turn Dynamixel LED off
-  //delay(2);
-  Dynamixel.setMode(GRIP_SERVO_ID, WHEEL,0x0000,0x3FF);              // Turn mode to SERVO, must be WHEEL if using wheel mode
-  //delay(2);
-  Dynamixel.setMaxTorque(GRIP_SERVO_ID, 0x3FF);                     // Set Dynamixel to max torque limit
-  //delay(2);
-  Dynamixel.setHoldingTorque(GRIP_SERVO_ID, 0x1);
-  //delay(2);
-  // Wrist
-  Dynamixel.setHoldingTorque(WRIST_SERVO_ID, 0x1);
-  //delay(2);
-  Dynamixel.ledState(WRIST_SERVO_ID, OFF);                            // Turn Dynamixel LED off
-  //delay(2);
-  Dynamixel.setMode(WRIST_SERVO_ID, SERVO,0x0000,0x3FF);              // Turn mode to SERVO, must be WHEEL if using wheel mode
-  //delay(2);
-  Dynamixel.setMaxTorque(WRIST_SERVO_ID, 0x3FF);                     // Set Dynamixel to max torque limit
-  //delay(2);
-  Dynamixel.setHoldingTorque(WRIST_SERVO_ID, 0x1);
-  //delay(2);
-  //pinMode(6,OUTPUT);
-  //digitalWrite(6,HIGH);
-  wrist_pos = 90;
-  Dynamixel.servo(WRIST_SERVO_ID,wrist_pos,WRIST_SPEED);
 #ifdef WATCHDOG_
   wdt_disable();  //long delay follows
 #endif
@@ -146,6 +113,7 @@ void setup() {
   wdt_reset();             //watchdog timer reset
 #endif
 }
+
 void loop() {
   //Main loop runs at full speed
   #ifdef WATCHDOG_
@@ -162,7 +130,8 @@ void loop() {
     print_data();
     last_f = millis();
   }
-  //Compute the PIDs if needed
+  // compute PIDs and drive motors if in
+  // automatic (precision) mode
   PIDDrive();
   //Slow loop
   //Runs this every ~500ms
@@ -171,112 +140,46 @@ void loop() {
     last_s = millis();
   }
 }
+
 void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
-  //Pipe clamp
-  if (getButton(0) ^ getButton(2)) {
-    if (getButton(2)) {
-        //Dynamixel.ledState(GRIP_SERVO_ID, ON);                            // Turn Dynamixel LED on and move
-        //delay(5);
-        Dynamixel.wheel(GRIP_SERVO_ID,LEFT,0x3FF);
-        //delay(2);
 
-    }
-    else if (getButton(0)) {
-        //Dynamixel.ledState(GRIP_SERVO_ID, ON);                            // Turn Dynamixel LED on and move
-        //delay(5);
-        Dynamixel.wheel(GRIP_SERVO_ID,RIGHT,0x3FF);
-        //delay(2);
-    }
-  }
-  else {
-    //Dynamixel.ledState(GRIP_SERVO_ID, OFF);                            // Turn Dynamixel LED off
-    //delay(5);
-    Dynamixel.wheel(GRIP_SERVO_ID,LEFT,0x00);
-    //delay(2);
-  }
-  //Secondary arm
-  //check for invalid states
-  
-  if ((getButton(3) ^ getButton(1))) {
-    //both up and down buttons at same time is invalid
-    if (getButton(3)) {
-      if(getButton(4)){
-        setMotor(LOWER_ARM_MOTOR, -SEC_LINAC_PRECISION);
-      } else {
-        setMotor(LOWER_ARM_MOTOR, -127);
-      }
-    }
-    else if (getButton(1)) {
-      if(getButton(4)){
-        setMotor(LOWER_ARM_MOTOR, SEC_LINAC_PRECISION);
-      } else {
-        setMotor(LOWER_ARM_MOTOR, 127);
-      }
-    }
-  } else {
-    setMotor(LOWER_ARM_MOTOR, 0);
-  }
-  
-  //Main arm
-  if (getButton(JOYSTICK_PAD_UP) ^ getButton(JOYSTICK_PAD_DOWN)) {
-    if (getButton(JOYSTICK_PAD_UP)) {
-      //Up
-      if(getButton(4)){
-        //Precision
-        setMotor(UPPER_ARM_MOTOR, LINAC_PRECISION);
-      } else {
-        setMotor(UPPER_ARM_MOTOR, 127);
-      }
-    }
-    else if (getButton(JOYSTICK_PAD_DOWN)) {
-      //DOWN
-      if(getButton(4)){
-        //Precision
-        setMotor(UPPER_ARM_MOTOR, -LINAC_PRECISION);
-      } else {
-        setMotor(UPPER_ARM_MOTOR, -127);
-      }
-     }
-  }
-  else {
-    setMotor(UPPER_ARM_MOTOR, 0);
-  }
-  
   //Gripper
-  if (getButton(5) ^ getButton(7)) {
-    if (getButton(5)) {
-      claw_pos+=4;
+  //check for invalid states
+  if ((getButton(DIAMOND_LEFT) ^ getButton(DIAMOND_RIGHT))) {
+    //both left and right buttons at same time is invalid
+    if (getButton(DIAMOND_LEFT)) {
+      //close gripper
+      digitalWrite(GRIP_VALVE,LOW);
     }
-    else if (getButton(7)) {
-      claw_pos-=4;
+    else if (getButton(DIAMOND_RIGHT)) {
+      //open gripper
+      digitalWrite(GRIP_VALVE,HIGH);
     }
-    claw_pos = constrain(claw_pos,90-(CLAW_MAX/2),90+(CLAW_MAX/2));
   }
-  clawServo.write(claw_pos);
-  
-  //Wrist rotation
-  if (getButton(JOYSTICK_PAD_LEFT) ^ getButton(JOYSTICK_PAD_RIGHT)) {
-    if (getButton(JOYSTICK_PAD_LEFT)) {
-      wrist_pos+=20;
-    }
-    else if (getButton(JOYSTICK_PAD_RIGHT)) {
-      wrist_pos-=20;
-    }
-    wrist_pos = constrain(wrist_pos,0x01,0x3FF);
-    Dynamixel.servo(WRIST_SERVO_ID,wrist_pos,WRIST_SPEED);
+
+  // Home arm
+  if ((homed == 0 || homed == 3) && getButton(SMALL_LEFT)) {
+    homed = 1;
   }
+  if (homed == 3) {
+    if (getButton(DIAMOND_UP) ^ getButton(DIAMOND_DOWN)) {
+      if (getButton(DIAMOND_UP)) move_arm(1, getButton);
+      else if (getButton(DIAMOND_DOWN)) move_arm(-1);
+    }
+    else move_arm(0);
+  }
+  arm_loop();
   
 } 
 void slow_loop() {    
-  
   //2x per second
   //Compressor
- // compressor_ctl();
+  compressor_ctl();
 } 
 
-void tank_drive() {
+void tank_drive() { // not actually tank drive
   int power_out = 0;
   int turn_out  = 0;
   int zeroed_power =    ((int)(astate->stickX) - 127);
@@ -301,7 +204,7 @@ void tank_drive() {
   
  //System reset logic
  #ifdef WATCHDOG_
-  if (getButton(9)) {
+  if (getButton(SMALL_LEFT)) { // reset
     reset_counter++;
     if (reset_counter == 50) {
       left_enabled = 0;
@@ -316,7 +219,7 @@ void tank_drive() {
     reset_counter = 0;
  #endif
     /* Arm the PID if button 4 is down and either the sticks are currently centered or the PID is already armed */
-   if(getButton(4)){
+   if(getButton(SHOULDER_TOP_LEFT)){
     //PID button down
     if(pid_interlock || (power_out == 0 && turn_out == 0)){
       //PID can engage
@@ -339,7 +242,7 @@ void tank_drive() {
     }  
     //PID outputs directly to motors at a rate of PID_SAMPLE_TIME
     return;
-  } else{
+  } else {
     //Button 4 is up, NO pid
     leftOut = 0;
     rightOut = 0;
@@ -349,7 +252,7 @@ void tank_drive() {
     rightPID.SetMode(MANUAL);
   }
   //apply turbo mode
-  if (getButton(6)) {
+  if (getButton(SHOULDER_TOP_RIGHT)) {
     power_constraint = min(abs(power_out * 2), 255 - abs(turn_out));
     if (abs(power_out) > 75) {
       power_out = constrain(power_out * 2, -power_constraint, power_constraint);
@@ -362,21 +265,7 @@ void tank_drive() {
       left_out  =    power_out + (turn_out);
       right_out = -1 * power_out + (turn_out);
     }
-  } else if (getButton(4)) { //precision mode
-    
-    /*
-    if (abs(power_out) > 75) {
-      left_out  =    power_out / 2 + (turn_out / 2);
-      right_out = -1 * power_out / 2 + (turn_out / 2);
-    } else if (abs(power_out) >  20) {
-      left_out  =    power_out / 2 + (turn_out / 8);
-      right_out = -1 * power_out / 2 + (turn_out / 8);
-    } else {
-    */
-      //left_out  /= 2;
-      //right_out /= 2;
-    //}
-  } else {
+  } else if (!getButton(SHOULDER_TOP_LEFT)) {
     if (abs(power_out) > 75) {
       left_out  =    power_out + (turn_out);
       right_out = -1 * power_out + (turn_out);
@@ -397,29 +286,4 @@ void tank_drive() {
   drive_right(right_enabled,right_out);
 }
 
-/* Gripper
-  //check for invalid states
-  if ((getButton(0) ^ getButton(2))) {
-    //both up and down buttons at same time is invalid
-    if (getButton(2)) {
-      //close gripper
-      digitalWrite(GRIP_VALVE,LOW);
-    }
-    else if (getButton(0)) {
-      //open gripper
-      digitalWrite(GRIP_VALVE,HIGH);
-    }
-  }
-  // Home arm
-/*  if ((homed == 0 || homed == 3) && getButton(8)) {
-   homed = 1;
-  }
-  if (homed == 3) {
-    if (getButton(3) ^ getButton(1)) {
-      if (getButton(3)) move_arm(1);
-      else if (getButton(1)) move_arm(-1);
-    }
-    else move_arm(0);
-  }
-  arm_loop();
-  */
+
