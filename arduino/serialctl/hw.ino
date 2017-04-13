@@ -21,6 +21,8 @@ void init_pins() {
 
   //Gen purpose I/O
   pinMode(13, OUTPUT);
+  pinMode(GRIP_VALVE,OUTPUT);
+  digitalWrite(GRIP_VALVE,LOW);
 }
 
 void measure_offset() {
@@ -63,10 +65,10 @@ void print_data() {
     SerComm.print("0");
   SerComm.print(", I=");
   SerComm.print(i2);
-  SerComm.print("A");
-  //SerComm.print("P(air):");
-  //SerComm.print(psi);
-  //SerComm.print("PSI");
+  SerComm.print("A | ");
+  SerComm.print("AIR:");
+  SerComm.print(psi);
+  SerComm.print("PSI");
   SerComm.println();
 }
 
@@ -209,10 +211,10 @@ void compressor_ctl(){
   
   if(pumping == 1){
     //Go!
-    COMPCTL.motor(COMPPIN,127);
+    setMotor(COMPRESSOR_MOTOR,127);
   } else{
     //Stop!
-    COMPCTL.motor(COMPPIN,0);
+    setMotor(COMPRESSOR_MOTOR,0);
   }
 }
 

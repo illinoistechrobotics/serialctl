@@ -1,5 +1,3 @@
-#define CONTROLLER ST12
-#define PIN 1
 #define POWER 50
 #define THRESHOLD 150
 #define MIN_EXTEND 50
@@ -18,16 +16,23 @@ void arm_loop() {
   if(comm_ok){
   switch (homed) {
     case 1:
-      CONTROLLER.motor(PIN, -POWER);
+      setMotor(EXT_ARM_MOTOR,-POWER);
       homed = 2;
-      last_movement = millis();
+      /* Play it safe, these types are 4 words long! */
+      ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+        last_movement = millis();
+      }
       break;
     case 2:
-      lag = millis() - last_movement;
+      ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+        lag = millis() - last_movement;
+      }
       if (lag > THRESHOLD) { // we've stopped
         homed = 3;
-        count = 0;
-        CONTROLLER.motor(PIN, 0);
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+          count = 0;
+        }
+        setMotor(EXT_ARM_MOTOR,0);
       }
       break;
     default:
@@ -53,15 +58,19 @@ void isrA() {
 }
 
 void move_arm(int8_t dir, bool precision) {
+  unsigned long rcount;
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+    rcount=count;
+  }
   if (homed == 3) {
     if (abs(dir) != 1) {
-        CONTROLLER.motor(PIN, 0);
+        setMotor(EXT_ARM_MOTOR,0);
         return; 
     }
-    speed = (precision ? LINAC_PRECISION : 127)*dir;
-    if (dir < 0 && count < MIN_EXTEND ||
-        dir > 0 && count > MAX_EXTEND )
+    speed = (precision ? ARM_LINAC_PRECISION : 127)*dir;
+    if (dir < 0 && rcount < MIN_EXTEND ||
+        dir > 0 && rcount > MAX_EXTEND )
         return;
-    CONTROLLER.motor(PIN, speed);
+    setMotor(EXT_ARM_MOTOR,speed);
   }
 }

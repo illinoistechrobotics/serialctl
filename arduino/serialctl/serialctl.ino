@@ -1,5 +1,4 @@
 #include <Servo.h>
-#include <Dynamixel_Serial.h>
 #include <Sabertooth.h>
 
 //    serialctl
@@ -38,8 +37,7 @@ static int power_constraint = 0;
  * 0 indicates PID was not used in the last iteration, 1 indicates the PID was used in the last iteration
  */
 static unsigned char pid_interlock=0;
-#undef PRINTMOTORS
-#define WATCHDOG_
+
 
 #ifdef WATCHDOG_
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
@@ -71,7 +69,11 @@ void setMotor(int motorID, int output) {
 }
 
 void setup() {
+  t_start = millis(); //Save the start time
+  SerCommDbg.begin(115200);
+  DEBUGPRINT(BOOTSTR); 
 #ifdef WATCHDOG_
+  DEBUGPRINT("Enabling Watchdog timer...");
   wdt_enable(WDTO_250MS);  //Set 250ms WDT
   wdt_reset();             //watchdog timer reset
 #endif
@@ -82,36 +84,45 @@ void setup() {
   safe.btnhi = 0;
   safe.btnlo = 0;
   safe.cksum = 0b1000000010001011;
-  SerComm.begin(57600);
-  SerCommDbg.begin(115200);
-  PIDInit(); //Initialize PID subsystem 
-  comm_init(); //Initialize the communication FSM
+  DEBUGPRINT("Initializing I2C communication subsystems...");
   setup_iic();
+  DEBUGPRINT("Initializing GPIO and PWM pins...");
   init_pins(); //Initialize pins and motor controllers (refer to hw.ino)
+  DEBUGPRINT("Initializing drive PID subsystem...");
+  PIDInit(); //Initialize PID subsystem
+  DEBUGPRINT("Initializing RC communication subsystems...");
+  SerComm.begin(57600);
+  comm_init(); //Initialize the communication FSM
+  DEBUGPRINT("Initializing extension arm system...");
+  arm_setup();
   last_f = millis();
   last_s = millis();
-  drive_left(0,0);  //Ensure both motors are stopped
+  drive_left(0,0);  //Ensure both motors are stopped, technically redundant
   drive_right(0,0); 
-  t_start = millis(); //Save the start time
+
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
   pid_interlock=0;
-  arm_setup();
   
 #ifdef WATCHDOG_
+  DEBUGPRINT("Disabling watchdog timer...");
   wdt_disable();  //long delay follows
 #endif
   //wait at least ten seconds (TC of filters)
   //before measuring offset (variable delay so
-  //as not to waste time spent homing arm)
+  //as not to waste time spent during setup)
+  DEBUGPRINT("Waiting for drive current sense filters to stabilize...");
   if ((t_start = millis() - t_start) < 10000) {
     delay(10000 - t_start);
   }
+  DEBUGPRINT("Calibrating drive current sensors...");
   measure_offset();
 #ifdef WATCHDOG_
+  DEBUGPRINT("Enabling Watchdog timer...");
   wdt_enable(WDTO_250MS);  //Set 250ms WDT
   wdt_reset();             //watchdog timer reset
 #endif
+  DEBUGPRINT("---Initialization complete!---.");
 }
 
 void loop() {
@@ -158,11 +169,15 @@ void fast_loop() {
       digitalWrite(GRIP_VALVE,HIGH);
     }
   }
+  //END gripper
 
   // Home arm
   if ((homed == 0 || homed == 3) && getButton(SMALL_LEFT)) {
     homed = 1;
   }
+  // END arm homing
+
+  //Arm extension
   if (homed == 3) {
     if (getButton(DIAMOND_UP) ^ getButton(DIAMOND_DOWN)) {
       if (getButton(DIAMOND_UP)) move_arm(1, getButton);
@@ -171,6 +186,32 @@ void fast_loop() {
     else move_arm(0);
   }
   arm_loop();
+  //END arm extension
+
+  //Main arm linear actuator control
+  if (getButton(DPAD_UP) ^ getButton(DPAD_DOWN)) {
+    if (getButton(DPAD_UP)) {
+      //Up
+      if(getButton(4)){
+        //Precision
+        setMotor(UPPER_ARM_MOTOR, LINAC_PRECISION);
+      } else {
+        setMotor(UPPER_ARM_MOTOR, 127);
+      }
+    }
+    else if (getButton(DPAD_DOWN)) {
+      //DOWN
+      if(getButton(4)){
+        //Precision
+        setMotor(UPPER_ARM_MOTOR, -LINAC_PRECISION);
+      } else {
+        setMotor(UPPER_ARM_MOTOR, -127);
+      }
+     }
+  }
+  else {
+    setMotor(UPPER_ARM_MOTOR, 0);
+  }
   
 } 
 void slow_loop() {    
@@ -207,6 +248,7 @@ void tank_drive() { // not actually tank drive
   if (getButton(SMALL_LEFT)) { // reset
     reset_counter++;
     if (reset_counter == 50) {
+      DEBUGPRINT("Performing system reset!");
       left_enabled = 0;
       right_enabled = 0;
       drive_left(left_enabled,0);

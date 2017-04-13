@@ -69,7 +69,7 @@ void comm_parse() {
         digitalWrite(13,HIGH);
       } else{
         cs=COMM_INVALID;
-        //SerCommDbg.println("Invalid");
+        SerCommDbg.println("Invalid RC packet received!");
       }
     }
   }

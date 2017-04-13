@@ -15,9 +15,11 @@ void PIDDrive(){
       //Bus fault!
       leftOut=0;
     }
+    #ifdef PRINTMOTORS
     SerCommDbg.print("PID(L): ");
     SerCommDbg.print(leftOut);
     SerCommDbg.println();
+    #endif
     drive_left(left_enabled,leftOut);
   }
   if(rightPID.NeedsCompute()){
@@ -28,9 +30,11 @@ void PIDDrive(){
       //Bus fault!
       rightOut=0;
     }
+    #ifdef PRINTMOTORS
     SerCommDbg.print("PID(R): ");
     SerCommDbg.print(rightOut);
     SerCommDbg.println();
+    #endif
     drive_right(right_enabled,rightOut);
  }
 }
@@ -102,6 +106,24 @@ void PIDTuner(){
         PIDWriteTunings();
         serialInputBufferIndex = 0;
         break;
+      case 'G':
+      case 'g':
+        SerCommDbg.println("Printing PID tunings:");
+        serialInputBufferIndex = 0;
+        SerCommDbg.print("Left P ");
+        SerCommDbg.println(pidLeftP,8);
+        SerCommDbg.print("Left I ");
+        SerCommDbg.println(pidLeftI,8);
+        SerCommDbg.print("Left D ");
+        SerCommDbg.println(pidLeftD,8);
+        SerCommDbg.print("Right P ");
+        SerCommDbg.println(pidRightP,8);
+        SerCommDbg.print("Right I ");
+        SerCommDbg.println(pidRightI,8);
+        SerCommDbg.print("Right D ");
+        SerCommDbg.println(pidRightD,8);
+        SerCommDbg.println("--------------------------------");
+        break;
       case 'M':
       case 'm':
         SerCommDbg.println("Reloading PID tunings from EEPROM");
@@ -114,7 +136,7 @@ void PIDTuner(){
           *currentPIDValueToUpdate = strtod(serialInputBuffer, NULL);
           SerCommDbg.print("Setting ");
           if (currentPIDValueToUpdate == &pidLeftP) {
-            SerCommDbg.print("Left P ");
+            
           }
           if (currentPIDValueToUpdate == &pidLeftI) {
             SerCommDbg.print("Left I ");
