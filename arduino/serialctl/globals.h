@@ -45,7 +45,7 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 
 // Input button nmubering
 #define DIAMOND_LEFT 0
-#define DIAMOND_BOTTOM 1
+#define DIAMOND_DOWN 1
 #define DIAMOND_RIGHT 2
 #define DIAMOND_UP 3
 #define SHOULDER_TOP_LEFT 4

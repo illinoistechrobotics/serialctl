@@ -18,6 +18,7 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "packet.h"
 #include "hw.h"
+#include "arm.h"
 #include "zserio.h"
 #include "globals.h"
 #include "PIDUtil.h"
@@ -180,10 +181,10 @@ void fast_loop() {
   //Arm extension
   if (homed == 3) {
     if (getButton(DIAMOND_UP) ^ getButton(DIAMOND_DOWN)) {
-      if (getButton(DIAMOND_UP)) move_arm(1, getButton);
-      else if (getButton(DIAMOND_DOWN)) move_arm(-1);
+      if (getButton(DIAMOND_UP)) move_arm(1, getButton(4));
+      else if (getButton(DIAMOND_DOWN)) move_arm(-1,getButton(4));
     }
-    else move_arm(0);
+    else move_arm(0,0);
   }
   arm_loop();
   //END arm extension

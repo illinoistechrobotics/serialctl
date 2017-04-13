@@ -9,6 +9,8 @@
 #define LINAC_PRECISION 32
 #define ARM_LINAC_PRECISION 96
 
+#define PRESSURE_OFFSET 0
+
 
 
 float current_offset_left, current_offset_right;

@@ -1,10 +1,9 @@
-#define POWER 50
-#define THRESHOLD 150
-#define MIN_EXTEND 50
-#define MAX_EXTEND 42000
+#include <util/atomic.h>
+#include "arm.h"
 
 volatile long count, last_movement;
 long lag;
+char homed=0;
 
 void arm_setup() {
   arm_safe();
@@ -44,11 +43,11 @@ void arm_loop() {
 }
 
 void arm_safe() {
-  CONTROLLER.motor(PIN, 0);
+  setMotor(EXT_ARM_MOTOR,0);
 }
 
 void isrA() {
-  if (digitalRead(B)) { // B leading
+  if (digitalRead(B_PIN)) { // B leading
     count++;
   } 
   else { // A leading
@@ -59,6 +58,7 @@ void isrA() {
 
 void move_arm(int8_t dir, bool precision) {
   unsigned long rcount;
+  int m_speed;
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
     rcount=count;
   }
@@ -67,10 +67,10 @@ void move_arm(int8_t dir, bool precision) {
         setMotor(EXT_ARM_MOTOR,0);
         return; 
     }
-    speed = (precision ? ARM_LINAC_PRECISION : 127)*dir;
+    m_speed = (precision ? ARM_LINAC_PRECISION : 127)*dir;
     if (dir < 0 && rcount < MIN_EXTEND ||
         dir > 0 && rcount > MAX_EXTEND )
         return;
-    setMotor(EXT_ARM_MOTOR,speed);
+    setMotor(EXT_ARM_MOTOR,m_speed);
   }
 }
