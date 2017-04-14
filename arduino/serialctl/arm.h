@@ -2,9 +2,10 @@
 #define B_PIN 3
 #define POWER 50
 #define THRESHOLD 150
-#define MIN_EXTEND 50
-#define MAX_EXTEND 42000
+#define MIN_EXTEND 60
+#define MAX_EXTEND 40000
 extern char homed;
+extern long armcount;
 void arm_setup();
 void arm_loop();
 void arm_safe();

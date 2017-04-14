@@ -87,6 +87,8 @@ void setup() {
   safe.cksum = 0b1000000010001011;
   DEBUGPRINT("Initializing I2C communication subsystems...");
   setup_iic();
+  DEBUGPRINT("Testing wheel encoder communication...");
+  PIDEncoderCheck();
   DEBUGPRINT("Initializing GPIO and PWM pins...");
   init_pins(); //Initialize pins and motor controllers (refer to hw.ino)
   DEBUGPRINT("Initializing drive PID subsystem...");
@@ -163,11 +165,11 @@ void fast_loop() {
     //both left and right buttons at same time is invalid
     if (getButton(DIAMOND_LEFT)) {
       //close gripper
-      digitalWrite(GRIP_VALVE,LOW);
+      digitalWrite(GRIP_VALVE,HIGH);
     }
     else if (getButton(DIAMOND_RIGHT)) {
       //open gripper
-      digitalWrite(GRIP_VALVE,HIGH);
+      digitalWrite(GRIP_VALVE,LOW);
     }
   }
   //END gripper
@@ -195,18 +197,18 @@ void fast_loop() {
       //Up
       if(getButton(4)){
         //Precision
-        setMotor(UPPER_ARM_MOTOR, LINAC_PRECISION);
+        setMotor(UPPER_ARM_MOTOR, -LINAC_PRECISION);
       } else {
-        setMotor(UPPER_ARM_MOTOR, 127);
+        setMotor(UPPER_ARM_MOTOR, -127);
       }
     }
     else if (getButton(DPAD_DOWN)) {
       //DOWN
       if(getButton(4)){
         //Precision
-        setMotor(UPPER_ARM_MOTOR, -LINAC_PRECISION);
+        setMotor(UPPER_ARM_MOTOR, LINAC_PRECISION);
       } else {
-        setMotor(UPPER_ARM_MOTOR, -127);
+        setMotor(UPPER_ARM_MOTOR, 127);
       }
      }
   }

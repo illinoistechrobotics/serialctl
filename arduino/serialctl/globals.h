@@ -9,11 +9,23 @@ extern double pidLeftP, pidLeftI, pidLeftD, pidRightP, pidRightI, pidRightD;
 extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 
 /*Configuration globals */
-#undef PRINTMOTORS  //Should all motor power power values be printed to SerCommDbg?
+#define PRINTMOTORS  //Should all motor power power values be printed to SerCommDbg?
 #define WATCHDOG_   //Should the hardware watchdog timer be set and used (strongly advised for safety!)?
 #define SerComm Serial1   //Serial port connected to Xbee
 #define SerCommDbg Serial   //Serial port for debugging info
-#define BOOTSTR "--ITR Goliath 4.2017, Copyright 2017 (c) Illinois Tech Robotics"   //String to print on SerCommDbg on initialization
+#define BOOTSTR "--ITR Goliath 4.2017, Copyright 2017 (c) Illinois Tech Robotics--"   //String to print on SerCommDbg on initialization
+
+
+/* 2017 PID tunings:
+ *  Printing PID tunings:
+* Left P 0.03500000
+* Left I 0.40000000
+* Left D 0.00003500
+* Right P 0.03000000
+* Right I 0.40000000
+* Right D 0.00003500
+
+ */
 
 #define RESET_BUTTON 9  //Button to use for system reset, requires watchdog timer to function
 

@@ -4,6 +4,7 @@
 volatile long count, last_movement;
 long lag;
 char homed=0;
+long armcount;
 
 void arm_setup() {
   arm_safe();
@@ -12,6 +13,9 @@ void arm_setup() {
 }
 
 void arm_loop() {
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
+    armcount=count;
+  }
   if(comm_ok){
   switch (homed) {
     case 1:
@@ -31,6 +35,7 @@ void arm_loop() {
         ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
           count = 0;
         }
+        armcount=0;
         setMotor(EXT_ARM_MOTOR,0);
       }
       break;
@@ -57,19 +62,16 @@ void isrA() {
 }
 
 void move_arm(int8_t dir, bool precision) {
-  unsigned long rcount;
   int m_speed;
-  ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
-    rcount=count;
-  }
+  
   if (homed == 3) {
     if (abs(dir) != 1) {
         setMotor(EXT_ARM_MOTOR,0);
         return; 
     }
     m_speed = (precision ? ARM_LINAC_PRECISION : 127)*dir;
-    if (dir < 0 && rcount < MIN_EXTEND ||
-        dir > 0 && rcount > MAX_EXTEND )
+    if (dir < 0 && armcount < MIN_EXTEND ||
+        dir > 0 && armcount > MAX_EXTEND )
         return;
     setMotor(EXT_ARM_MOTOR,m_speed);
   }

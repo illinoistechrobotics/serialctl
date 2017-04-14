@@ -11,8 +11,8 @@ void init_pins() {
   delay(10);
   //failsafes
   for (int i = 0; i < 3; i++) {
-    ST12.setTimeout(300);
-    ST34.setTimeout(300);
+    ST12.setTimeout(1000);
+    ST34.setTimeout(1000);
     ST12.motor(1, 0);
     ST34.motor(1, 0);
     ST12.motor(2, 0);
@@ -68,7 +68,8 @@ void print_data() {
   SerComm.print("A | ");
   SerComm.print("AIR:");
   SerComm.print(psi);
-  SerComm.print("PSI");
+  SerComm.print("PSI | X(arm): ");
+  SerComm.print(armcount);
   SerComm.println();
 }
 
@@ -197,6 +198,7 @@ void compressor_ctl(){
     psi += ADC2PSI(P_SENSOR);
   }
   psi = psi/5;
+  DEBUGPRINT(psi);
   if(comm_ok == 1){
     //Read pressures and pump if needed
     if(psi < MIN_PRESS){

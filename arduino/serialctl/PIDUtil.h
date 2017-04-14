@@ -13,5 +13,6 @@ void PIDTuner();
 void PIDInit();
 void PIDDrive();
 void PIDRefreshTunings();
+int PIDEncoderCheck();
 extern PID leftPID;
 extern PID rightPID;

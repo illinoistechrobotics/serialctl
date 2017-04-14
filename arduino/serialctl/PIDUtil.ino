@@ -6,6 +6,26 @@ extern char comm_ok, left_enabled, right_enabled;
 PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, REVERSE);
 PID rightPID(&rightIn, &rightOut, &rightSet, pidRightP, pidRightI, pidRightD, DIRECT);
 
+int PIDEncoderCheck(){
+  int rv=1;
+  #ifdef DEBUGPRINT
+  double dummy;
+  if(iic_encoder_read(ENCODER_LEFT_ADDR,&dummy)){
+    DEBUGPRINT("Left Encoder Data OK!");
+  } else {
+    DEBUGPRINT("Left Encoder Data Bus Fault!");
+    rv = -1;
+  }
+  if(iic_encoder_read(ENCODER_RIGHT_ADDR,&dummy)){
+    DEBUGPRINT("Right Encoder Data OK!");
+  } else {
+    DEBUGPRINT("Right Encoder Data Bus Fault!");
+    rv = -1;
+  }
+  #endif
+  return rv;
+}
+
 void PIDDrive(){
   if(leftPID.NeedsCompute()){
     if(iic_encoder_read(ENCODER_LEFT_ADDR,&leftIn)){
