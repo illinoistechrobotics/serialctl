@@ -21,13 +21,22 @@ int read_speed(char address){
   byte buff[sizeof(int)];
   for(int i = 0; i < sizeof(int); ++i){
     unsigned long timeout = millis();
-    while((!Wire.available()) && millis() - timeout < 100){};
-    if(millis() - timeout > 100){
-      SerComm.println("Speed read timeout");
+    while((!Wire.available()) && millis() - timeout < 10){};
+    if(millis() - timeout > 10){
+      //SerComm.println("Speed read timeout");
+      return -1;
     }
     buff[i] = Wire.read();
   }
   return *((int*) buff);
+}
+void fillSpeedBuffer(char *buffer, int buffersize, int speed) {
+  if (speed == -1) {
+    snprintf(buffer, buffersize, "FAIL");
+  }
+  else {
+    snprintf(buffer, buffersize, "% 4d", speed);
+  }
 }
 void print_speed(){
   char speedline[100];
@@ -35,12 +44,15 @@ void print_speed(){
     snprintf(speedline, 100, "% 4d, % 4d, %lu", last_left_speed, last_right_speed, millis());
   }
   else {
+    char leftTmp[5];
+    char rightTmp[5];
     int left_speed = read_speed(LEFT_SPEEDSERVO_ADDR);
     int right_speed = read_speed(RIGHT_SPEEDSERVO_ADDR);
-    
-    snprintf(speedline, 100, "% 4d, % 4d, % 4d, % 4d, %lu", 
-        left_speed,last_left_speed,
-        right_speed,last_right_speed,
+    fillSpeedBuffer(leftTmp, 5, left_speed);
+    fillSpeedBuffer(rightTmp, 5, right_speed);
+    snprintf(speedline, 100, "%s, % 4d, %s, % 4d, %lu", 
+        leftTmp,last_left_speed,
+        rightTmp,last_right_speed,
         millis());
   }
   SerComm.print(speedline);
@@ -51,7 +63,7 @@ void print_data(){
     SerComm.println("ESTOP");
   } else {
     if(cs != COMM_WAIT){
-      //SerComm.println("Good to roll");
+      //SerComm.print("Good to roll ");
       print_speed();
     }
     SerComm.println("Fenrir");
