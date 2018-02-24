@@ -9,7 +9,7 @@ long armcount;
 void arm_setup() {
   arm_safe();
   homed = 0;
-  attachInterrupt(A_INT,isrA,RISING);
+  //attachInterrupt(A_INT,isrA,RISING);
 }
 
 void arm_loop() {
