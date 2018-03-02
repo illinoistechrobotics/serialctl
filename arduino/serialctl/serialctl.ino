@@ -71,7 +71,7 @@ void setMotor(int motorID, int output) {
 
 void setup() {
   t_start = millis(); //Save the start time
-  SerCommDbg.begin(115200);
+  SerCommDbg.begin(57600);
   DEBUGPRINT(BOOTSTR); 
 #ifdef WATCHDOG_
   DEBUGPRINT("Enabling Watchdog timer...");

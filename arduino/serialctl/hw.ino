@@ -21,8 +21,7 @@ void init_pins() {
 
   //Gen purpose I/O
   pinMode(13, OUTPUT);
-  pinMode(GRIP_VALVE,OUTPUT);
-  digitalWrite(GRIP_VALVE,LOW);
+  pinMode(GRIP_VALVE,OUTPUT);  digitalWrite(GRIP_VALVE,LOW);
 }
 
 void measure_offset() {
