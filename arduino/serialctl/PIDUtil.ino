@@ -219,36 +219,48 @@ void PIDTuner(){
 
 void PIDWriteTunings(){
   //Write the current value of the PID tunings to the EEPROM, which is nonvolatile
-  EEPROM.put(FS_LEFT_P_4,pidLeftP);
-  EEPROM.put(FS_LEFT_I_4,pidLeftI);
-  EEPROM.put(FS_LEFT_D_4,pidLeftD);
-  EEPROM.put(FS_RIGHT_P_4,pidRightP);
-  EEPROM.put(FS_RIGHT_I_4,pidRightI);
-  EEPROM.put(FS_RIGHT_D_4,pidRightD);
+  EEPROM.put(FS_ZERO_P_4,pidZeroP);
+  EEPROM.put(FS_ZERO_I_4,pidZeroI);
+  EEPROM.put(FS_ZERO_D_4,pidZeroD);
+  EEPROM.put(FS_120_P_4,pid120P);
+  EEPROM.put(FS_120_I_4,pid120I);
+  EEPROM.put(FS_120_D_4,pid120D);
+  EEPROM.put(FS_240_P_4,pid240P);
+  EEPROM.put(FS_240_I_4,pid240I);
+  EEPROM.put(FS_240_D_4,pid240D);
 }
 
 void PIDLoadTunings(){
   //Load the PID tunings from the EEPROM
   //PID library cannot recover from NaN internal state
-  EEPROM.get(FS_LEFT_P_4,pidLeftP);
-  if(pidLeftP == NAN)
-    pidLeftP = 0;
-  EEPROM.get(FS_LEFT_I_4,pidLeftI);
-  if(pidLeftI == NAN)
-    pidLeftI = 0;
-  EEPROM.get(FS_LEFT_D_4,pidLeftD);
-  if(pidLeftD == NAN)
-    pidLeftD = 0;
-  EEPROM.get(FS_RIGHT_P_4,pidRightP);
-  if(pidRightP == NAN)
-    pidRightP = 0;
-  EEPROM.get(FS_RIGHT_I_4,pidRightI);
-  if(pidRightI == NAN)
-    pidRightI = 0;
-  EEPROM.get(FS_RIGHT_D_4,pidRightD);
-  if(pidRightD == NAN)
-    pidRightD = 0;
-    
+  EEPROM.get(FS_ZERO_P_4,pidZeroP);
+  if(pidZeroP == NAN)
+    pidZeroP = 0;
+  EEPROM.get(FS_ZERO_I_4,pidZeroI);
+  if(pidZeroI == NAN)
+    pidZeroI = 0;
+  EEPROM.get(FS_ZERO_D_4,pidZeroD);
+  if(pidZeroD == NAN)
+    pidZeroD = 0;
+  EEPROM.get(FS_120_P_4,pid120P);
+  if(pid120P == NAN)
+    pid120P = 0;
+  EEPROM.get(FS_120_I_4,pid120I);
+  if(pid120I == NAN)
+    pid120I = 0;
+  EEPROM.get(FS_120_D_4,pid120D);
+  if(pid120D == NAN)
+    pid120D = 0;
+  EEPROM.get(FS_240_P_4,pid240P);
+  if(pid240P == NAN)
+    pid240P = 0;
+  EEPROM.get(FS_240_I_4,pid240I);
+  if(pid240I == NAN)
+    pid240I = 0;
+  EEPROM.get(FS_240_D_4,pid240D);
+  if(pid240D == NAN)
+    pid240D = 0;
+        
   PIDRefreshTunings();
 }
 
