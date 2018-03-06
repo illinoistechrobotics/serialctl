@@ -1,8 +1,9 @@
 #pragma once
 
 
-#define CURRENT_RIGHT A0
-#define CURRENT_LEFT A1
+#define CURRENT_ZERO A0
+#define CURRENT_120 A1
+#define CURRENT_240 A2
 
 #define SABERTOOTH12 Serial2
 
@@ -13,7 +14,7 @@
 
 
 
-float current_offset_left, current_offset_right;
+float current_offset_zero, current_offset_120, current_offset_240;
 int offset_measured = 0;
 
 void init_pins();

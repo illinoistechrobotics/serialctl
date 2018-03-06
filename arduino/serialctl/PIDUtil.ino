@@ -105,8 +105,8 @@ void PIDTuner(){
   //Parse the data relating to the local PID tuner
   static char serialInputBuffer[PID_SERIAL_BUFFER_SIZE];
   static char serialInputBufferIndex = 0;
-  static char currentPIDValueIsLeft = 1;
-  static double *currentPIDValueToUpdate = &pidLeftP;
+  static char currentPIDValueIsZero = ;
+  static double *currentPIDValueToUpdate = &pidZeroP;
   //Serial Input for PID configuration
   if (SerCommDbg.available()) {
     int incomingByte = SerCommDbg.read();

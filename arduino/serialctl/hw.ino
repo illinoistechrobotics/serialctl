@@ -30,43 +30,54 @@ void measure_offset() {
   //should be during setup() after drive is stopped
   if (offset_measured) return;
   int n = 10;
-  current_offset_left = current_offset_right = 0;
+  current_offset_zero = current_offset_120, current_offset_240 = 0;
   for (int i = 0; i < n; i++) {
-    current_offset_left += analogRead(CURRENT_LEFT);
-    current_offset_right += analogRead(CURRENT_RIGHT);
+    current_offset_zero += analogRead(CURRENT_ZERO);
+    current_offset_120 += analogRead(CURRENT_120);
+    current_offset_240 += analogRead(CURRENT_240);
     delay(10);
   }
-  current_offset_left /= n;
-  current_offset_left -= 512;
-  current_offset_right /= n;
-  current_offset_right -= 512;
+  current_offset_zero /= n;
+  current_offset_zero -= 512;
+  current_offset_120 /= n;
+  current_offset_120 -= 512;
+  current_offset_240 /= n;
+  current_offset_240 -= 512;
   offset_measured = 1;
 }
 
 void print_data() {
-  float i1, i2;
-  i1 = (analogRead(CURRENT_LEFT) - 512.0 - current_offset_left) / 1.28;
-  i2 = (analogRead(CURRENT_RIGHT) - 512.0 - current_offset_right) / 1.28;
+  float i1, i2, i3;
+  i1 = (analogRead(CURRENT_ZERO) - 512.0 - current_offset_zero) / 1.28;
+  i2 = (analogRead(CURRENT_120) - 512.0 - current_offset_120) / 1.28;
+  i3 = (analogRead(CURRENT_240) - 512.0 - current_offset_240) / 1.28;
+  
   if(comm_ok==0){
     //Print failsafe notice
     SerComm.print("-FS- ");
   }
-  SerComm.print("L: V=");
-  if(left_enabled)
+  SerComm.print("Zero: V=");
+  if(zero_enabled)
     SerComm.print("+");
    else
     SerComm.print("0");
   SerComm.print(", I=");
   SerComm.print(i1);
-  SerComm.print("A | R: V=");
-  if(right_enabled)
+  SerComm.print("A | 120: V=");
+  if(120_enabled)
     SerComm.print("+");
    else
     SerComm.print("0");
   SerComm.print(", I=");
   SerComm.print(i2);
-  SerComm.print("A | ");
-  SerComm.print("AIR:");
+  SerComm.print("A | 240: V=");
+  if(240_enabled)
+    SerComm.print("+");
+   else
+    SerComm.print("0");
+  SerComm.print(", I=");
+  SerComm.print(i3);  
+  SerComm.print("A | AIR:");
   SerComm.print(psi);
   SerComm.print("PSI | X(arm): ");
   SerComm.print(armcount);
