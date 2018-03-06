@@ -31,25 +31,33 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 
 /* Sabertooth input mappings */
 #define UPPER_ARM_MOTOR 1
-#define EXT_ARM_MOTOR 2
+#define EXT_ARM_MOTOR 44
 #define COMPRESSOR_MOTOR 4
 
 
-// pins for motor controller 1 (right)
-#define ALI1 7
-#define BLI1 8
+// pins for motor controller 1 (0 degrees)
+#define ALI1 2
+#define BLI1 3
 #define AHI1 22
 #define BHI1 23
 #define DENABLE1 28
-#define DREADY1 30
+#define DREADY1 31
 
-// and 2 (left)
-#define ALI2 11
-#define BLI2 12
+// pins for motor controller 2 (120 degrees)
+#define ALI2 6
+#define BLI2 7
 #define AHI2 24
 #define BHI2 25
 #define DENABLE2 29
-#define DREADY2 31
+#define DREADY2 32
+
+// pins for motor controller 3 (240 degrees)
+#define ALI3 11
+#define BLI3 12
+#define AHI3 26
+#define BHI3 27
+#define DENABLE3 30
+#define DREADY3 33
 
 #define DEADBAND_HALF_WIDTH 10  // Control input deadband radius
 #define FAILTIME 200    //Failsafe timeout in milliseconds
