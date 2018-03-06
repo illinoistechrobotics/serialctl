@@ -34,9 +34,9 @@ int MPULoop() {
   SerCommDbg.print(" | GyY = "); SerCommDbg.print(GyY);
   SerCommDbg.print(" | GyZ = "); SerCommDbg.println(GyZ);
 
-  int angle = atan2(AcX, AcY);  
+  angle = atan2(AcX, AcY);  
   SerCommDbg.print("Angle of Rotation: "); SerCommDbg.println(angle);
-  return angle
+  return angle;
   delay(333);
 }
 
