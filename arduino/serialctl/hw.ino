@@ -104,6 +104,7 @@ void osmc_init() {
 }
 void fast_pwm() {
   TCCR1B = (TCCR1B & 0b11111000) | 0x03;
+  TCCR3B = (TCCR3B & 0b11111000) | 0x03;
   TCCR4B = (TCCR4B & 0b11111000) | 0x03;
 }
 
