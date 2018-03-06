@@ -358,28 +358,44 @@ void tank_drive() { // not actually tank drive
   }
   if (small_right_flag) {
     if ((angle == 360 || angle > 0) && angle <= 45) {
-      
+      drive_0(0,0);
+      drive_120(enabled_120,out_120);
+      drive_240(enabled_240,out_240);  
     }
     if (angle > 45 && angle <= 90) {
-      
+      drive_0(enabled_0,out_0);
+      drive_120(0,0);
+      drive_240(enabled_240,out_240);  
     }
     if (angle > 90 && angle <= 135) {
-      
+      drive_0(enabled_0,out_0);
+      drive_120(0,0);
+      drive_240(enabled_240,out_240);  
     }
     if (angle > 135 && angle <= 180) {
-      
+      drive_0(enabled_0,out_0);
+      drive_120(0,0);
+      drive_240(0,0);  
     }
     if (angle > 180 && angle <= 225) {
-      
+      drive_0(enabled_0,out_0);
+      drive_120(0,0);
+      drive_240(0,0);  
     }
     if (angle > 225 && angle <= 270) {
-      
+      drive_0(enabled_0,out_0);
+      drive_120(enabled_120,out_120);
+      drive_240(0,0);  
     }
     if (angle > 270 && angle <= 315) {
-      
+      drive_0(enabled_0,out_0);
+      drive_120(enabled_120,out_120);
+      drive_240(0,0);  
     }
     if (angle > 315 && (angle <= 360 || angle == 0)) {
-      
+      drive_0(0,0);
+      drive_120(enabled_120,out_120);
+      drive_240(enabled_240,out_240);  
     }
   }
   else {
