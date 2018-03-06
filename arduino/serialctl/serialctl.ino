@@ -27,7 +27,7 @@
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-char zero_enabled = 0, 120_enabled = 0, 240_enabled = 0;
+char enabled_0 = 0, enabled_120 = 0, enabled_240 = 0;
 long last_f = 0, last_s = 0, t_start = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(129, SABERTOOTH12);
@@ -135,9 +135,9 @@ void loop() {
   wdt_reset();
   #endif
   comm_parse();
-  zero_enabled = try_enable_zero(zero_enabled);
-  120_enabled = try_enable_120(120_enabled);
-  240_enabled = try_enable_240(240_enabled);
+  enabled_0 = try_enable_zero(enabled_0);
+  enabled_120 = try_enable_120(enabled_120);
+  enabled_240 = try_enable_240(enabled_240);
   //Fast loop
   if (millis() - last_f >= 40) {
     //Every line sent to the computer gets us a new state
@@ -245,8 +245,9 @@ void tank_drive() { // not actually tank drive
       turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
     }
   }
-  int left_out =     power_out + (turn_out / 8);
-  int right_out = -1 * power_out + (turn_out / 8);
+  int out_0 = power_out + (turn_out / 8);
+  int out_120 = power_out + (turn_out / 8);
+  int out_240 = power_out + (turn_out / 8);
   
  //System reset logic
  #ifdef WATCHDOG_
@@ -254,11 +255,12 @@ void tank_drive() { // not actually tank drive
     reset_counter++;
     if (reset_counter == 50) {
       DEBUGPRINT("Performing system reset!");
-      left_enabled = 0;
-      right_enabled = 0;
-      drive_zero(zero_enabled,0);
-      drive_120(120_enabled,0);
-      drive_240(240_enabled,0);
+      enabled_0 = 0;
+      enabled_120 = 0;
+      enabled_240 = 0;
+      drive_zero(enabled_0,0);
+      drive_120(enabled_120,0);
+      drive_240(enabled_240,0);
       wdt_enable(WDTO_15MS);
       while (1);
     }
@@ -271,82 +273,82 @@ void tank_drive() { // not actually tank drive
     //PID button down
     if(pid_interlock || (power_out == 0 && turn_out == 0)){
       //PID can engage
-      zeroSet = -2*(power_out+turn_out);
-      120Set = -2*(power_out+turn_out);
-      240Set = -2*(power_out+turn_out);
-      zeroPID.SetMode(AUTOMATIC);
-      120PID.SetMode(AUTOMATIC);
-      240PID.SetMode(AUTOMATIC);
+      Set0 = -2*(power_out+turn_out);
+      Set120 = -2*(power_out+turn_out);
+      Set240 = -2*(power_out+turn_out);
+      PID0.SetMode(AUTOMATIC);
+      PID120.SetMode(AUTOMATIC);
+      PID240.SetMode(AUTOMATIC);
       /* Allow PID to stay engaged */
       pid_interlock=1;
     } else{
       //PID button down, but NOT safe to engage PID
-      zeroOut = 0;
-      120Out = 0;
-      240Out = 0;
+      Out0 = 0;
+      Out120 = 0;
+      Out240 = 0;
       /* Ensure that sticks are centered before allowing the PID to engage again! Risk of mechanical damage!*/
       pid_interlock=0;
-      zeroPID.SetMode(MANUAL);
-      120PID.SetMode(MANUAL);
-      240PID.SetMode(MANUAL);
-      drive_zero(zero_enabled,0);
-      drive_120(120_enabled,0);
-      drive_240(240_enabled,0);
+      PID0.SetMode(MANUAL);
+      PID120.SetMode(MANUAL);
+      PID240.SetMode(MANUAL);
+      drive_zero(enabled_0,0);
+      drive_120(enabled_120,0);
+      drive_240(enabled_240,0);
     }  
     //PID outputs directly to motors at a rate of PID_SAMPLE_TIME
     return;
   } else {
     //Button 4 is up, NO pid
-    zeroOut = 0;
-    120Out = 0;
-    240Out = 0;
+    Out0 = 0;
+    Out120 = 0;
+    Out240 = 0;
     /* Ensure that sticks are centered before allowing the PID to engage again! Risk of mechanical damage!*/
     pid_interlock=0;
-    zeroPID.SetMode(MANUAL);
-    120PID.SetMode(MANUAL);
-    240PID.SetMode(MANUAL);
+    PID0.SetMode(MANUAL);
+    PID120.SetMode(MANUAL);
+    PID240.SetMode(MANUAL);
   }
   //apply turbo mode
   if (getButton(SHOULDER_TOP_RIGHT)) {
     power_constraint = min(abs(power_out * 2), 255 - abs(turn_out));
     if (abs(power_out) > 75) {
       power_out = constrain(power_out * 2, -power_constraint, power_constraint);
-      zero_out  =  power_out + (turn_out);
-      120_out = power_out + (turn_out);
-      240_out = power_out + (turn_out);
+      out_0  =  power_out + (turn_out);
+      out_120 = power_out + (turn_out);
+      out_240 = power_out + (turn_out);
     } else if (abs(power_out) >  20) {
-      zero_out  =    power_out * 2 + (turn_out / 4);
-      120_out = power_out * 2 + (turn_out / 4);
-      240_out = power_out * 2 + (turn_out / 4);
+      out_0  =    power_out * 2 + (turn_out / 4);
+      out_120 = power_out * 2 + (turn_out / 4);
+      out_240 = power_out * 2 + (turn_out / 4);
     } else {
-      zero_out  =    power_out + (turn_out);
-      120_out = power_out + (turn_out);
-      240_out = power_out + (turn_out);
+      out_0  =    power_out + (turn_out);
+      out_120 = power_out + (turn_out);
+      out_240 = power_out + (turn_out);
     }
   } else if (!getButton(SHOULDER_TOP_LEFT)) {
     if (abs(power_out) > 75) {
-      zero_out  =    power_out + (turn_out);
-      120_out = power_out + (turn_out);
-      240_out = power_out + (turn_out);
+      out_0  =    power_out + (turn_out);
+      out_120 = power_out + (turn_out);
+      out_240 = power_out + (turn_out);
     } else if (abs(power_out) >  20) {
-      zero_out  =    power_out + (turn_out / 4);
-      120_out = power_out + (turn_out / 4);
-      240_out = power_out + (turn_out / 4);
+      out_0  =    power_out + (turn_out / 4);
+      out_120 = power_out + (turn_out / 4);
+      out_240 = power_out + (turn_out / 4);
     }
   }
   #ifdef PRINTMOTORS
   // Debug printing
   SerCommDbg.print("Zero");
-  SerCommDbg.print(zero_out);
+  SerCommDbg.print(out_0);
   SerCommDbg.print(" 120");
-  SerCommDbg.println(120_out);
+  SerCommDbg.println(out_120);
   SerCommDbg.print(" 240");
-  SerCommDbg.print(240_out);
+  SerCommDbg.print(out_240);
   #endif
   // Drive motors!
-  drive_zero(zero_enabled,zero_out);
-  drive_120(120_enabled,120_out);
-  drive_240(240_enabled,240_out);
+  drive_zero(enabled_0,out_0);
+  drive_120(enabled_120,out_120);
+  drive_240(enabled_240,out_240);
 }
 
 

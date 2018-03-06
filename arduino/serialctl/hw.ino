@@ -57,21 +57,21 @@ void print_data() {
     SerComm.print("-FS- ");
   }
   SerComm.print("Zero: V=");
-  if(zero_enabled)
+  if(enabled_0)
     SerComm.print("+");
    else
     SerComm.print("0");
   SerComm.print(", I=");
   SerComm.print(i1);
   SerComm.print("A | 120: V=");
-  if(120_enabled)
+  if(enabled_120)
     SerComm.print("+");
    else
     SerComm.print("0");
   SerComm.print(", I=");
   SerComm.print(i2);
   SerComm.print("A | 240: V=");
-  if(240_enabled)
+  if(enabled_240)
     SerComm.print("+");
    else
     SerComm.print("0");

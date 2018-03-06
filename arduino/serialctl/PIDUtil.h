@@ -7,6 +7,7 @@
 #define ENCODER_ZERO_ADDR 5
 #define ENCODER_120_ADDR 6
 #define ENCODER_240_ADDR 7
+#define GYRO_ACCEL_ADDR 4
 
 void PIDWriteTunings();
 void PIDLoadTunings();
@@ -15,6 +16,6 @@ void PIDInit();
 void PIDDrive();
 void PIDRefreshTunings();
 int PIDEncoderCheck();
-extern PID zeroPID;
-extern PID 120PID;
-extern PID 240PID;
+extern PID PID0;
+extern PID PID120;
+extern PID PID240;

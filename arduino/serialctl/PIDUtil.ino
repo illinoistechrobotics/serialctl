@@ -1,11 +1,11 @@
 #include "PIDUtil.h"
 double pidZeroP=0, pidZeroI=0, pidZeroD=0, pid120P=0, pid120I=0, pid120D=0, pid240P, pid240I, pid240D;
-double zeroIn=0, zeroOut=0, zeroSet=0, 120In=0, 120Out=0, 120Set=0, 240In=0, 240Out=0, 240Set=0;
-extern char comm_ok, zero_enabled, 120_enabled, 240_enabled;
+double In0=0, Out0=0, Set0=0, In120=0, Out120=0, Set120=0, In240=0, Out240=0, Set240=0;
+extern char comm_ok, enabled_0, enabled_120, enabled_240;
 
-PID zeroPID(&zeroIn, &zeroOut, &zeroSet, pidZeroP, pidZeroI, pidZeroD, DIRECT);
-PID 120PID(&120In, &120Out, &120Set, pid120P, pid120I, pid120D, DIRECT);
-PID 240PID(&240In, &240Out, &240Set, pid240P, pid240I, pid240D, DIRECT);
+PID PID0(&In0, &Out0, &Set0, pidZeroP, pidZeroI, pidZeroD, DIRECT);
+PID PID120(&In120, &Out120, &Set120, pid120P, pid120I, pid120D, DIRECT);
+PID PID240(&In240, &Out240, &Set240, pid240P, pid240I, pid240D, DIRECT);
 
 int PIDEncoderCheck(){
   int rv=1;
@@ -34,116 +34,134 @@ int PIDEncoderCheck(){
 }
 
 void PIDDrive(){
-  if(zeroPID.NeedsCompute()){
-    if(iic_encoder_read(ENCODER_ZERO_ADDR,&zeroIn)){
+  if(PID0.NeedsCompute()){
+    if(iic_encoder_read(ENCODER_ZERO_ADDR,&In0)){
     //Successfully read the left encoder
-      zeroPID.Compute();
+      PID0.Compute();
     } else {
       //Bus fault!
-      zeroOut=0;
+      Out0=0;
     }
     #ifdef PRINTMOTORS
     SerCommDbg.print("PID(Zero): ");
-    SerCommDbg.print(zeroOut);
+    SerCommDbg.print(Out0);
     SerCommDbg.println();
     #endif
-    drive_zero(zero_enabled,zeroOut);
+    drive_zero(enabled_0,Out0);
   }
-  if(120PID.NeedsCompute()){
-    if(iic_encoder_read(ENCODER_120_ADDR,&120In)){
+  if(PID120.NeedsCompute()){
+    if(iic_encoder_read(ENCODER_120_ADDR,&In120)){
     //Successfully read the left encoder
-      120PID.Compute();
+      PID120.Compute();
     } else {
       //Bus fault!
-      120Out=0;
+      Out120=0;
     }
     #ifdef PRINTMOTORS
     SerCommDbg.print("PID(120): ");
-    SerCommDbg.print(120Out);
+    SerCommDbg.print(Out120);
     SerCommDbg.println();
     #endif
-    drive_120(120_enabled,120Out);
+    drive_120(enabled_120,Out120);
  }
-  if(240PID.NeedsCompute()){
-    if(iic_encoder_read(ENCODER_240_ADDR,&240In)){
+  if(PID240.NeedsCompute()){
+    if(iic_encoder_read(ENCODER_240_ADDR,&In240)){
     //Successfully read the left encoder
-      240PID.Compute();
+      PID240.Compute();
     } else {
       //Bus fault!
-      240Out=0;
+      Out240=0;
     }
     #ifdef PRINTMOTORS
     SerCommDbg.print("PID(240): ");
-    SerCommDbg.print(240Out);
+    SerCommDbg.print(Out240);
     SerCommDbg.println();
     #endif
-    drive_240(240_enabled,240Out);
+    drive_240(enabled_240,Out240);
  } 
 }
 
 void PIDInit(){
     PIDLoadTunings(); //Load the PID tunings from the EEPROM
     PIDRefreshTunings();
-    zeroPID.SetMode(MANUAL);
-    120PID.SetMode(MANUAL);
-    240PID.SetMode(MANUAL);
-    zeroPID.SetSampleTime(PID_SAMPLE_TIME);
-    120PID.SetSampleTime(PID_SAMPLE_TIME);
-    240PID.SetSampleTime(PID_SAMPLE_TIME);
-    zeroPID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
-    120PID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
-    240PID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
+    PID0.SetMode(MANUAL);
+    PID120.SetMode(MANUAL);
+    PID240.SetMode(MANUAL);
+    PID0.SetSampleTime(PID_SAMPLE_TIME);
+    PID120.SetSampleTime(PID_SAMPLE_TIME);
+    PID240.SetSampleTime(PID_SAMPLE_TIME);
+    PID0.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
+    PID120.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
+    PID240.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
 }
 
 void PIDRefreshTunings(){
-  zeroPID.SetTunings(pidZeroP, pidZeroI, pidZeroD);
-  120PID.SetTunings(pid120P, pid120I, pid120D);  
-  240PID.SetTunings(pid240P, pid240I, pid240D);  
+  PID0.SetTunings(pidZeroP, pidZeroI, pidZeroD);
+  PID120.SetTunings(pid120P, pid120I, pid120D);  
+  PID240.SetTunings(pid240P, pid240I, pid240D);  
 }
 
 void PIDTuner(){
   //Parse the data relating to the local PID tuner
   static char serialInputBuffer[PID_SERIAL_BUFFER_SIZE];
   static char serialInputBufferIndex = 0;
-  static char currentPIDValueIsZero = ;
+  static char currentPIDValueIs0 = 1;
+  static char currentPIDValueIs120 = 0;
+  static char currentPIDValueIs240 = 0;
   static double *currentPIDValueToUpdate = &pidZeroP;
   //Serial Input for PID configuration
   if (SerCommDbg.available()) {
     int incomingByte = SerCommDbg.read();
     switch(incomingByte) {
-      case 'L':
-      case 'l':
-        currentPIDValueIsLeft = 1;
+      case '0':
+        currentPIDValueIs0 = 1;
+        currentPIDValueIs120 = 0;
+        currentPIDValueIs240 = 0;
         break;
-      case 'R':
-      case 'r':
-        currentPIDValueIsLeft = 0;
+      case '120':
+        currentPIDValueIs0 = 0;
+        currentPIDValueIs120 = 1;
+        currentPIDValueIs240 = 0;        
+        break;
+      case '240':
+        currentPIDValueIs0 = 0;
+        currentPIDValueIs120 = 0;
+        currentPIDValueIs240 = 1;
         break;
       case 'P':
       case 'p':
-        if (currentPIDValueIsLeft) {
-          currentPIDValueToUpdate = &pidLeftP;
+        if (currentPIDValueIs0) {
+          currentPIDValueToUpdate = &pidZeroP;
         }
-        else {
-          currentPIDValueToUpdate = &pidRightP;
+        if (currentPIDValueIs120) {
+          currentPIDValueToUpdate = &pid120P;
+        }
+        if (currentPIDValueIs240) {
+          currentPIDValueToUpdate = &pid240P;
         }
         break;
       case 'I':
       case 'i':
-        if (currentPIDValueIsLeft) {
-          currentPIDValueToUpdate = &pidLeftI;
+        if (currentPIDValueIs0) {
+          currentPIDValueToUpdate = &pidZeroI;
         }
-        else {
-          currentPIDValueToUpdate = &pidRightI;
+        if (currentPIDValueIs120) {
+          currentPIDValueToUpdate = &pid120I;
+        }
+        if (currentPIDValueIs240) {
+          currentPIDValueToUpdate = &pid240I;
         }
         break;
       case 'D':
       case 'd':
-        if (currentPIDValueIsLeft) {
-          currentPIDValueToUpdate = &pidLeftD;
+        if (currentPIDValueIs0) {
+          currentPIDValueToUpdate = &pidZeroD;
         }
-        else {
-          currentPIDValueToUpdate = &pidRightD;
+        if (currentPIDValueIs120) {
+          currentPIDValueToUpdate = &pid120D;
+        }
+        if (currentPIDValueIs240) {
+          currentPIDValueToUpdate = &pid240D;
         }
         break;
       case 'W':
@@ -156,18 +174,24 @@ void PIDTuner(){
       case 'g':
         SerCommDbg.println("Printing PID tunings:");
         serialInputBufferIndex = 0;
-        SerCommDbg.print("Left P ");
-        SerCommDbg.println(pidLeftP,8);
-        SerCommDbg.print("Left I ");
-        SerCommDbg.println(pidLeftI,8);
-        SerCommDbg.print("Left D ");
-        SerCommDbg.println(pidLeftD,8);
-        SerCommDbg.print("Right P ");
-        SerCommDbg.println(pidRightP,8);
-        SerCommDbg.print("Right I ");
-        SerCommDbg.println(pidRightI,8);
-        SerCommDbg.print("Right D ");
-        SerCommDbg.println(pidRightD,8);
+        SerCommDbg.print("Zero P ");
+        SerCommDbg.println(pidZeroP,8);
+        SerCommDbg.print("Zero I ");
+        SerCommDbg.println(pidZeroI,8);
+        SerCommDbg.print("Zero D ");
+        SerCommDbg.println(pidZeroD,8);
+        SerCommDbg.print("120 P ");
+        SerCommDbg.println(pid120P,8);
+        SerCommDbg.print("120 I ");
+        SerCommDbg.println(pid120I,8);
+        SerCommDbg.print("120 D ");
+        SerCommDbg.println(pid120D,8);
+        SerCommDbg.print("240 P ");
+        SerCommDbg.println(pid240P,8);
+        SerCommDbg.print("240 I ");
+        SerCommDbg.println(pid240I,8);
+        SerCommDbg.print("240 D ");
+        SerCommDbg.println(pid240D,8);
         SerCommDbg.println("--------------------------------");
         break;
       case 'M':
@@ -181,23 +205,32 @@ void PIDTuner(){
           serialInputBuffer[serialInputBufferIndex] = '\0';
           *currentPIDValueToUpdate = strtod(serialInputBuffer, NULL);
           SerCommDbg.print("Setting ");
-          if (currentPIDValueToUpdate == &pidLeftP) {
+          if (currentPIDValueToUpdate == &pidZeroP) {
             
           }
-          if (currentPIDValueToUpdate == &pidLeftI) {
-            SerCommDbg.print("Left I ");
+          if (currentPIDValueToUpdate == &pidZeroI) {
+            SerCommDbg.print("Zero I ");
           }
-          if (currentPIDValueToUpdate == &pidLeftD) {
-            SerCommDbg.print("Left D ");
+          if (currentPIDValueToUpdate == &pidZeroD) {
+            SerCommDbg.print("Zero D ");
           }
-          if (currentPIDValueToUpdate == &pidRightP) {
-            SerCommDbg.print("Right P ");
+          if (currentPIDValueToUpdate == &pid120P) {
+            SerCommDbg.print("120 P ");
           }
-          if (currentPIDValueToUpdate == &pidRightI) {
-            SerCommDbg.print("Right I ");
+          if (currentPIDValueToUpdate == &pid120I) {
+            SerCommDbg.print("120 I ");
           }
-          if (currentPIDValueToUpdate == &pidRightD) {
-          SerCommDbg.print("Right D ");
+          if (currentPIDValueToUpdate == &pid120D) {
+          SerCommDbg.print("120 D ");
+          }
+          if (currentPIDValueToUpdate == &pid240P) {
+            SerCommDbg.print("240 P ");
+          }
+          if (currentPIDValueToUpdate == &pid240I) {
+            SerCommDbg.print("240 I ");
+          }
+          if (currentPIDValueToUpdate == &pid240D) {
+            SerCommDbg.print("240 D ");
           }
           SerCommDbg.print("to ");
           SerCommDbg.println(*currentPIDValueToUpdate);

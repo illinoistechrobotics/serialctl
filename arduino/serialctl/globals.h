@@ -4,9 +4,9 @@ extern packet_t pA, pB, safe;
 extern packet_t *astate, *incoming;
 extern comm_state cs;
 extern long last_p;
-extern char comm_ok, zero_enabled, 120_enabled, 240_enabled;
+extern char comm_ok, enabled_0, enabled_120, enabled_240;
 extern double pidZeroP, pidZeroI, pidZeroD, pid120P, pid120I, pid120D, pid240P, pid240I, pid240D;
-extern double zeroIn, zeroOut, zeroSet, 120In, 120Out, 120Set, 240In, 240Out, 240Set;
+extern double In0, Out0, Set0, In120, Out120, Set120, In240, Out240, Set240;
 
 /*Configuration globals */
 #define PRINTMOTORS  //Should all motor power power values be printed to SerCommDbg?
