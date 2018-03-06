@@ -4,9 +4,9 @@ extern packet_t pA, pB, safe;
 extern packet_t *astate, *incoming;
 extern comm_state cs;
 extern long last_p;
-extern char comm_ok, left_enabled, right_enabled;
-extern double pidLeftP, pidLeftI, pidLeftD, pidRightP, pidRightI, pidRightD;
-extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
+extern char comm_ok, zero_enabled, 120_enabled, 240_enabled;
+extern double pidZeroP, pidZeroI, pidZeroD, pid120P, pid120I, pid120D, pid240P, pid240I, pid240D;
+extern double zeroIn, zeroOut, zeroSet, 120In, 120Out, 120Set, 240In, 240Out, 240Set;
 
 /*Configuration globals */
 #define PRINTMOTORS  //Should all motor power power values be printed to SerCommDbg?
@@ -84,9 +84,11 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 /* Internal macros, do not modify for config purposes */
 #define PID_SERIAL_BUFFER_SIZE 20
 
-#define try_enable_right(e) try_enable_osmc(e,DENABLE1,DREADY1,ALI1,BLI1,AHI1,BHI1)
-#define try_enable_left(e) try_enable_osmc(e,DENABLE2,DREADY2,ALI2,BLI2,AHI2,BHI2)
-#define drive_right(e,x) drive_osmc(e,DENABLE1,x,0,ALI1,BLI1,AHI1,BHI1)
-#define drive_left(e,x) drive_osmc(e,DENABLE2,x,0,ALI2,BLI2,AHI2,BHI2)
+#define try_enable_zero(e) try_enable_osmc(e,DENABLE1,DREADY1,ALI1,BLI1,AHI1,BHI1)
+#define try_enable_120(e) try_enable_osmc(e,DENABLE2,DREADY2,ALI2,BLI2,AHI2,BHI2)
+#define try_enable_240(e) try_enable_osmc(e,DENABLE3,DREADY3,ALI3,BLI3,AHI3,BHI3)
+#define drive_zero(e,x) drive_osmc(e,DENABLE1,x,0,ALI1,BLI1,AHI1,BHI1)
+#define drive_120(e,x) drive_osmc(e,DENABLE2,x,0,ALI2,BLI2,AHI2,BHI2)
+#define drive_240(e,x) drive_osmc(e,DENABLE3,x,0,ALI3,BLI3,AHI3,BHI3)
 
 #define DEBUGPRINT(x) SerCommDbg.println(x)

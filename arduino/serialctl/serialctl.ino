@@ -27,7 +27,7 @@
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
-char left_enabled = 0, right_enabled = 0;
+char zero_enabled = 0, 120_enabled = 0, 240_enabled = 0;
 long last_f = 0, last_s = 0, t_start = 0, usec;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(129, SABERTOOTH12);
@@ -100,8 +100,9 @@ void setup() {
   arm_setup();
   last_f = millis();
   last_s = millis();
-  drive_left(0,0);  //Ensure both motors are stopped, technically redundant
-  drive_right(0,0); 
+  drive_zero(0,0);  //Ensure all motors are stopped, technically redundant
+  drive_120(0,0); 
+  drive_240(0,0);
 
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
@@ -134,8 +135,9 @@ void loop() {
   wdt_reset();
   #endif
   comm_parse();
-  left_enabled = try_enable_left(left_enabled);
-  right_enabled = try_enable_right(right_enabled);
+  zero_enabled = try_enable_zero(zero_enabled);
+  120_enabled = try_enable_120(120_enabled);
+  240_enabled = try_enable_240(240_enabled);
   //Fast loop
   if (millis() - last_f >= 40) {
     //Every line sent to the computer gets us a new state
@@ -254,8 +256,9 @@ void tank_drive() { // not actually tank drive
       DEBUGPRINT("Performing system reset!");
       left_enabled = 0;
       right_enabled = 0;
-      drive_left(left_enabled,0);
-      drive_right(right_enabled,0);
+      drive_zero(zero_enabled,0);
+      drive_120(120_enabled,0);
+      drive_240(240_enabled,0);
       wdt_enable(WDTO_15MS);
       while (1);
     }
@@ -268,67 +271,82 @@ void tank_drive() { // not actually tank drive
     //PID button down
     if(pid_interlock || (power_out == 0 && turn_out == 0)){
       //PID can engage
-      leftSet = -2*(power_out+turn_out);
-      rightSet = -2*(power_out-turn_out);
-      leftPID.SetMode(AUTOMATIC);
-      rightPID.SetMode(AUTOMATIC);
+      zeroSet = -2*(power_out+turn_out);
+      120Set = -2*(power_out+turn_out);
+      240Set = -2*(power_out+turn_out);
+      zeroPID.SetMode(AUTOMATIC);
+      120PID.SetMode(AUTOMATIC);
+      240PID.SetMode(AUTOMATIC);
       /* Allow PID to stay engaged */
       pid_interlock=1;
     } else{
       //PID button down, but NOT safe to engage PID
-      leftOut = 0;
-      rightOut = 0;
+      zeroOut = 0;
+      120Out = 0;
+      240Out = 0;
       /* Ensure that sticks are centered before allowing the PID to engage again! Risk of mechanical damage!*/
       pid_interlock=0;
-      leftPID.SetMode(MANUAL);
-      rightPID.SetMode(MANUAL);
-      drive_left(left_enabled,0);
-      drive_right(right_enabled,0);
+      zeroPID.SetMode(MANUAL);
+      120PID.SetMode(MANUAL);
+      240PID.SetMode(MANUAL);
+      drive_zero(zero_enabled,0);
+      drive_120(120_enabled,0);
+      drive_240(240_enabled,0);
     }  
     //PID outputs directly to motors at a rate of PID_SAMPLE_TIME
     return;
   } else {
     //Button 4 is up, NO pid
-    leftOut = 0;
-    rightOut = 0;
+    zeroOut = 0;
+    120Out = 0;
+    240Out = 0;
     /* Ensure that sticks are centered before allowing the PID to engage again! Risk of mechanical damage!*/
     pid_interlock=0;
-    leftPID.SetMode(MANUAL);
-    rightPID.SetMode(MANUAL);
+    zeroPID.SetMode(MANUAL);
+    120PID.SetMode(MANUAL);
+    240PID.SetMode(MANUAL);
   }
   //apply turbo mode
   if (getButton(SHOULDER_TOP_RIGHT)) {
     power_constraint = min(abs(power_out * 2), 255 - abs(turn_out));
     if (abs(power_out) > 75) {
       power_out = constrain(power_out * 2, -power_constraint, power_constraint);
-      left_out  =  power_out + (turn_out);
-      right_out = -1 * power_out + (turn_out);
+      zero_out  =  power_out + (turn_out);
+      120_out = power_out + (turn_out);
+      240_out = power_out + (turn_out);
     } else if (abs(power_out) >  20) {
-      left_out  =    power_out * 2 + (turn_out / 4);
-      right_out = -1 * power_out * 2 + (turn_out / 4);
+      zero_out  =    power_out * 2 + (turn_out / 4);
+      120_out = power_out * 2 + (turn_out / 4);
+      240_out = power_out * 2 + (turn_out / 4);
     } else {
-      left_out  =    power_out + (turn_out);
-      right_out = -1 * power_out + (turn_out);
+      zero_out  =    power_out + (turn_out);
+      120_out = power_out + (turn_out);
+      240_out = power_out + (turn_out);
     }
   } else if (!getButton(SHOULDER_TOP_LEFT)) {
     if (abs(power_out) > 75) {
-      left_out  =    power_out + (turn_out);
-      right_out = -1 * power_out + (turn_out);
+      zero_out  =    power_out + (turn_out);
+      120_out = power_out + (turn_out);
+      240_out = power_out + (turn_out);
     } else if (abs(power_out) >  20) {
-      left_out  =    power_out + (turn_out / 4);
-      right_out = -1 * power_out + (turn_out / 4);
+      zero_out  =    power_out + (turn_out / 4);
+      120_out = power_out + (turn_out / 4);
+      240_out = power_out + (turn_out / 4);
     }
   }
   #ifdef PRINTMOTORS
   // Debug printing
-  SerCommDbg.print("L");
-  SerCommDbg.print(left_out);
-  SerCommDbg.print(" R");
-  SerCommDbg.println(right_out);
+  SerCommDbg.print("Zero");
+  SerCommDbg.print(zero_out);
+  SerCommDbg.print(" 120");
+  SerCommDbg.println(120_out);
+  SerCommDbg.print(" 240");
+  SerCommDbg.print(240_out);
   #endif
   // Drive motors!
-  drive_left(left_enabled,left_out);
-  drive_right(right_enabled,right_out);
+  drive_zero(zero_enabled,zero_out);
+  drive_120(120_enabled,120_out);
+  drive_240(240_enabled,240_out);
 }
 
 

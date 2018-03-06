@@ -1,78 +1,104 @@
 #include "PIDUtil.h"
-double pidLeftP=0, pidLeftI=0, pidLeftD=0, pidRightP=0, pidRightI=0, pidRightD=0;
-double leftIn=0, leftOut=0, leftSet=0, rightIn=0, rightOut=0, rightSet=0;
-extern char comm_ok, left_enabled, right_enabled;
+double pidZeroP=0, pidZeroI=0, pidZeroD=0, pid120P=0, pid120I=0, pid120D=0, pid240P, pid240I, pid240D;
+double zeroIn=0, zeroOut=0, zeroSet=0, 120In=0, 120Out=0, 120Set=0, 240In=0, 240Out=0, 240Set=0;
+extern char comm_ok, zero_enabled, 120_enabled, 240_enabled;
 
-PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, REVERSE);
-PID rightPID(&rightIn, &rightOut, &rightSet, pidRightP, pidRightI, pidRightD, DIRECT);
+PID zeroPID(&zeroIn, &zeroOut, &zeroSet, pidZeroP, pidZeroI, pidZeroD, DIRECT);
+PID 120PID(&120In, &120Out, &120Set, pid120P, pid120I, pid120D, DIRECT);
+PID 240PID(&240In, &240Out, &240Set, pid240P, pid240I, pid240D, DIRECT);
 
 int PIDEncoderCheck(){
   int rv=1;
   #ifdef DEBUGPRINT
   double dummy;
-  if(iic_encoder_read(ENCODER_LEFT_ADDR,&dummy)){
-    DEBUGPRINT("Left Encoder Data OK!");
+  if(iic_encoder_read(ENCODER_ZERO_ADDR,&dummy)){
+    DEBUGPRINT("Zero Encoder Data OK!");
   } else {
-    DEBUGPRINT("Left Encoder Data Bus Fault!");
+    DEBUGPRINT("Zero Encoder Data Bus Fault!");
     rv = -1;
   }
-  if(iic_encoder_read(ENCODER_RIGHT_ADDR,&dummy)){
-    DEBUGPRINT("Right Encoder Data OK!");
+  if(iic_encoder_read(ENCODER_120_ADDR,&dummy)){
+    DEBUGPRINT("120 Encoder Data OK!");
   } else {
-    DEBUGPRINT("Right Encoder Data Bus Fault!");
+    DEBUGPRINT("120 Encoder Data Bus Fault!");
     rv = -1;
   }
+  if(iic_encoder_read(ENCODER_240_ADDR,&dummy)){
+    DEBUGPRINT("240 Encoder Data OK!");
+  } else {
+    DEBUGPRINT("240 Encoder Data Bus Fault!");
+    rv = -1;
+  }  
   #endif
   return rv;
 }
 
 void PIDDrive(){
-  if(leftPID.NeedsCompute()){
-    if(iic_encoder_read(ENCODER_LEFT_ADDR,&leftIn)){
+  if(zeroPID.NeedsCompute()){
+    if(iic_encoder_read(ENCODER_ZERO_ADDR,&zeroIn)){
     //Successfully read the left encoder
-      leftPID.Compute();
+      zeroPID.Compute();
     } else {
       //Bus fault!
-      leftOut=0;
+      zeroOut=0;
     }
     #ifdef PRINTMOTORS
-    SerCommDbg.print("PID(L): ");
-    SerCommDbg.print(leftOut);
+    SerCommDbg.print("PID(Zero): ");
+    SerCommDbg.print(zeroOut);
     SerCommDbg.println();
     #endif
-    drive_left(left_enabled,leftOut);
+    drive_zero(zero_enabled,zeroOut);
   }
-  if(rightPID.NeedsCompute()){
-    if(iic_encoder_read(ENCODER_RIGHT_ADDR,&rightIn)){
+  if(120PID.NeedsCompute()){
+    if(iic_encoder_read(ENCODER_120_ADDR,&120In)){
     //Successfully read the left encoder
-      rightPID.Compute();
+      120PID.Compute();
     } else {
       //Bus fault!
-      rightOut=0;
+      120Out=0;
     }
     #ifdef PRINTMOTORS
-    SerCommDbg.print("PID(R): ");
-    SerCommDbg.print(rightOut);
+    SerCommDbg.print("PID(120): ");
+    SerCommDbg.print(120Out);
     SerCommDbg.println();
     #endif
-    drive_right(right_enabled,rightOut);
+    drive_120(120_enabled,120Out);
  }
+  if(240PID.NeedsCompute()){
+    if(iic_encoder_read(ENCODER_240_ADDR,&240In)){
+    //Successfully read the left encoder
+      240PID.Compute();
+    } else {
+      //Bus fault!
+      240Out=0;
+    }
+    #ifdef PRINTMOTORS
+    SerCommDbg.print("PID(240): ");
+    SerCommDbg.print(240Out);
+    SerCommDbg.println();
+    #endif
+    drive_240(240_enabled,240Out);
+ } 
 }
 
 void PIDInit(){
     PIDLoadTunings(); //Load the PID tunings from the EEPROM
     PIDRefreshTunings();
-    leftPID.SetMode(MANUAL);
-    rightPID.SetMode(MANUAL);
-    leftPID.SetSampleTime(PID_SAMPLE_TIME);
-    rightPID.SetSampleTime(PID_SAMPLE_TIME);
-    leftPID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
-    rightPID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
+    zeroPID.SetMode(MANUAL);
+    120PID.SetMode(MANUAL);
+    240PID.SetMode(MANUAL);
+    zeroPID.SetSampleTime(PID_SAMPLE_TIME);
+    120PID.SetSampleTime(PID_SAMPLE_TIME);
+    240PID.SetSampleTime(PID_SAMPLE_TIME);
+    zeroPID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
+    120PID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
+    240PID.SetOutputLimits(-PID_OUTPUT_LIMIT,PID_OUTPUT_LIMIT);
 }
 
 void PIDRefreshTunings(){
-  leftPID.SetTunings(pidLeftP, pidLeftI, pidLeftD);
-  rightPID.SetTunings(pidRightP, pidRightI, pidRightD);  
+  zeroPID.SetTunings(pidZeroP, pidZeroI, pidZeroD);
+  120PID.SetTunings(pid120P, pid120I, pid120D);  
+  240PID.SetTunings(pid240P, pid240I, pid240D);  
 }
 
 void PIDTuner(){

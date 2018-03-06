@@ -83,8 +83,13 @@ void osmc_init() {
   digitalWrite(BLI2, LOW);
   digitalWrite(AHI2, LOW);
   digitalWrite(BHI2, LOW);
+  digitalWrite(ALI3, LOW);
+  digitalWrite(BLI3, LOW);
+  digitalWrite(AHI3, LOW);
+  digitalWrite(BHI3, LOW);
   digitalWrite(DENABLE1, LOW);
   digitalWrite(DENABLE2, LOW);
+  digitalWrite(DENABLE3, LOW);
   
   pinMode(ALI1, OUTPUT);
   pinMode(AHI1, OUTPUT);
@@ -94,10 +99,16 @@ void osmc_init() {
   pinMode(AHI2, OUTPUT);
   pinMode(BLI2, OUTPUT);
   pinMode(BHI2, OUTPUT);
+  pinMode(ALI3, OUTPUT);
+  pinMode(AHI3, OUTPUT);
+  pinMode(BLI3, OUTPUT);
+  pinMode(BHI3, OUTPUT);
   pinMode(DENABLE1, OUTPUT);
   pinMode(DENABLE2, OUTPUT);
+  pinMode(DENABLE3, OUTPUT);
   pinMode(DREADY1, INPUT);
   pinMode(DREADY2, INPUT);
+  pinMode(DREADY3, INPUT);
 
   pinMode(13, OUTPUT);
   fast_pwm();
@@ -132,7 +143,8 @@ char try_enable_osmc(char enabled, char enablepin, char readypin,
 // OSMC motor controller stuff
 // Low side outputs must be PWM capable and NOT 5 or 6 (on Uno)
 // Do not change timer0,
-// Pins 7 and 8 use timer4 in phase correct mode
+// Pins 2 and 3 use timer3 in phase correct mode
+// Pins 6 and 7 use timer4 in phase correct mode
 // Pins 11 and 12 use timer1 in phase correct mode
 // OSMC ALI and BLI are the low side driver inputs and must ALWAYS be low/zero when the ready signal is not provided
 // OSMC AHI and BHI are the high side driver inputs.
