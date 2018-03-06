@@ -35,6 +35,7 @@ Sabertooth ST34(129, SABERTOOTH12);
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
 int angle = 0;
+boolean small_right_flag = false;
 
 /* Interlock to only allow engaging PID while sticks are at zero,
  * 0 indicates PID was not used in the last iteration, 1 indicates the PID was used in the last iteration
@@ -352,7 +353,6 @@ void tank_drive() { // not actually tank drive
   SerCommDbg.print(out_240);
   #endif
   // Drive motors!
-  boolean small_right_flag = false;
   if (getButton(SMALL_RIGHT)) {
     small_right_flag = !small_right_flag;
   }
