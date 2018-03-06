@@ -34,6 +34,7 @@ Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(129, SABERTOOTH12);
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
+int angle = 0;
 
 /* Interlock to only allow engaging PID while sticks are at zero,
  * 0 indicates PID was not used in the last iteration, 1 indicates the PID was used in the last iteration
@@ -163,6 +164,8 @@ void loop() {
 void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
+
+  angle = MPULoop();
 
   //Gripper
   //check for invalid states
@@ -349,8 +352,35 @@ void tank_drive() { // not actually tank drive
   SerCommDbg.print(out_240);
   #endif
   // Drive motors!
+  boolean small_right_flag = false;
   if (getButton(SMALL_RIGHT)) {
-    
+    small_right_flag = !small_right_flag;
+  }
+  if (small_right_flag) {
+    if ((angle == 360 || angle > 0) && angle <= 45) {
+      
+    }
+    if (angle > 45 && angle <= 90) {
+      
+    }
+    if (angle > 90 && angle <= 135) {
+      
+    }
+    if (angle > 135 && angle <= 180) {
+      
+    }
+    if (angle > 180 && angle <= 225) {
+      
+    }
+    if (angle > 225 && angle <= 270) {
+      
+    }
+    if (angle > 270 && angle <= 315) {
+      
+    }
+    if (angle > 315 && (angle <= 360 || angle == 0)) {
+      
+    }
   }
   else {
     drive_0(enabled_0,out_0);
