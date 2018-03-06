@@ -1,9 +1,9 @@
 #include "PIDUtil.h"
-double pidZeroP=0, pidZeroI=0, pidZeroD=0, pid120P=0, pid120I=0, pid120D=0, pid240P, pid240I, pid240D;
+double pid0P=0, pid0I=0, pid0D=0, pid120P=0, pid120I=0, pid120D=0, pid240P, pid240I, pid240D;
 double In0=0, Out0=0, Set0=0, In120=0, Out120=0, Set120=0, In240=0, Out240=0, Set240=0;
 extern char comm_ok, enabled_0, enabled_120, enabled_240;
 
-PID PID0(&In0, &Out0, &Set0, pidZeroP, pidZeroI, pidZeroD, DIRECT);
+PID PID0(&In0, &Out0, &Set0, pid0P, pid0I, pid0D, DIRECT);
 PID PID120(&In120, &Out120, &Set120, pid120P, pid120I, pid120D, DIRECT);
 PID PID240(&In240, &Out240, &Set240, pid240P, pid240I, pid240D, DIRECT);
 
@@ -96,7 +96,7 @@ void PIDInit(){
 }
 
 void PIDRefreshTunings(){
-  PID0.SetTunings(pidZeroP, pidZeroI, pidZeroD);
+  PID0.SetTunings(pid0P, pid0I, pid0D);
   PID120.SetTunings(pid120P, pid120I, pid120D);  
   PID240.SetTunings(pid240P, pid240I, pid240D);  
 }
@@ -108,7 +108,7 @@ void PIDTuner(){
   static char currentPIDValueIs0 = 1;
   static char currentPIDValueIs120 = 0;
   static char currentPIDValueIs240 = 0;
-  static double *currentPIDValueToUpdate = &pidZeroP;
+  static double *currentPIDValueToUpdate = &pid0P;
   //Serial Input for PID configuration
   if (SerCommDbg.available()) {
     int incomingByte = SerCommDbg.read();
@@ -131,7 +131,7 @@ void PIDTuner(){
       case 'P':
       case 'p':
         if (currentPIDValueIs0) {
-          currentPIDValueToUpdate = &pidZeroP;
+          currentPIDValueToUpdate = &pid0P;
         }
         if (currentPIDValueIs120) {
           currentPIDValueToUpdate = &pid120P;
@@ -143,7 +143,7 @@ void PIDTuner(){
       case 'I':
       case 'i':
         if (currentPIDValueIs0) {
-          currentPIDValueToUpdate = &pidZeroI;
+          currentPIDValueToUpdate = &pid0I;
         }
         if (currentPIDValueIs120) {
           currentPIDValueToUpdate = &pid120I;
@@ -155,7 +155,7 @@ void PIDTuner(){
       case 'D':
       case 'd':
         if (currentPIDValueIs0) {
-          currentPIDValueToUpdate = &pidZeroD;
+          currentPIDValueToUpdate = &pid0D;
         }
         if (currentPIDValueIs120) {
           currentPIDValueToUpdate = &pid120D;
@@ -175,11 +175,11 @@ void PIDTuner(){
         SerCommDbg.println("Printing PID tunings:");
         serialInputBufferIndex = 0;
         SerCommDbg.print("Zero P ");
-        SerCommDbg.println(pidZeroP,8);
+        SerCommDbg.println(pid0P,8);
         SerCommDbg.print("Zero I ");
-        SerCommDbg.println(pidZeroI,8);
+        SerCommDbg.println(pid0I,8);
         SerCommDbg.print("Zero D ");
-        SerCommDbg.println(pidZeroD,8);
+        SerCommDbg.println(pid0D,8);
         SerCommDbg.print("120 P ");
         SerCommDbg.println(pid120P,8);
         SerCommDbg.print("120 I ");
@@ -205,13 +205,13 @@ void PIDTuner(){
           serialInputBuffer[serialInputBufferIndex] = '\0';
           *currentPIDValueToUpdate = strtod(serialInputBuffer, NULL);
           SerCommDbg.print("Setting ");
-          if (currentPIDValueToUpdate == &pidZeroP) {
+          if (currentPIDValueToUpdate == &pid0P) {
             
           }
-          if (currentPIDValueToUpdate == &pidZeroI) {
+          if (currentPIDValueToUpdate == &pid0I) {
             SerCommDbg.print("Zero I ");
           }
-          if (currentPIDValueToUpdate == &pidZeroD) {
+          if (currentPIDValueToUpdate == &pid0D) {
             SerCommDbg.print("Zero D ");
           }
           if (currentPIDValueToUpdate == &pid120P) {
@@ -252,9 +252,9 @@ void PIDTuner(){
 
 void PIDWriteTunings(){
   //Write the current value of the PID tunings to the EEPROM, which is nonvolatile
-  EEPROM.put(FS_ZERO_P_4,pidZeroP);
-  EEPROM.put(FS_ZERO_I_4,pidZeroI);
-  EEPROM.put(FS_ZERO_D_4,pidZeroD);
+  EEPROM.put(FS_ZERO_P_4,pid0P);
+  EEPROM.put(FS_ZERO_I_4,pid0I);
+  EEPROM.put(FS_ZERO_D_4,pid0D);
   EEPROM.put(FS_120_P_4,pid120P);
   EEPROM.put(FS_120_I_4,pid120I);
   EEPROM.put(FS_120_D_4,pid120D);
@@ -266,15 +266,15 @@ void PIDWriteTunings(){
 void PIDLoadTunings(){
   //Load the PID tunings from the EEPROM
   //PID library cannot recover from NaN internal state
-  EEPROM.get(FS_ZERO_P_4,pidZeroP);
-  if(pidZeroP == NAN)
-    pidZeroP = 0;
-  EEPROM.get(FS_ZERO_I_4,pidZeroI);
-  if(pidZeroI == NAN)
-    pidZeroI = 0;
-  EEPROM.get(FS_ZERO_D_4,pidZeroD);
-  if(pidZeroD == NAN)
-    pidZeroD = 0;
+  EEPROM.get(FS_ZERO_P_4,pid0P);
+  if(pid0P == NAN)
+    pid0P = 0;
+  EEPROM.get(FS_ZERO_I_4,pid0I);
+  if(pid0I == NAN)
+    pid0I = 0;
+  EEPROM.get(FS_ZERO_D_4,pid0D);
+  if(pid0D == NAN)
+    pid0D = 0;
   EEPROM.get(FS_120_P_4,pid120P);
   if(pid120P == NAN)
     pid120P = 0;

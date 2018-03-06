@@ -5,7 +5,7 @@ extern packet_t *astate, *incoming;
 extern comm_state cs;
 extern long last_p;
 extern char comm_ok, enabled_0, enabled_120, enabled_240;
-extern double pidZeroP, pidZeroI, pidZeroD, pid120P, pid120I, pid120D, pid240P, pid240I, pid240D;
+extern double pid0P, pid0I, pid0D, pid120P, pid120I, pid120D, pid240P, pid240I, pid240D;
 extern double In0, Out0, Set0, In120, Out120, Set120, In240, Out240, Set240;
 
 /*Configuration globals */
