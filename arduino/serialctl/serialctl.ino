@@ -23,6 +23,7 @@
 #include "globals.h"
 #include "PIDUtil.h"
 #include "iic_encoder_io.h"
+#include "MPU6050.h"
 
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
@@ -103,6 +104,8 @@ void setup() {
   drive_0(0,0);  //Ensure all motors are stopped, technically redundant
   drive_120(0,0); 
   drive_240(0,0);
+
+  MPUInit();
 
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
@@ -346,9 +349,14 @@ void tank_drive() { // not actually tank drive
   SerCommDbg.print(out_240);
   #endif
   // Drive motors!
-  drive_0(enabled_0,out_0);
-  drive_120(enabled_120,out_120);
-  drive_240(enabled_240,out_240);
+  if (getButton(SMALL_RIGHT)) {
+    
+  }
+  else {
+    drive_0(enabled_0,out_0);
+    drive_120(enabled_120,out_120);
+    drive_240(enabled_240,out_240);
+  }
 }
 
 
