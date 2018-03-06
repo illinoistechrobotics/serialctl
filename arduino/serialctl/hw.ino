@@ -30,15 +30,15 @@ void measure_offset() {
   //should be during setup() after drive is stopped
   if (offset_measured) return;
   int n = 10;
-  current_offset_zero = current_offset_120, current_offset_240 = 0;
+  current_offset_0 = current_offset_120, current_offset_240 = 0;
   for (int i = 0; i < n; i++) {
-    current_offset_zero += analogRead(CURRENT_ZERO);
+    current_offset_0 += analogRead(CURRENT_0);
     current_offset_120 += analogRead(CURRENT_120);
     current_offset_240 += analogRead(CURRENT_240);
     delay(10);
   }
-  current_offset_zero /= n;
-  current_offset_zero -= 512;
+  current_offset_0 /= n;
+  current_offset_0 -= 512;
   current_offset_120 /= n;
   current_offset_120 -= 512;
   current_offset_240 /= n;
@@ -48,7 +48,7 @@ void measure_offset() {
 
 void print_data() {
   float i1, i2, i3;
-  i1 = (analogRead(CURRENT_ZERO) - 512.0 - current_offset_zero) / 1.28;
+  i1 = (analogRead(CURRENT_0) - 512.0 - current_offset_0) / 1.28;
   i2 = (analogRead(CURRENT_120) - 512.0 - current_offset_120) / 1.28;
   i3 = (analogRead(CURRENT_240) - 512.0 - current_offset_240) / 1.28;
   

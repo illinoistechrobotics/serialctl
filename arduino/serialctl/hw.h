@@ -1,7 +1,7 @@
 #pragma once
 
 
-#define CURRENT_ZERO A0
+#define CURRENT_0 A0
 #define CURRENT_120 A1
 #define CURRENT_240 A2
 
@@ -14,7 +14,7 @@
 
 
 
-float current_offset_zero, current_offset_120, current_offset_240;
+float current_offset_0, current_offset_120, current_offset_240;
 int offset_measured = 0;
 
 void init_pins();

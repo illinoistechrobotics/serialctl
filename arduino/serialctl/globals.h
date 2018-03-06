@@ -84,10 +84,10 @@ extern double In0, Out0, Set0, In120, Out120, Set120, In240, Out240, Set240;
 /* Internal macros, do not modify for config purposes */
 #define PID_SERIAL_BUFFER_SIZE 20
 
-#define try_enable_zero(e) try_enable_osmc(e,DENABLE1,DREADY1,ALI1,BLI1,AHI1,BHI1)
+#define try_enable_0(e) try_enable_osmc(e,DENABLE1,DREADY1,ALI1,BLI1,AHI1,BHI1)
 #define try_enable_120(e) try_enable_osmc(e,DENABLE2,DREADY2,ALI2,BLI2,AHI2,BHI2)
 #define try_enable_240(e) try_enable_osmc(e,DENABLE3,DREADY3,ALI3,BLI3,AHI3,BHI3)
-#define drive_zero(e,x) drive_osmc(e,DENABLE1,x,0,ALI1,BLI1,AHI1,BHI1)
+#define drive_0(e,x) drive_osmc(e,DENABLE1,x,0,ALI1,BLI1,AHI1,BHI1)
 #define drive_120(e,x) drive_osmc(e,DENABLE2,x,0,ALI2,BLI2,AHI2,BHI2)
 #define drive_240(e,x) drive_osmc(e,DENABLE3,x,0,ALI3,BLI3,AHI3,BHI3)
 

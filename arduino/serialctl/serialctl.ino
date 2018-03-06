@@ -100,7 +100,7 @@ void setup() {
   arm_setup();
   last_f = millis();
   last_s = millis();
-  drive_zero(0,0);  //Ensure all motors are stopped, technically redundant
+  drive_0(0,0);  //Ensure all motors are stopped, technically redundant
   drive_120(0,0); 
   drive_240(0,0);
 
@@ -135,7 +135,7 @@ void loop() {
   wdt_reset();
   #endif
   comm_parse();
-  enabled_0 = try_enable_zero(enabled_0);
+  enabled_0 = try_enable_0(enabled_0);
   enabled_120 = try_enable_120(enabled_120);
   enabled_240 = try_enable_240(enabled_240);
   //Fast loop
@@ -258,7 +258,7 @@ void tank_drive() { // not actually tank drive
       enabled_0 = 0;
       enabled_120 = 0;
       enabled_240 = 0;
-      drive_zero(enabled_0,0);
+      drive_0(enabled_0,0);
       drive_120(enabled_120,0);
       drive_240(enabled_240,0);
       wdt_enable(WDTO_15MS);
@@ -291,7 +291,7 @@ void tank_drive() { // not actually tank drive
       PID0.SetMode(MANUAL);
       PID120.SetMode(MANUAL);
       PID240.SetMode(MANUAL);
-      drive_zero(enabled_0,0);
+      drive_0(enabled_0,0);
       drive_120(enabled_120,0);
       drive_240(enabled_240,0);
     }  
@@ -346,7 +346,7 @@ void tank_drive() { // not actually tank drive
   SerCommDbg.print(out_240);
   #endif
   // Drive motors!
-  drive_zero(enabled_0,out_0);
+  drive_0(enabled_0,out_0);
   drive_120(enabled_120,out_120);
   drive_240(enabled_240,out_240);
 }

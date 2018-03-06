@@ -11,7 +11,7 @@ int PIDEncoderCheck(){
   int rv=1;
   #ifdef DEBUGPRINT
   double dummy;
-  if(iic_encoder_read(ENCODER_ZERO_ADDR,&dummy)){
+  if(iic_encoder_read(ENCODER_0_ADDR,&dummy)){
     DEBUGPRINT("Zero Encoder Data OK!");
   } else {
     DEBUGPRINT("Zero Encoder Data Bus Fault!");
@@ -35,7 +35,7 @@ int PIDEncoderCheck(){
 
 void PIDDrive(){
   if(PID0.NeedsCompute()){
-    if(iic_encoder_read(ENCODER_ZERO_ADDR,&In0)){
+    if(iic_encoder_read(ENCODER_0_ADDR,&In0)){
     //Successfully read the left encoder
       PID0.Compute();
     } else {
@@ -47,7 +47,7 @@ void PIDDrive(){
     SerCommDbg.print(Out0);
     SerCommDbg.println();
     #endif
-    drive_zero(enabled_0,Out0);
+    drive_0(enabled_0,Out0);
   }
   if(PID120.NeedsCompute()){
     if(iic_encoder_read(ENCODER_120_ADDR,&In120)){
@@ -252,9 +252,9 @@ void PIDTuner(){
 
 void PIDWriteTunings(){
   //Write the current value of the PID tunings to the EEPROM, which is nonvolatile
-  EEPROM.put(FS_ZERO_P_4,pid0P);
-  EEPROM.put(FS_ZERO_I_4,pid0I);
-  EEPROM.put(FS_ZERO_D_4,pid0D);
+  EEPROM.put(FS_0_P_4,pid0P);
+  EEPROM.put(FS_0_I_4,pid0I);
+  EEPROM.put(FS_0_D_4,pid0D);
   EEPROM.put(FS_120_P_4,pid120P);
   EEPROM.put(FS_120_I_4,pid120I);
   EEPROM.put(FS_120_D_4,pid120D);
@@ -266,13 +266,13 @@ void PIDWriteTunings(){
 void PIDLoadTunings(){
   //Load the PID tunings from the EEPROM
   //PID library cannot recover from NaN internal state
-  EEPROM.get(FS_ZERO_P_4,pid0P);
+  EEPROM.get(FS_0_P_4,pid0P);
   if(pid0P == NAN)
     pid0P = 0;
-  EEPROM.get(FS_ZERO_I_4,pid0I);
+  EEPROM.get(FS_0_I_4,pid0I);
   if(pid0I == NAN)
     pid0I = 0;
-  EEPROM.get(FS_ZERO_D_4,pid0D);
+  EEPROM.get(FS_0_D_4,pid0D);
   if(pid0D == NAN)
     pid0D = 0;
   EEPROM.get(FS_120_P_4,pid120P);
