@@ -22,6 +22,8 @@ void init_pins() {
   //Gen purpose I/O
   pinMode(13, OUTPUT);
   pinMode(GRIP_VALVE,OUTPUT);
+  pinMode(LED_PIN,OUTPUT);
+  digitalWrite(LED_PIN,LOW);
   digitalWrite(GRIP_VALVE,LOW);
 }
 

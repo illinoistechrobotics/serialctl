@@ -34,6 +34,8 @@ extern double In0, Out0, Set0, In120, Out120, Set120, In240, Out240, Set240;
 #define EXT_ARM_MOTOR 44
 #define COMPRESSOR_MOTOR 4
 
+// Flashing LED
+#define LED_PIN 9
 
 // pins for motor controller 1 (0 degrees)
 #define ALI1 2

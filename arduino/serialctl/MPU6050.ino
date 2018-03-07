@@ -14,7 +14,7 @@ void MPUInit() {
 int MPULoop() {
   int angle = 0;
   int rotationThreshold = 1;
-  int loopSpeed = 100;
+  int loopSpeed = 100;      // set this depending on ms to execute loop
   
   Wire.beginTransmission(GYRO_ACCEL_ADDR);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
