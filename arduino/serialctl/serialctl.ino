@@ -85,6 +85,8 @@ void setup() {
   //Initialize safe to safe values!!
   safe.leftStickX = 127;
   safe.leftStickY = 127;
+  safe.rightStickX = 127;
+  safe.rightStickY = 127;
   safe.btnhi = 0;
   safe.btnlo = 0;
   safe.cksum = 0b1000000010001011;
@@ -146,8 +148,8 @@ void loop() {
   //Fast loop
   if (millis() - last_f >= 40) {
     //Every line sent to the computer gets us a new state
-    tank_drive();
     fast_loop();
+    tank_drive();
     print_data();
     last_f = millis();
   }
@@ -233,11 +235,36 @@ void slow_loop() {
 } 
 
 void tank_drive() { // not actually tank drive
+  int x_out = 0;
+  int y_out  = 0;
+  int drift_out = 0;
   int power_out = 0;
-  int turn_out  = 0;
-  int zeroed_power =    ((int)(astate->leftStickX) - 127);
-  int zeroed_turn =     -1 * ((int)(astate->leftStickY) - 127);
+  int zeroed_x =    ((int)(astate->leftStickX) - 127);
+  int zeroed_y =     -1 * ((int)(astate->leftStickY) - 127);
+  int zeroed_drift = -1 * ((int)(astate->rightStickX) - 127);
+  int zeroed_power = ((int)(astate->rightStickY) - 127);
 
+  if (abs(zeroed_x) > DEADBAND_HALF_WIDTH) {
+    if (zeroed_x > 0) {
+      x_out = zeroed_x - DEADBAND_HALF_WIDTH;
+    } else {
+      x_out = zeroed_x + DEADBAND_HALF_WIDTH;
+    }
+  }
+  if (abs(zeroed_y) > DEADBAND_HALF_WIDTH) {
+    if (zeroed_y > 0) {
+      y_out = zeroed_y - DEADBAND_HALF_WIDTH;
+    } else {
+      y_out = zeroed_y + DEADBAND_HALF_WIDTH;
+    }
+  }
+  if (abs(zeroed_drift) > DEADBAND_HALF_WIDTH) {
+    if (zeroed_drift > 0) {
+      drift_out = zeroed_drift - DEADBAND_HALF_WIDTH;
+    } else {
+      drift_out = zeroed_drift + DEADBAND_HALF_WIDTH;
+    }
+  }
   if (abs(zeroed_power) > DEADBAND_HALF_WIDTH) {
     if (zeroed_power > 0) {
       power_out = zeroed_power - DEADBAND_HALF_WIDTH;
@@ -245,16 +272,9 @@ void tank_drive() { // not actually tank drive
       power_out = zeroed_power + DEADBAND_HALF_WIDTH;
     }
   }
-  if (abs(zeroed_turn) > DEADBAND_HALF_WIDTH) {
-    if (zeroed_turn > 0) {
-      turn_out = zeroed_turn - DEADBAND_HALF_WIDTH;
-    } else {
-      turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
-    }
-  }
-  int out_0 = power_out + (turn_out / 8);
-  int out_120 = power_out + (turn_out / 8);
-  int out_240 = power_out + (turn_out / 8);
+  int out_0 = x_out + (y_out / 8);
+  int out_120 = x_out + (y_out / 8);
+  int out_240 = x_out + (y_out / 8);
   
  //System reset logic
  #ifdef WATCHDOG_
@@ -278,11 +298,11 @@ void tank_drive() { // not actually tank drive
     /* Arm the PID if button 4 is down and either the sticks are currently centered or the PID is already armed */
    if(getButton(SHOULDER_TOP_LEFT)){
     //PID button down
-    if(pid_interlock || (power_out == 0 && turn_out == 0)){
+    if(pid_interlock || (x_out == 0 && y_out == 0)){
       //PID can engage
-      Set0 = -2*(power_out+turn_out);
-      Set120 = -2*(power_out+turn_out);
-      Set240 = -2*(power_out+turn_out);
+      Set0 = -2*(x_out+y_out);
+      Set120 = -2*(x_out+y_out);
+      Set240 = -2*(x_out+y_out);
       PID0.SetMode(AUTOMATIC);
       PID120.SetMode(AUTOMATIC);
       PID240.SetMode(AUTOMATIC);
@@ -317,30 +337,30 @@ void tank_drive() { // not actually tank drive
   }
   //apply turbo mode
   if (getButton(SHOULDER_TOP_RIGHT)) {
-    power_constraint = min(abs(power_out * 2), 255 - abs(turn_out));
-    if (abs(power_out) > 75) {
-      power_out = constrain(power_out * 2, -power_constraint, power_constraint);
-      out_0  =  power_out + (turn_out);
-      out_120 = power_out + (turn_out);
-      out_240 = power_out + (turn_out);
-    } else if (abs(power_out) >  20) {
-      out_0  =    power_out * 2 + (turn_out / 4);
-      out_120 = power_out * 2 + (turn_out / 4);
-      out_240 = power_out * 2 + (turn_out / 4);
+    power_constraint = min(abs(x_out * 2), 255 - abs(y_out));
+    if (abs(x_out) > 75) {
+      power_out = constrain(x_out * 2, -power_constraint, power_constraint);
+      out_0  =  x_out + (y_out);
+      out_120 = x_out + (y_out);
+      out_240 = x_out + (y_out);
+    } else if (abs(x_out) >  20) {
+      out_0  =  x_out * 2 + (y_out / 4);
+      out_120 = x_out * 2 + (y_out / 4);
+      out_240 = x_out * 2 + (y_out / 4);
     } else {
-      out_0  =    power_out + (turn_out);
-      out_120 = power_out + (turn_out);
-      out_240 = power_out + (turn_out);
+      out_0  =  x_out + (y_out);
+      out_120 = x_out + (y_out);
+      out_240 = x_out + (y_out);
     }
   } else if (!getButton(SHOULDER_TOP_LEFT)) {
-    if (abs(power_out) > 75) {
-      out_0  =    power_out + (turn_out);
-      out_120 = power_out + (turn_out);
-      out_240 = power_out + (turn_out);
-    } else if (abs(power_out) >  20) {
-      out_0  =    power_out + (turn_out / 4);
-      out_120 = power_out + (turn_out / 4);
-      out_240 = power_out + (turn_out / 4);
+    if (abs(x_out) > 75) {
+      out_0  =  x_out + (y_out);
+      out_120 = x_out + (y_out);
+      out_240 = x_out + (y_out);
+    } else if (abs(x_out) >  20) {
+      out_0  =  x_out + (y_out / 4);
+      out_120 = x_out + (y_out / 4);
+      out_240 = x_out + (y_out / 4);
     }
   }
   #ifdef PRINTMOTORS

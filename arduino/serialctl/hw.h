@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define CURRENT_0 A0
 #define CURRENT_120 A1
 #define CURRENT_240 A2
@@ -11,8 +10,6 @@
 #define ARM_LINAC_PRECISION 96
 
 #define PRESSURE_OFFSET 160
-
-
 
 float current_offset_0, current_offset_120, current_offset_240;
 int offset_measured = 0;
