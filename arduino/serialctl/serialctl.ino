@@ -148,8 +148,9 @@ void loop() {
   //Fast loop
   if (millis() - last_f >= 40) {
     //Every line sent to the computer gets us a new state
-    fast_loop();
+    angle = MPULoop();
     tank_drive();
+    fast_loop();
     print_data();
     last_f = millis();
   }
@@ -167,8 +168,6 @@ void loop() {
 void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
-
-  angle = MPULoop();
 
   //Gripper
   //check for invalid states
@@ -235,34 +234,34 @@ void slow_loop() {
 } 
 
 void tank_drive() { // not actually tank drive
-  int x_out = 0;
-  int y_out  = 0;
-  int drift_out = 0;
+  int driftX_out = 0;
+  int driftY_out  = 0;
+  int rotation_out = 0;
   int power_out = 0;
-  int zeroed_x =    ((int)(astate->leftStickX) - 127);
-  int zeroed_y =     -1 * ((int)(astate->leftStickY) - 127);
-  int zeroed_drift = -1 * ((int)(astate->rightStickX) - 127);
+  int zeroed_driftX = ((int)(astate->leftStickX) - 127);
+  int zeroed_driftY = ((int)(astate->leftStickY) - 127);
+  int zeroed_rotation = ((int)(astate->rightStickX) - 127);
   int zeroed_power = ((int)(astate->rightStickY) - 127);
 
-  if (abs(zeroed_x) > DEADBAND_HALF_WIDTH) {
-    if (zeroed_x > 0) {
-      x_out = zeroed_x - DEADBAND_HALF_WIDTH;
+  if (abs(zeroed_driftX) > DEADBAND_HALF_WIDTH) {
+    if (zeroed_driftX > 0) {
+      driftX_out = zeroed_driftX - DEADBAND_HALF_WIDTH;
     } else {
-      x_out = zeroed_x + DEADBAND_HALF_WIDTH;
+      driftX_out = zeroed_driftX + DEADBAND_HALF_WIDTH;
     }
   }
-  if (abs(zeroed_y) > DEADBAND_HALF_WIDTH) {
-    if (zeroed_y > 0) {
-      y_out = zeroed_y - DEADBAND_HALF_WIDTH;
+  if (abs(zeroed_driftY) > DEADBAND_HALF_WIDTH) {
+    if (zeroed_driftY > 0) {
+      driftY_out = zeroed_driftY - DEADBAND_HALF_WIDTH;
     } else {
-      y_out = zeroed_y + DEADBAND_HALF_WIDTH;
+      driftY_out = zeroed_driftY + DEADBAND_HALF_WIDTH;
     }
   }
-  if (abs(zeroed_drift) > DEADBAND_HALF_WIDTH) {
-    if (zeroed_drift > 0) {
-      drift_out = zeroed_drift - DEADBAND_HALF_WIDTH;
+  if (abs(zeroed_rotation) > DEADBAND_HALF_WIDTH) {
+    if (zeroed_rotation > 0) {
+      rotation_out = zeroed_rotation - DEADBAND_HALF_WIDTH;
     } else {
-      drift_out = zeroed_drift + DEADBAND_HALF_WIDTH;
+      rotation_out = zeroed_rotation + DEADBAND_HALF_WIDTH;
     }
   }
   if (abs(zeroed_power) > DEADBAND_HALF_WIDTH) {
@@ -272,9 +271,9 @@ void tank_drive() { // not actually tank drive
       power_out = zeroed_power + DEADBAND_HALF_WIDTH;
     }
   }
-  int out_0 = x_out + (y_out / 8);
-  int out_120 = x_out + (y_out / 8);
-  int out_240 = x_out + (y_out / 8);
+  int out_0 = power_out + (driftY_out / 8);
+  int out_120 = power_out + (driftY_out / 8);
+  int out_240 = power_out + (driftY_out / 8);
   
  //System reset logic
  #ifdef WATCHDOG_
@@ -298,11 +297,11 @@ void tank_drive() { // not actually tank drive
     /* Arm the PID if button 4 is down and either the sticks are currently centered or the PID is already armed */
    if(getButton(SHOULDER_TOP_LEFT)){
     //PID button down
-    if(pid_interlock || (x_out == 0 && y_out == 0)){
+    if(pid_interlock || (driftX_out == 0 && driftY_out == 0)){
       //PID can engage
-      Set0 = -2*(x_out+y_out);
-      Set120 = -2*(x_out+y_out);
-      Set240 = -2*(x_out+y_out);
+      Set0 = -2*(driftX_out+driftY_out);
+      Set120 = -2*(driftX_out+driftY_out);
+      Set240 = -2*(driftX_out+driftY_out);
       PID0.SetMode(AUTOMATIC);
       PID120.SetMode(AUTOMATIC);
       PID240.SetMode(AUTOMATIC);
@@ -337,30 +336,30 @@ void tank_drive() { // not actually tank drive
   }
   //apply turbo mode
   if (getButton(SHOULDER_TOP_RIGHT)) {
-    power_constraint = min(abs(x_out * 2), 255 - abs(y_out));
-    if (abs(x_out) > 75) {
-      power_out = constrain(x_out * 2, -power_constraint, power_constraint);
-      out_0  =  x_out + (y_out);
-      out_120 = x_out + (y_out);
-      out_240 = x_out + (y_out);
-    } else if (abs(x_out) >  20) {
-      out_0  =  x_out * 2 + (y_out / 4);
-      out_120 = x_out * 2 + (y_out / 4);
-      out_240 = x_out * 2 + (y_out / 4);
+    power_constraint = min(abs(driftX_out * 2), 255 - abs(driftY_out));
+    if (abs(driftX_out) > 75) {
+      power_out = constrain(driftX_out * 2, -power_constraint, power_constraint);
+      out_0  =  driftX_out + (driftY_out);
+      out_120 = driftX_out + (driftY_out);
+      out_240 = driftX_out + (driftY_out);
+    } else if (abs(driftX_out) >  20) {
+      out_0  =  driftX_out * 2 + (driftY_out / 4);
+      out_120 = driftX_out * 2 + (driftY_out / 4);
+      out_240 = driftX_out * 2 + (driftY_out / 4);
     } else {
-      out_0  =  x_out + (y_out);
-      out_120 = x_out + (y_out);
-      out_240 = x_out + (y_out);
+      out_0  =  driftX_out + (driftY_out);
+      out_120 = driftX_out + (driftY_out);
+      out_240 = driftX_out + (driftY_out);
     }
   } else if (!getButton(SHOULDER_TOP_LEFT)) {
-    if (abs(x_out) > 75) {
-      out_0  =  x_out + (y_out);
-      out_120 = x_out + (y_out);
-      out_240 = x_out + (y_out);
-    } else if (abs(x_out) >  20) {
-      out_0  =  x_out + (y_out / 4);
-      out_120 = x_out + (y_out / 4);
-      out_240 = x_out + (y_out / 4);
+    if (abs(driftX_out) > 75) {
+      out_0  =  driftX_out + (driftY_out);
+      out_120 = driftX_out + (driftY_out);
+      out_240 = driftX_out + (driftY_out);
+    } else if (abs(driftX_out) >  20) {
+      out_0  =  driftX_out + (driftY_out / 4);
+      out_120 = driftX_out + (driftY_out / 4);
+      out_240 = driftX_out + (driftY_out / 4);
     }
   }
   #ifdef PRINTMOTORS

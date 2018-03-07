@@ -13,6 +13,9 @@ void MPUInit() {
 
 int MPULoop() {
   int angle = 0;
+  int rotationThreshold = 1;
+  int loopSpeed = 100;
+  
   Wire.beginTransmission(GYRO_ACCEL_ADDR);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
@@ -34,9 +37,19 @@ int MPULoop() {
   SerCommDbg.print(" | GyY = "); SerCommDbg.print(GyY);
   SerCommDbg.print(" | GyZ = "); SerCommDbg.println(GyZ);
 
-  angle = atan2(AcX, AcY);  
+  if (GyZ >= rotationThreshold || GyZ <= -rotationThreshold) {
+    GyZ /= loopSpeed;
+    angle += GyZ;
+  }
+
+  if (angle < 0) {
+    angle += 360;
+  } else if (angle > 359) {
+    angle -= 360;
+  }
+  
   SerCommDbg.print("Angle of Rotation: "); SerCommDbg.println(angle);
   return angle;
-  delay(333);
+  //delay(333);
 }
 
