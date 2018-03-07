@@ -271,9 +271,16 @@ void tank_drive() { // not actually tank drive
       power_out = zeroed_power + DEADBAND_HALF_WIDTH;
     }
   }
-  int out_0 = power_out + (driftY_out / 8);
-  int out_120 = power_out + (driftY_out / 8);
-  int out_240 = power_out + (driftY_out / 8);
+
+  // Polar Stick Positions
+  int leftHyp = sqrt((driftX_out^2)+(driftY_out^2));
+  int rightHyp = sqrt((rotation_out^2)+(power_out^2));
+  int leftAng = atan2(driftY_out,driftX_out);
+  int rightAng = atan2(power_out,rotation_out);
+  
+  int out_0 = power_out + (leftHyp / 8);
+  int out_120 = power_out + (leftHyp / 8);
+  int out_240 = power_out + (leftHyp / 8);
   
  //System reset logic
  #ifdef WATCHDOG_
@@ -297,11 +304,11 @@ void tank_drive() { // not actually tank drive
     /* Arm the PID if button 4 is down and either the sticks are currently centered or the PID is already armed */
    if(getButton(SHOULDER_TOP_LEFT)){
     //PID button down
-    if(pid_interlock || (driftX_out == 0 && driftY_out == 0)){
+    if(pid_interlock || (leftHyp == 0 && rightHyp == 0)){
       //PID can engage
-      Set0 = -2*(driftX_out+driftY_out);
-      Set120 = -2*(driftX_out+driftY_out);
-      Set240 = -2*(driftX_out+driftY_out);
+      Set0 = -2*(power_out+leftHyp);
+      Set120 = -2*(power_out+leftHyp);
+      Set240 = -2*(power_out+leftHyp);
       PID0.SetMode(AUTOMATIC);
       PID120.SetMode(AUTOMATIC);
       PID240.SetMode(AUTOMATIC);
@@ -336,30 +343,30 @@ void tank_drive() { // not actually tank drive
   }
   //apply turbo mode
   if (getButton(SHOULDER_TOP_RIGHT)) {
-    power_constraint = min(abs(driftX_out * 2), 255 - abs(driftY_out));
-    if (abs(driftX_out) > 75) {
-      power_out = constrain(driftX_out * 2, -power_constraint, power_constraint);
-      out_0  =  driftX_out + (driftY_out);
-      out_120 = driftX_out + (driftY_out);
-      out_240 = driftX_out + (driftY_out);
-    } else if (abs(driftX_out) >  20) {
-      out_0  =  driftX_out * 2 + (driftY_out / 4);
-      out_120 = driftX_out * 2 + (driftY_out / 4);
-      out_240 = driftX_out * 2 + (driftY_out / 4);
+    power_constraint = min(abs(power_out * 2), 255 - abs(leftHyp));
+    if (abs(leftHyp) > 75) {
+      power_out = constrain(leftHyp * 2, -power_constraint, power_constraint);
+      out_0  =  power_out + (leftHyp);
+      out_120 = power_out + (leftHyp);
+      out_240 = power_out + (leftHyp);
+    } else if (abs(leftHyp) >  20) {
+      out_0  =  power_out * 2 + (leftHyp / 4);
+      out_120 = power_out * 2 + (leftHyp / 4);
+      out_240 = power_out * 2 + (leftHyp / 4);
     } else {
-      out_0  =  driftX_out + (driftY_out);
-      out_120 = driftX_out + (driftY_out);
-      out_240 = driftX_out + (driftY_out);
+      out_0  =  power_out + (leftHyp);
+      out_120 = power_out + (leftHyp);
+      out_240 = power_out + (leftHyp);
     }
   } else if (!getButton(SHOULDER_TOP_LEFT)) {
-    if (abs(driftX_out) > 75) {
-      out_0  =  driftX_out + (driftY_out);
-      out_120 = driftX_out + (driftY_out);
-      out_240 = driftX_out + (driftY_out);
-    } else if (abs(driftX_out) >  20) {
-      out_0  =  driftX_out + (driftY_out / 4);
-      out_120 = driftX_out + (driftY_out / 4);
-      out_240 = driftX_out + (driftY_out / 4);
+    if (abs(leftHyp) > 75) {
+      out_0  =  power_out + (leftHyp);
+      out_120 = power_out + (leftHyp);
+      out_240 = power_out + (leftHyp);
+    } else if (abs(leftHyp) >  20) {
+      out_0  =  power_out + (leftHyp / 4);
+      out_120 = power_out + (leftHyp / 4);
+      out_240 = power_out + (leftHyp / 4);
     }
   }
   #ifdef PRINTMOTORS
