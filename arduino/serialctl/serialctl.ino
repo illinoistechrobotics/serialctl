@@ -491,6 +491,7 @@ void tank_drive() { // not actually tank drive
     drive_0(enabled_0,out_0);
     drive_120(enabled_120,out_120);
     drive_240(enabled_240,out_240);
+    digitalWrite(LED_PIN,LOW); 
   }
 }
 
