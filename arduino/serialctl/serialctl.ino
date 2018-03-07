@@ -83,8 +83,8 @@ void setup() {
 #endif
 
   //Initialize safe to safe values!!
-  safe.stickX = 127;
-  safe.stickY = 127;
+  safe.leftStickX = 127;
+  safe.leftStickY = 127;
   safe.btnhi = 0;
   safe.btnlo = 0;
   safe.cksum = 0b1000000010001011;
@@ -235,8 +235,8 @@ void slow_loop() {
 void tank_drive() { // not actually tank drive
   int power_out = 0;
   int turn_out  = 0;
-  int zeroed_power =    ((int)(astate->stickX) - 127);
-  int zeroed_turn =     -1 * ((int)(astate->stickY) - 127);
+  int zeroed_power =    ((int)(astate->leftStickX) - 127);
+  int zeroed_turn =     -1 * ((int)(astate->leftStickY) - 127);
 
   if (abs(zeroed_power) > DEADBAND_HALF_WIDTH) {
     if (zeroed_power > 0) {

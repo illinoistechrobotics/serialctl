@@ -38,8 +38,10 @@ int joystick_update(packet_t *ctl){
         SDL_JoystickUpdate();
 
  //populate controller struct
-        ctl->stickX = (SDL_JoystickGetAxis(jstick, 1)/256)+128;
-        ctl->stickY = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
+        ctl->leftStickX = (SDL_JoystickGetAxis(jstick, 1)/256)+128;
+        ctl->leftStickY = (SDL_JoystickGetAxis(jstick, 1)/256)+128;
+        ctl->rightStickX = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
+        ctl->rightStickY = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
         ctl->btnlo = 0;
         ctl->btnhi = 0;
         for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 12)); i++){ //16 bits available - 4 for dpad

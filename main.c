@@ -38,7 +38,7 @@ int main(int argc, char ** argv){
             printf("Unable to send data!\n");
             return 2;
             }
-        printf("X: %i, Y: %i, CRC: %i, Resp: %s\n", ctl.stickX, ctl.stickY, ctl.cksum, msg); 
+        printf("Left X: %i, Left Y: %i, Right X: %i, Right Y: %i, CRC: %i, Resp: %s\n", ctl.leftStickX, ctl.leftStickY, ctl.rightStickX, ctl.rightStickY, ctl.cksum, msg); 
 //        usleep(150E3);
         }
         return 0;
