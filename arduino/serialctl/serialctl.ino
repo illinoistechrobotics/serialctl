@@ -23,6 +23,8 @@
 #include "globals.h"
 #include "PIDUtil.h"
 #include "iic_encoder_io.h"
+
+int angle = 0;
 #include "MPU6050.h"
 
 packet_t pA, pB, safe;
@@ -34,7 +36,6 @@ Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(129, SABERTOOTH12);
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
-int angle = 0;
 boolean small_right_flag = false;
 
 /* Interlock to only allow engaging PID while sticks are at zero,
@@ -281,6 +282,9 @@ void tank_drive() { // not actually tank drive
   int out_0 = power_out + (leftHyp / 8);
   int out_120 = power_out + (leftHyp / 8);
   int out_240 = power_out + (leftHyp / 8);
+
+  int out_arcade_120 = -1 * power_out + (driftX_out / 8);
+  int out_arcade_240 = power_out + (driftX_out / 8);
   
  //System reset logic
  #ifdef WATCHDOG_
@@ -349,24 +353,34 @@ void tank_drive() { // not actually tank drive
       out_0  =  power_out + (leftHyp);
       out_120 = power_out + (leftHyp);
       out_240 = power_out + (leftHyp);
+      out_arcade_120 = -1 * power_out + (driftX_out);
+      out_arcade_240 = power_out + (driftX_out);
     } else if (abs(leftHyp) >  20) {
       out_0  =  power_out * 2 + (leftHyp / 4);
       out_120 = power_out * 2 + (leftHyp / 4);
       out_240 = power_out * 2 + (leftHyp / 4);
+      out_arcade_120 = -1 * power_out + (driftX_out / 4);
+      out_arcade_240 = power_out + (driftX_out / 4);
     } else {
       out_0  =  power_out + (leftHyp);
       out_120 = power_out + (leftHyp);
       out_240 = power_out + (leftHyp);
+      out_arcade_120 = -1 * power_out + (driftX_out);
+      out_arcade_240 = power_out + (driftX_out);
     }
   } else if (!getButton(SHOULDER_TOP_LEFT)) {
     if (abs(leftHyp) > 75) {
       out_0  =  power_out + (leftHyp);
       out_120 = power_out + (leftHyp);
       out_240 = power_out + (leftHyp);
+      out_arcade_120 = -1 * power_out + (driftX_out);
+      out_arcade_240 = power_out + (driftX_out);
     } else if (abs(leftHyp) >  20) {
       out_0  =  power_out + (leftHyp / 4);
       out_120 = power_out + (leftHyp / 4);
       out_240 = power_out + (leftHyp / 4);
+      out_arcade_120 = -1 * power_out + (driftX_out / 4);
+      out_arcade_240 = power_out + (driftX_out / 4);
     }
   }
   #ifdef PRINTMOTORS
@@ -382,116 +396,441 @@ void tank_drive() { // not actually tank drive
   if (getButton(SMALL_RIGHT)) {
     small_right_flag = !small_right_flag;
   }
+  // Clean up this code post mrdc
   if (small_right_flag) {
     if (rotation_out > 0) { // Clockwise rotation
-      if ((angle == 360 || angle > 0) && angle <= 45) {
-        drive_0(0,0);
-        drive_120(enabled_120,out_120);
-        drive_240(enabled_240,out_240);
-        digitalWrite(LED_PIN,HIGH);  
+      if (abs(leftAng) > 67.5) { // Forward Drift
+        if ((angle > 315 && angle <= 360) || (angle >= 0 && angle <= 45)) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 45 && angle <= 135) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 135 && angle <= 225) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 225 && angle <= 315) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 45 && angle <= 90) {
-        drive_0(enabled_0,out_0);
-        drive_120(0,0);
-        drive_240(enabled_240,out_240);
-        digitalWrite(LED_PIN,HIGH);  
+      if (leftAng > 22.5 && leftAng <= 67.5) { // Drift right diagonal up
+        if (angle >= 0 && angle <= 90) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 90 && angle <= 180) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 180 && angle <= 270) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 270 && angle <= 360) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 90 && angle <= 135) {
-        drive_0(enabled_0,out_0);
-        drive_120(0,0);
-        drive_240(enabled_240,out_240);
-        digitalWrite(LED_PIN,LOW);  
+      if (abs(leftAng) <= 22.5) { // Drift right
+        if (angle > 45 && angle <= 135) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 135 && angle <= 225) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 225 && angle <= 315) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 315 && angle <= 45) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 135 && angle <= 180) {
-        drive_0(enabled_0,out_0);
-        drive_120(0,0);
-        drive_240(0,0); 
-        digitalWrite(LED_PIN,LOW);  
+      if (leftAng > -67.5 && leftAng <= -22.5) { // Drift right diagonal down
+        if (angle > 90 && angle <= 180) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 180 && angle <= 270) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 270 && angle <= 360) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 0 && angle <= 90) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 180 && angle <= 225) {
-        drive_0(enabled_0,out_0);
-        drive_120(0,0);
-        drive_240(0,0);
-        digitalWrite(LED_PIN,LOW);   
+      if ((-abs(leftAng)) <= -67.5) { // Drift down
+        if (angle > 135 && angle <= 225) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 225 && angle <= 315) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 315 && angle <= 45) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 45 && angle <= 135) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 225 && angle <= 270) {
-        drive_0(enabled_0,out_0);
-        drive_120(enabled_120,out_120);
-        drive_240(0,0);
-        digitalWrite(LED_PIN,LOW);   
+      if (leftAng < -22.5 && leftAng >= -67.5) { // Drift left diagonal down
+        if (angle > 180 && angle <= 270) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 270 && angle <= 360) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 0 && angle <= 90) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 90 && angle <= 180) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 270 && angle <= 315) {
-        drive_0(enabled_0,out_0);
-        drive_120(enabled_120,out_120);
-        drive_240(0,0);
-        digitalWrite(LED_PIN,LOW);   
+      if ((-abs(leftAng)) > -22.5) { // Drift left
+        if (angle > 225 && angle <= 315) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 315 && angle <= 45) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 45 && angle <= 135) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 135 && angle <= 225) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 315 && (angle <= 360 || angle == 0)) {
-        drive_0(0,0);
-        drive_120(enabled_120,out_120);
-        drive_240(enabled_240,out_240);
-        digitalWrite(LED_PIN,LOW);   
+      if (leftAng < -22.5 && leftAng >= -67.5) { // Drift left diagonal up
+        if (angle > 270 && angle < 360) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 0 && angle <= 90) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 90 && angle <= 180) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 180 && angle <= 270) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
     }
     else if (rotation_out < 0) { // Counterclockwise rotation
       out_0 = -1 * out_0;
       out_120 = -1 * out_120;
       out_240 = -1 * out_240;
-      if ((angle == 360 || angle > 0) && angle <= 45) {
-        drive_0(0,0);
-        drive_120(enabled_120,out_120);
-        drive_240(enabled_240,out_240);
-        digitalWrite(LED_PIN,HIGH);   
+      if (abs(leftAng) > 67.5) { // Forward Drift
+        if ((angle > 315 && angle <= 360) || (angle >= 0 && angle <= 45)) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 45 && angle <= 135) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 135 && angle <= 225) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 225 && angle <= 315) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 45 && angle <= 90) {
-        drive_0(enabled_0,out_0);
-        drive_120(0,0);
-        drive_240(enabled_240,out_240);
-        digitalWrite(LED_PIN,LOW);   
+       if (leftAng < -22.5 && leftAng >= -67.5) { // Drift left diagonal up
+        if (angle > 270 && angle < 360) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 0 && angle <= 90) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 90 && angle <= 180) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 180 && angle <= 270) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 90 && angle <= 135) {
-        drive_0(enabled_0,out_0);
-        drive_120(0,0);
-        drive_240(enabled_240,out_240);
-        digitalWrite(LED_PIN,LOW);   
+      if ((-abs(leftAng)) > -22.5) { // Drift left
+        if (angle > 225 && angle <= 315) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 315 && angle <= 45) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 45 && angle <= 135) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 135 && angle <= 225) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 135 && angle <= 180) {
-        drive_0(enabled_0,out_0);
-        drive_120(0,0);
-        drive_240(0,0);
-        digitalWrite(LED_PIN,LOW);   
+          if (leftAng < -22.5 && leftAng >= -67.5) { // Drift left diagonal down
+        if (angle > 180 && angle <= 270) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 270 && angle <= 360) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 0 && angle <= 90) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 90 && angle <= 180) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 180 && angle <= 225) {
-        drive_0(enabled_0,out_0);
-        drive_120(0,0);
-        drive_240(0,0);
-        digitalWrite(LED_PIN,LOW);   
+           if ((-abs(leftAng)) <= -67.5) { // Drift down
+        if (angle > 135 && angle <= 225) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 225 && angle <= 315) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 315 && angle <= 45) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 45 && angle <= 135) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 225 && angle <= 270) {
-        drive_0(enabled_0,out_0);
-        drive_120(enabled_120,out_120);
-        drive_240(0,0);
-        digitalWrite(LED_PIN,LOW);   
+        if (leftAng > -67.5 && leftAng <= -22.5) { // Drift right diagonal down
+        if (angle > 90 && angle <= 180) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 180 && angle <= 270) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 270 && angle <= 360) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 0 && angle <= 90) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 270 && angle <= 315) {
-        drive_0(enabled_0,out_0);
-        drive_120(enabled_120,out_120);
-        drive_240(0,0);
-        digitalWrite(LED_PIN,LOW);   
+      if (abs(leftAng) <= 22.5) { // Drift right
+        if (angle > 45 && angle <= 135) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 135 && angle <= 225) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 225 && angle <= 315) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 315 && angle <= 45) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
-      if (angle > 315 && (angle <= 360 || angle == 0)) {
-        drive_0(0,0);
-        drive_120(enabled_120,out_120);
-        drive_240(enabled_240,out_240);
-        digitalWrite(LED_PIN,HIGH);   
+      if (leftAng > 22.5 && leftAng <= 67.5) { // Drift right diagonal up
+        if (angle >= 0 && angle <= 90) {
+          drive_0(0,0);
+          drive_120(enabled_120,out_120);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,HIGH);  
+        }
+        if (angle > 90 && angle <= 180) {
+          drive_0(enabled_0,out_0);
+          drive_120(enabled_120,out_0);
+          drive_240(0,0);
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 180 && angle <= 270) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(0,0); 
+          digitalWrite(LED_PIN,LOW);  
+        }
+        if (angle > 270 && angle <= 360) {
+          drive_0(enabled_0,out_0);
+          drive_120(0,0);
+          drive_240(enabled_240,out_240);
+          digitalWrite(LED_PIN,LOW);   
+        }
       }
     }
   }
-  else {
+  else if (SHOULDER_BOTTOM_RIGHT) { // Spin!!!
     drive_0(enabled_0,out_0);
     drive_120(enabled_120,out_120);
     drive_240(enabled_240,out_240);
     digitalWrite(LED_PIN,LOW); 
+  } else {
+    drive_0(0,0); // front motor disabled - standard robot drive
+    drive_120(enabled_120,out_arcade_120);
+    drive_240(enabled_240,out_arcade_240);
   }
 }
 
