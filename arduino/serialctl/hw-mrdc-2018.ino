@@ -2,6 +2,7 @@
 #include "globals.h"
 
 int spinwheel_state;
+int rope_state;
 
 void manipulator_setup() {
   spinwheel.attach(SPINNER_PIN);
@@ -9,6 +10,10 @@ void manipulator_setup() {
 
   spinwheel.writeMicroseconds(OFF_SPEED);
   spinwheel_aux.writeMicroseconds(FORWARD_CMD);
+
+  rope.attach(ROPE_PIN);
+
+  winch.attach(WINCH_PIN);
 }
 
 void manipulator_spinwheel() {
@@ -26,6 +31,16 @@ void manipulator_spinwheel() {
   } else {
     spinwheel.writeMicroseconds(OFF_SPEED);
     spinwheel_state = 0;
+  }
+}
+
+void manipulator_rope() {
+  if (get_button(0) && rope_state == 0) {
+    rope.write(150);
+    rope_state = 1;
+  } else if (rope_state == 1) {
+    rope.write(90);
+    rope_state = 0;
   }
 }
 
