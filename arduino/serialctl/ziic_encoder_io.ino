@@ -1,8 +1,8 @@
-#include <Wire.h>
+#include <Wire_ng.h>
 #include "iic_encoder_io.h"
 //Prepares for IIC communication with encoders
 void setup_iic(){
-    Wire.begin();        // join i2c bus (address optional for master)
+    Wire.begin(0);        // join i2c bus (address optional for master)
 }
 
 //Reads the RPM from an encoder at 'addr' returns 1 for success and 0 if a bus fault is encountered.

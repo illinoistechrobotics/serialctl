@@ -5,7 +5,7 @@ int rotationThreshold = 1;
 int loopSpeed = 100;      // set this depending on ms to execute loop
 
 void MPUInit() {
-  Wire.begin();
+  Wire.begin(0);
   Wire.beginTransmission(GYRO_ACCEL_ADDR);
   Wire.write(0x6B);  // PWR_MGMT_1 register
   Wire.write(0);     // set to zero (wakes up the MPU-6050)
