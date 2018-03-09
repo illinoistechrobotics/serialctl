@@ -58,7 +58,7 @@ extern double In0, Out0, Set0, In120, Out120, Set120, In240, Out240, Set240;
 #define BLI3 12
 #define AHI3 26
 #define BHI3 27
-#define DENABLE3 30
+#define DENABLE3 34
 #define DREADY3 33
 
 #define DEADBAND_HALF_WIDTH 10  // Control input deadband radius
