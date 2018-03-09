@@ -28,7 +28,7 @@ void manipulator_spinwheel() {
     spinwheel.writeMicroseconds(LAUNCH_SPEED);
     spinwheel_aux.writeMicroseconds(REVERSE_CMD);
     spinwheel_state = -1;
-  } else {
+  } else if (spinwheel_state != 0) {
     spinwheel.writeMicroseconds(OFF_SPEED);
     spinwheel_state = 0;
   }
@@ -43,4 +43,9 @@ void manipulator_rope() {
     rope_state = 0;
   }
 }
+
+void manipulator_winch() {
+  
+}
+
 

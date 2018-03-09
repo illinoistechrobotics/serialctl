@@ -20,3 +20,5 @@ Servo rope;
 
 void manipulator_setup();
 void manipulator_spinwheel();
+void manipulator_rope();
+void manipulator_winch();
