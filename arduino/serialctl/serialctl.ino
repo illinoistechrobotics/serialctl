@@ -75,6 +75,8 @@ void loop() {
   // MRDC Manipulator 2018
   manipulator_spinwheel();
   manipulator_rope();
+  manipulator_winch();
+  manipulator_actuator();
 
   tank_drive();
 

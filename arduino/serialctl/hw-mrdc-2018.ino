@@ -1,8 +1,15 @@
+// hw-mrdc-2018
+// MRDC Manipulator 2018
+// Taylor Berg, 3-9-18
+
 #include "hw.h"
 #include "globals.h"
 
-int spinwheel_state;
-int rope_state;
+// keep states so we aren't wasting too many cycles
+int spinwheel_state = 0;
+int rope_state = 0;
+int actuator_state = 0;
+int winch_state = 0;
 
 void manipulator_setup() {
   spinwheel.attach(SPINNER_PIN);
@@ -36,6 +43,7 @@ void manipulator_spinwheel() {
 
 void manipulator_rope() {
   if (get_button(0) && rope_state == 0) {
+    SerComm.write("Pulling rope ");
     rope.write(150);
     rope_state = 1;
   } else if (rope_state == 1) {
@@ -45,7 +53,38 @@ void manipulator_rope() {
 }
 
 void manipulator_winch() {
-  
+  if (get_button(3)) {
+    // up/down on dpad stretches and releases winch
+    if (get_button(JOYSTICK_PAD_UP) && !get_button(JOYSTICK_PAD_DOWN) && winch_state != 1) {
+      SerComm.write("Stretching winch ");
+      winch.write(30);
+      winch_state = 1;
+    } else if (get_button(JOYSTICK_PAD_DOWN) && !get_button(JOYSTICK_PAD_UP) && winch_state != -1) {
+      SerComm.write("Releasing winch ");
+      winch.write(150);
+      winch_state = -1;
+    }
+  } else if (winch_state != 0) {
+    winch.write(90);
+    winch_state = 0;
+  }
+}
+
+void manipulator_actuator() {
+  if (!get_button(3)) {
+    if (get_button(JOYSTICK_PAD_UP) && !get_button(JOYSTICK_PAD_DOWN) && actuator_state != 1) {
+      SerComm.write("Moving arm up ");
+      actuator.write(30);
+      actuator_state = 1;
+    } else if (get_button(JOYSTICK_PAD_DOWN) && !get_button(JOYSTICK_PAD_UP) && actuator_state != -1) {
+      SerComm.write("Moving arm down ");
+      actuator.write(150);
+      actuator_state = -1;
+    }
+  } else if (actuator_state != 0) {
+    actuator.write(90);
+    actuator_state = 0;
+  }
 }
 
 
