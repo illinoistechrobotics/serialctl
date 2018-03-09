@@ -1,5 +1,6 @@
 #include <Servo.h>
 #include <Sabertooth.h>
+#include <Adafruit_NeoPixel.h>
 
 //    serialctl
 //
@@ -27,6 +28,12 @@
 int angle = 0;
 #include "MPU6050.h"
 
+/* LED strip */
+#define LED_PIN 9
+#define LED_COUNT 13
+Adafruit_NeoPixel led_strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
 comm_state cs;
@@ -37,6 +44,7 @@ Sabertooth ST34(129, SABERTOOTH12);
 static uint8_t reset_counter = 0;
 static int power_constraint = 0;
 boolean small_right_flag = false;
+
 
 /* Interlock to only allow engaging PID while sticks are at zero,
  * 0 indicates PID was not used in the last iteration, 1 indicates the PID was used in the last iteration
@@ -135,6 +143,7 @@ void setup() {
   wdt_reset();             //watchdog timer reset
 #endif
   DEBUGPRINT("---Initialization complete!---.");
+  led_strip.begin();
 }
 
 void loop() {
@@ -404,25 +413,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 45 && angle <= 135) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 135 && angle <= 225) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 225 && angle <= 315) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if (leftAng > 22.5 && leftAng <= 67.5) { // Drift right diagonal up
@@ -430,25 +439,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 90 && angle <= 180) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 180 && angle <= 270) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 270 && angle <= 360) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if (abs(leftAng) <= 22.5) { // Drift right
@@ -456,25 +465,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 135 && angle <= 225) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 225 && angle <= 315) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 315 && angle <= 45) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if (leftAng > -67.5 && leftAng <= -22.5) { // Drift right diagonal down
@@ -482,25 +491,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 180 && angle <= 270) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 270 && angle <= 360) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 0 && angle <= 90) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if ((-abs(leftAng)) <= -67.5) { // Drift down
@@ -508,25 +517,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 225 && angle <= 315) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 315 && angle <= 45) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 45 && angle <= 135) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if (leftAng < -22.5 && leftAng >= -67.5) { // Drift left diagonal down
@@ -534,25 +543,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 270 && angle <= 360) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 0 && angle <= 90) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 90 && angle <= 180) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if ((-abs(leftAng)) > -22.5) { // Drift left
@@ -560,25 +569,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 315 && angle <= 45) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 45 && angle <= 135) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 135 && angle <= 225) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if (leftAng < -22.5 && leftAng >= -67.5) { // Drift left diagonal up
@@ -586,25 +595,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 0 && angle <= 90) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 90 && angle <= 180) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 180 && angle <= 270) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
     }
@@ -617,25 +626,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 45 && angle <= 135) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 135 && angle <= 225) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 225 && angle <= 315) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
        if (leftAng < -22.5 && leftAng >= -67.5) { // Drift left diagonal up
@@ -643,25 +652,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 0 && angle <= 90) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 90 && angle <= 180) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 180 && angle <= 270) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if ((-abs(leftAng)) > -22.5) { // Drift left
@@ -669,25 +678,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 315 && angle <= 45) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 45 && angle <= 135) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 135 && angle <= 225) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
           if (leftAng < -22.5 && leftAng >= -67.5) { // Drift left diagonal down
@@ -695,25 +704,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 270 && angle <= 360) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 0 && angle <= 90) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 90 && angle <= 180) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
            if ((-abs(leftAng)) <= -67.5) { // Drift down
@@ -721,25 +730,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 225 && angle <= 315) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 315 && angle <= 45) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 45 && angle <= 135) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
         if (leftAng > -67.5 && leftAng <= -22.5) { // Drift right diagonal down
@@ -747,25 +756,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 180 && angle <= 270) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 270 && angle <= 360) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 0 && angle <= 90) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if (abs(leftAng) <= 22.5) { // Drift right
@@ -773,25 +782,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 135 && angle <= 225) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 225 && angle <= 315) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 315 && angle <= 45) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
       if (leftAng > 22.5 && leftAng <= 67.5) { // Drift right diagonal up
@@ -799,25 +808,25 @@ void tank_drive() { // not actually tank drive
           drive_0(0,0);
           drive_120(enabled_120,out_120);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,HIGH);  
+          turn_on_led();  
         }
         if (angle > 90 && angle <= 180) {
           drive_0(enabled_0,out_0);
           drive_120(enabled_120,out_0);
           drive_240(0,0);
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 180 && angle <= 270) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(0,0); 
-          digitalWrite(LED_PIN,LOW);  
+          turn_off_led();  
         }
         if (angle > 270 && angle <= 360) {
           drive_0(enabled_0,out_0);
           drive_120(0,0);
           drive_240(enabled_240,out_240);
-          digitalWrite(LED_PIN,LOW);   
+          turn_off_led();   
         }
       }
     }
@@ -825,13 +834,29 @@ void tank_drive() { // not actually tank drive
   else if (SHOULDER_BOTTOM_RIGHT) { // Spin!!!
     drive_0(enabled_0,out_0);
     drive_120(enabled_120,out_120);
-    drive_240(enabled_240,out_240);
-    digitalWrite(LED_PIN,LOW); 
+    drive_240(enabled_240,out_240); 
+    turn_off_led(); 
   } else {
     drive_0(0,0); // front motor disabled - standard robot drive
     drive_120(enabled_120,out_arcade_120);
     drive_240(enabled_240,out_arcade_240);
   }
 }
+
+void turn_on_led() {
+  for(int i=0; i<LED_COUNT;i++) {
+    led_strip.setPixelColor(i, led_strip.Color(0,255,0));
+  }
+  led_strip.show();
+}
+
+void turn_off_led() {
+  for(int i=0; i<LED_COUNT;i++) {
+    led_strip.setPixelColor(i, led_strip.Color(0,0,0));
+  }
+  led_strip.show();
+
+}
+
 
 
