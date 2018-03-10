@@ -9,7 +9,7 @@ extern double pidLeftP, pidLeftI, pidLeftD, pidRightP, pidRightI, pidRightD;
 extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 
 /*Configuration globals */
-#define PRINTMOTORS  //Should all motor power power values be printed to SerCommDbg?
+#undef PRINTMOTORS  //Should all motor power power values be printed to SerCommDbg?
 #define WATCHDOG_   //Should the hardware watchdog timer be set and used (strongly advised for safety!)?
 #define SerComm Serial1   //Serial port connected to Xbee
 #define SerCommDbg Serial   //Serial port for debugging info

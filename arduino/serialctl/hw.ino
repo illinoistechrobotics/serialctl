@@ -197,7 +197,7 @@ void compressor_ctl(){
     psi += ADC2PSI(P_SENSOR);
   }
   psi = psi/5;
-  DEBUGPRINT(psi);
+  //DEBUGPRINT(psi);
   if(comm_ok == 1){
     //Read pressures and pump if needed
     if(psi < MIN_PRESS){
