@@ -1,13 +1,15 @@
 #pragma once
 
-#define SPINNER_PIN 50
-#define AUX_PIN 51
+#include <PWMServo.h>
 
-#define WINCH_PIN 49
+#define SPINNER_PIN 2
+#define AUX_PIN 3
 
-#define ROPE_PIN 48
+#define WINCH_PIN 4
 
-#define ACTUATOR_PIN 47
+#define ROPE_PIN 6
+
+#define ACTUATOR_PIN 5
 
 #define LAUNCH_SPEED 1250
 #define OFF_SPEED 1000
