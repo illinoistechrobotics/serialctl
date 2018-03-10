@@ -56,10 +56,10 @@ extern double In0, Out0, Set0, In120, Out120, Set120, In240, Out240, Set240;
 // pins for motor controller 3 (240 degrees)
 #define ALI3 11
 #define BLI3 12
-#define AHI3 26
+#define AHI3 51
 #define BHI3 27
-#define DENABLE3 34
-#define DREADY3 33
+#define DENABLE3 47
+#define DREADY3 39
 
 #define DEADBAND_HALF_WIDTH 10  // Control input deadband radius
 #define FAILTIME 200    //Failsafe timeout in milliseconds
