@@ -159,68 +159,16 @@ void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
 
-  //Gripper
-  //check for invalid states
-  if ((getButton(DIAMOND_LEFT) ^ getButton(DIAMOND_RIGHT))) {
-    //both left and right buttons at same time is invalid
-    if (getButton(DIAMOND_LEFT)) {
-      //close gripper
-      digitalWrite(GRIP_VALVE,HIGH);
-    }
-    else if (getButton(DIAMOND_RIGHT)) {
-      //open gripper
-      digitalWrite(GRIP_VALVE,LOW);
-    }
-  }
-  //END gripper
-
-  // Home arm
-  if ((homed == 0 || homed == 3) && getButton(SMALL_LEFT)) {
-    homed = 1;
-  }
-  // END arm homing
-
-  //Arm extension
-  if (homed == 3) {
-    if (getButton(DIAMOND_UP) ^ getButton(DIAMOND_DOWN)) {
-      if (getButton(DIAMOND_UP)) move_arm(1, getButton(4));
-      else if (getButton(DIAMOND_DOWN)) move_arm(-1,getButton(4));
-    }
-    else move_arm(0,0);
-  }
-  arm_loop();
-  //END arm extension
-
-  //Main arm linear actuator control
+  //Main arm boxing glove control
   if (getButton(DPAD_UP) ^ getButton(DPAD_DOWN)) {
-    if (getButton(DPAD_UP)) {
-      //Up
-      if(getButton(4)){
-        //Precision
-        setMotor(UPPER_ARM_MOTOR, -LINAC_PRECISION);
-      } else {
-        setMotor(UPPER_ARM_MOTOR, -127);
-      }
-    }
-    else if (getButton(DPAD_DOWN)) {
-      //DOWN
-      if(getButton(4)){
-        //Precision
-        setMotor(UPPER_ARM_MOTOR, LINAC_PRECISION);
-      } else {
-        setMotor(UPPER_ARM_MOTOR, 127);
-      }
-     }
+    if (getButton(DPAD_UP)) setMotor(2, 85);
+    else setMotor(2, -20);
   }
-  else {
-    setMotor(UPPER_ARM_MOTOR, 0);
-  }
+  else setMotor(2, 0);
   
 } 
 void slow_loop() {    
   //2x per second
-  //Compressor
-  compressor_ctl();
 } 
 
 void tank_drive() { // not actually tank drive
