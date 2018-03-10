@@ -48,7 +48,6 @@ void loop(){
   wdt_reset();
   print_data();
   comm_parse();
-  //run_manipulator(); 
 
   // Start + 3 -> Arcade Drive, Start + 2 -> Tank Drive
   if (getButton(9) && (getButton(2) ^ getButton(1))) {
@@ -68,6 +67,7 @@ void loop(){
     SerComm.print("Arcade Drive ");
     arcade_drive();
   }
+  run_manipulator();
   //limits data rate
   delay(33);
 }

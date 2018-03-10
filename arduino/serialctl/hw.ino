@@ -7,14 +7,13 @@
 boolean estop_state = false;
 int last_left_speed, last_right_speed;
 int current_manipulator_direction = 0;
+Servo manipulator;
 void init_pins(){
   Wire.begin();
-  pinMode(MANIPULATOR_FORWARD_PIN, OUTPUT);
-  pinMode(MANIPULATOR_REVERSE_PIN, OUTPUT);
+  manipulator.attach(MANIPULATOR_PIN);
+  manipulator.writeMicroseconds(MANIPULATOR_BASE_MICROSECONDS);
   pinMode(0, OUTPUT);
-  pinMode(1, OUTPUT); 
-
- set_manipulator_dir(0);
+  pinMode(1, OUTPUT);
 }
 int read_speed(char address){
   Wire.requestFrom(address,sizeof(int));
@@ -113,46 +112,13 @@ void estop(){
 
 void run_manipulator() {
   if (getButton(1) && !getButton(3)) { // Manipulator Down
-    set_manipulator_dir(-1);
+    manipulator.writeMicroseconds(MANIPULATOR_BASE_MICROSECONDS + MANIPULATOR_SPEED);
   }
   else if (!getButton(1) && getButton(3)) { // Manipulator Up
-    set_manipulator_dir(1);
-  }
-  else if (((!getButton(1) && !getButton(3)) || (getButton(1) && getButton(3)))) { // Stop Manipulator
-    set_manipulator_dir(0);
-  }
- if (getButton(0) && !getButton(2))
- {
-  digitalWrite(0, LOW);
-  digitalWrite(1, HIGH);
- }
-else if (!getButton(0) && getButton(2))
- {
-  digitalWrite(0, HIGH);
-  digitalWrite(1, LOW);
- }
-else
- {
-  digitalWrite(0, LOW);
-  digitalWrite(1, LOW);
- }
-}
-
-void set_manipulator_dir(int direction) {
-  if (direction < 0) {
-    current_manipulator_direction = -1;
-    digitalWrite(MANIPULATOR_FORWARD_PIN, LOW);
-    digitalWrite(MANIPULATOR_REVERSE_PIN, HIGH);
-  }
-  else if (direction > 0) {
-    current_manipulator_direction = 1;
-    digitalWrite(MANIPULATOR_FORWARD_PIN, HIGH);
-    digitalWrite(MANIPULATOR_REVERSE_PIN, LOW);
+    manipulator.writeMicroseconds(MANIPULATOR_BASE_MICROSECONDS - MANIPULATOR_SPEED);
   }
   else {
-    current_manipulator_direction = 0;
-    digitalWrite(MANIPULATOR_FORWARD_PIN, LOW);
-    digitalWrite(MANIPULATOR_REVERSE_PIN, LOW);
+    manipulator.writeMicroseconds(MANIPULATOR_BASE_MICROSECONDS);
   }
 }
 
