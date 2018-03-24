@@ -6,7 +6,7 @@ void init_pins() {
   //Main motors
   osmc_init();
   //Linear Actuators
-  SABERTOOTH12.begin(9600);
+  //SABERTOOTH12.begin(9600);
   //SABERTOOTH34.begin(9600);
   delay(10);
   //failsafes

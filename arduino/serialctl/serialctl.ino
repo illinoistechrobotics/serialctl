@@ -406,7 +406,7 @@ void tank_drive() { // not actually tank drive
     small_right_flag = !small_right_flag;
   }
   // Clean up this code post mrdc
-  if (small_right_flag) {
+ /* if (small_right_flag) {
     if (rotation_out > 0) { // Clockwise rotation
       if (abs(leftAng) > 67.5) { // Forward Drift
         if ((angle > 315 && angle <= 360) || (angle >= 0 && angle <= 45)) {
@@ -841,6 +841,11 @@ void tank_drive() { // not actually tank drive
     drive_120(enabled_120,out_arcade_120);
     drive_240(enabled_240,out_arcade_240);
   }
+*/
+  drive_0(enabled_0, 10);
+  drive_120(enabled_120, 10);
+//  drive_240(enabled_240, 10);
+  turn_on_led();
 }
 
 void turn_on_led() {

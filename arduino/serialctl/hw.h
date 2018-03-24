@@ -1,8 +1,8 @@
 #pragma once
 
-#define CURRENT_0 A0
-#define CURRENT_120 A1
-#define CURRENT_240 A2
+#define CURRENT_0 A11
+#define CURRENT_120 A13
+#define CURRENT_240 A15
 
 #define SABERTOOTH12 Serial2
 
