@@ -5,6 +5,9 @@
 #include "crc16.h"
 #include "packet.h"
 #include <string.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <stdio.h>
 
 #define BAUDRATE B9600
 
@@ -74,28 +77,42 @@ ssize_t serio_send(connection_t *ctx, void *data, size_t len){
 	return write(ctx->fd,datap,2+B64_ENC_LEN(len));
 }
 ssize_t serio_recv(connection_t *ctx, char *buf)
-{ 
+{
+        fd_set rfds;
+	struct timeval tv;
+	int n;
 	static char ba[RECVBUF];
+			continue;
 	char *next, *t;
-	do { 
+	next = strchr(ba, '\n');
+	while (next == NULL) { 
 		if(bidx == RECVBUF-1){
 			bidx=0;
 			printf("Input buffer overflow!\n");
 			memset(ba,0x00,RECVBUF);
 		}
-		int n = read(ctx->fd, ba+bidx, RECVBUF-(bidx+1));  // read as much as possible
+		FD_ZERO(&rfds);
+		FD_SET(ctx->fd, &rfds);
+		tv.tv_sec = 0;
+		tv.tv_usec = 500E3;
+		n = select((ctx->fd)+1, &rfds, 0, 0, &tv);
 		if( n==-1) return -1;    // couldn't read
 		if( n==0 ) {
-			usleep( 5 * 1000 ); // wait 5 msec try again
-			continue;
+			printf("Sending noop, no data for 500ms!\n");
+			write(ctx->fd, "[", 1);
 		}
+		else {
+			n = read(ctx->fd, ba+bidx, RECVBUF - (bidx + 1)); // read as much as possible
+			if (n > 0) {
+				bidx += n;
+				ba[bidx] = 0x00;
+			}
+		}
+		next = strchr(ba, '\n');
 		#ifdef DEBUG
 		printf("read(): %i, bidx: %i\n",n, bidx);
 		#endif
-		bidx += n;
-		ba[bidx]=0x00;
-		next=strchr(ba,'\n'); 
-	} while(next == NULL);
+	}	
 	//Clobber newline and hop over it
 	next[0] = 0x00;
 	next++;
