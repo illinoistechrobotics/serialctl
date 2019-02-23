@@ -42,6 +42,7 @@ int run_serial(const char *port){
 	if(serio_init(&c, port))
 		return 2;
 	while(loop){
+		printf("Looping");
 		if(serio_recv(&c, msg) < 0){
 			printf("Error reading data!\n");
 			return 2;
