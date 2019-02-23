@@ -40,13 +40,13 @@ void comm_parse() {
 			//populate buffer, preventing overflows from dropped start or end bytes
 			if (recvcount >= B64_ENC_LEN(sizeof(packet_t))) {
 				cs = COMM_INVALID;
-				} else {
+			} else {
 					encstr[recvcount] = inc;
 					recvcount++;
-				}
 			}
+		}
 
-			if(cs==COMM_COMPLETE){
+		if(cs==COMM_COMPLETE){
 			// SerComm.println("Comm recieve");
 			//Base64 decode
 			base64_decode((char *)incoming, encstr, B64_ENC_LEN(sizeof(packet_t)));
@@ -65,13 +65,11 @@ void comm_parse() {
 					SerComm.println("Invalid");
 				}
 			}
-		}
+	  }
 
-		if(millis()-ptime > 250){
-		//Been too long, copy safe state over active one
-		memcpy(astate,&safe,sizeof(packet_t));
-		cs=COMM_WAIT;
-		recvcount = 0;
-		SerComm.println("|-|-[FAILSAFE]-|-|");
-	}
-}
+	  if(millis()-ptime > 250){
+		  //Been too long, copy safe state over active one
+		  memcpy(astate,&safe,sizeof(packet_t));
+		  SerComm.println("|-|-[FAILSAFE]-|-|");
+	  }
+  }

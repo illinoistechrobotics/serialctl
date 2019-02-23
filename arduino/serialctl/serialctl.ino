@@ -31,10 +31,13 @@ long last_s=0;
 #define ntohl(x) htonl(x)
 #define DEADBAND_HALF_WIDTH 5
 
-#define WATCHDOG_
+#undef WATCHDOG_
 
 #ifdef WATCHDOG_
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
+#else
+void wdt_enable(int a) { }
+void wdt_reset() { }
 #endif
 
 int getButton(int num){
@@ -67,15 +70,19 @@ void setup() {
 	safe.btnlo = 0;
 	safe.cksum = 0b1000000010001011;
 	SerComm.begin(9600);
+  SerComm.println("comm_init");
 	comm_init();
+  SerComm.println("init_drive");
 	init_drive();
 	// Copy safe values over the current state
 	memcpy(astate, &safe, sizeof(packet_t));
 	// Set the motors to those safe values
+  SerComm.println("tank_drive");
 	tank_drive();
 	// Dont send data until we recieve something
 	pinMode(12, OUTPUT);
 	digitalWrite(12, HIGH);
+  SerComm.println("Wait for start");
 	while(1){
 		if(SerComm.available()){
 			if(SerComm.read()=='[')
@@ -83,6 +90,7 @@ void setup() {
 		}
 		wdt_reset();
 	}
+  SerComm.println("Started");
 	digitalWrite(12, LOW);
 }
 

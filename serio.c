@@ -82,7 +82,6 @@ ssize_t serio_recv(connection_t *ctx, char *buf)
 	struct timeval tv;
 	int n;
 	static char ba[RECVBUF];
-			continue;
 	char *next, *t;
 	next = strchr(ba, '\n');
 	while (next == NULL) { 
@@ -100,6 +99,7 @@ ssize_t serio_recv(connection_t *ctx, char *buf)
 		if( n==0 ) {
 			printf("Sending noop, no data for 500ms!\n");
 			write(ctx->fd, "[", 1);
+			tcflush(ctx->fd, TCIOFLUSH);
 		}
 		else {
 			n = read(ctx->fd, ba+bidx, RECVBUF - (bidx + 1)); // read as much as possible
