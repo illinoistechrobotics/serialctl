@@ -9,7 +9,7 @@ void print_data(){
 	SerComm.print(", ");
 	SerComm.println(rightMotorDebug);
 }
-void victor_init(){
+void init_drive(){
 	fl.attach(FRONT_LEFT);
 	fr.attach(FRONT_RIGHT);
 	rl.attach(REAR_LEFT);
