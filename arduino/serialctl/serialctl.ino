@@ -23,6 +23,7 @@
 #include "globals.h"
 #include "PIDUtil.h"
 #include "iic_encoder_io.h"
+#include "sequencing.h"
 
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
@@ -96,8 +97,8 @@ void setup() {
   DEBUGPRINT("Initializing RC communication subsystems...");
   SerComm.begin(57600);
   comm_init(); //Initialize the communication FSM
-  DEBUGPRINT("Initializing extension arm system...");
-  arm_setup();
+  DEBUGPRINT("Initializing sequencing game...");
+  init_sequencing();
   last_f = millis();
   last_s = millis();
   drive_left(0,0);  //Ensure both motors are stopped, technically redundant
@@ -159,13 +160,17 @@ void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
 
-  //Main arm boxing glove control
-  if (getButton(DPAD_UP) ^ getButton(DPAD_DOWN)) {
-    if (getButton(DPAD_UP)) setMotor(2, 85);
-    else setMotor(2, -20);
+  if (getButton(SMALL_RIGHT)) {
+    start_sequencing();
+  } else if (getButton(SMALL_LEFT)) {
+    stop_sequencing();
   }
-  else setMotor(2, 0);
-  
+
+  if (getButton(DIAMOND_DOWN)) {
+    // lower sequencing arm
+  } else if (getButton(DIAMOND_UP)) {
+    // raise sequencing arm
+  }
 } 
 void slow_loop() {    
   //2x per second
