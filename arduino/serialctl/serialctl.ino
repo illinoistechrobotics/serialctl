@@ -86,7 +86,7 @@ void setup() {
 	while(1){
 		if(SerComm.available()){
 			if(SerComm.read()=='[')
-			break;
+			break;//
 		}
 		wdt_reset();
 	}
@@ -102,8 +102,13 @@ void loop(){
 	
 	tank_drive();
 
- 
+  //bombayservo
+  if(getButton(4) == 1)
+   door_up();
 
+  if(getButton(6) == 1)
+   door_down();
+   
 	// limits data rate
 	delay(TICK_RATE);
 }
@@ -124,8 +129,8 @@ void arcade_drive() {
 }
 
 void tank_drive(){
-	int left_out =  ((int)(astate->stickLY) - 128);
-	int right_out = -1* ((int)(astate->stickRY) - 128);
+	int left_out =  ((int)(astate->stickRY) - 128);
+	int right_out = -1* ((int)(astate->stickLY) - 128);
 	
 	// Square inputs
 	left_out = (left_out * abs(left_out)) / 127;

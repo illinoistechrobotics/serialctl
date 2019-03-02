@@ -21,11 +21,17 @@ void init_drive(){
 }
 
 void drive_left(int power){
-	power = map(constrain(power,-127,127),-127,127,1000,2000);
+	power = map(constrain(power,-127,127),-127,127,2000,1000);
 	lm.write(power);
 }
 
 void drive_right(int power){
 	power = map(constrain(power,-127,127),127,-127,1000,2000);
 	rm.write(power);
+}
+void door_down(){
+  bs1.write(100);
+}
+void door_up(){
+  bs1.write(0);
 }
