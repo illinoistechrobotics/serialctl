@@ -18,7 +18,7 @@
 #include "zserio.h"
 #include <Servo.h>
 #include "globals.h"
-#include "hw-mrdc-2018.h"
+#include "hw-mrdc-2019.h"
 
 packet_t pA, pB, safe;
 packet_t *astate, *incoming;
@@ -63,8 +63,8 @@ void setup() {
   //copy safe values over the current state
   memcpy(astate, &safe, sizeof(packet_t));
 
-  // MRDC Manipulator 2018
-  //manipulator_setup();
+  // MRDC Manipulator 2019
+  manipulator_setup();
 }
 void loop() {
   //Every line sent to the computer gets us a new state
@@ -72,11 +72,11 @@ void loop() {
   print_data();
   comm_parse();
 
-  // MRDC Manipulator 2018
+  // MRDC Manipulator 2019
   //manipulator_spinwheel();
   //manipulator_rope();
   //manipulator_winch();
-  //manipulator_actuator(); //Lift for arm
+  manipulator_actuator(); //Lift for arm
 
   tank_drive();
 

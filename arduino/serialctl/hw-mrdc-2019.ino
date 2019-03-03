@@ -4,12 +4,12 @@
 
 #include "hw.h"
 #include "globals.h"
- v
+ 
 // keep states so we aren't wasting too many cycles
-int spinwheel_state = 0;
-int rope_state = 0;
+//int spinwheel_state = 0;
+//int rope_state = 0;
 int actuator_state = 0;
-int winch_state = 0;
+//int winch_state = 0;
 
 void manipulator_setup() {
   //pinMode(SPINNER_PIN, OUTPUT);
@@ -78,11 +78,11 @@ void manipulator_winch() {
 }
 
 void manipulator_actuator() {
-  if (!(get_button(3)) && get_button(JOYSTICK_PAD_UP) && !get_button(JOYSTICK_PAD_DOWN) /*&& actuator_state != 1*/) {
+  if (!(get_button(6))/*&& actuator_state != 1*/) {
     //SerComm.write("Moving arm up ");
     actuator.writeMicroseconds(1250);
     //actuator_state = 1;
-  } else if (!(get_button(3)) && get_button(JOYSTICK_PAD_DOWN) && !get_button(JOYSTICK_PAD_UP) /*&& actuator_state != -1*/) {
+  } else if ((get_button(5)) /*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
     actuator.writeMicroseconds(1750);
     //actuator_state = -1;
