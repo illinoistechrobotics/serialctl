@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PWMServo.h>
+
 
 #define SPINNER_PIN 2
 #define AUX_PIN 3
@@ -9,7 +9,7 @@
 
 #define ROPE_PIN 6
 
-#define ACTUATOR_PIN 5
+#define ACTUATOR_PIN 6
 
 #define LAUNCH_SPEED 1250
 #define OFF_SPEED 1000

@@ -4,7 +4,7 @@
 
 #include "hw.h"
 #include "globals.h"
-
+ v
 // keep states so we aren't wasting too many cycles
 int spinwheel_state = 0;
 int rope_state = 0;
@@ -12,21 +12,21 @@ int actuator_state = 0;
 int winch_state = 0;
 
 void manipulator_setup() {
-  pinMode(SPINNER_PIN, OUTPUT);
-  pinMode(AUX_PIN, OUTPUT);
-  pinMode(ROPE_PIN, OUTPUT);
-  pinMode(WINCH_PIN, OUTPUT);
+  //pinMode(SPINNER_PIN, OUTPUT);
+  //pinMode(AUX_PIN, OUTPUT);
+  //pinMode(ROPE_PIN, OUTPUT);
+  //pinMode(WINCH_PIN, OUTPUT);
   pinMode(ACTUATOR_PIN, OUTPUT);
   
-  spinwheel.attach(SPINNER_PIN);
-  spinwheel_aux.attach(AUX_PIN);
+  //spinwheel.attach(SPINNER_PIN);
+  //spinwheel_aux.attach(AUX_PIN);
 
-  spinwheel.writeMicroseconds(OFF_SPEED);
-  spinwheel_aux.writeMicroseconds(FORWARD_CMD);
+  //spinwheel.writeMicroseconds(OFF_SPEED);
+  //spinwheel_aux.writeMicroseconds(FORWARD_CMD);
 
-  rope.attach(ROPE_PIN);
+  //rope.attach(ROPE_PIN);
 
-  winch.attach(WINCH_PIN);
+  //winch.attach(WINCH_PIN);
 
   actuator.attach(ACTUATOR_PIN);
 }
@@ -91,5 +91,3 @@ void manipulator_actuator() {
     //actuator_state = 0;
   }
 }
-
-

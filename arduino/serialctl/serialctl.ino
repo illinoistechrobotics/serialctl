@@ -64,7 +64,7 @@ void setup() {
   memcpy(astate, &safe, sizeof(packet_t));
 
   // MRDC Manipulator 2018
-  manipulator_setup();
+  //manipulator_setup();
 }
 void loop() {
   //Every line sent to the computer gets us a new state
@@ -73,10 +73,10 @@ void loop() {
   comm_parse();
 
   // MRDC Manipulator 2018
-  manipulator_spinwheel();
-  manipulator_rope();
-  manipulator_winch();
-  manipulator_actuator();
+  //manipulator_spinwheel();
+  //manipulator_rope();
+  //manipulator_winch();
+  //manipulator_actuator(); //Lift for arm
 
   tank_drive();
 
