@@ -52,10 +52,10 @@ void drive_right(int power) {
 }
 
 bool is_estop() {
-  if (getButton(ESTOP_DISABLE)) {
+  if (get_button(ESTOP_DISABLE)) {
     estop_state = false;
   }
-  if (getButton(ESTOP_ENABLE)) {
+  if (get_button(ESTOP_ENABLE)) {
     estop_state = true;
   }
   if (estop_state) {
