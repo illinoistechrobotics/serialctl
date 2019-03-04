@@ -5,3 +5,5 @@ void print_data();
 void drive_left(int power);
 void drive_right(int power);
 uint8_t get_button(int num);
+void estop();
+bool is_estop();

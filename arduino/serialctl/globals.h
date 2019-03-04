@@ -22,3 +22,10 @@ extern char comm_ok;
 #define JOYSTICK_PAD_RIGHT 13
 #define JOYSTICK_PAD_DOWN 14
 #define JOYSTICK_PAD_LEFT 15
+
+//Configurable ESTOP 
+//MUST ALSO UPDATE IN ui.c
+
+#define ESTOP_ENABLE 5
+#define ESTOP_DISABLE 7
+

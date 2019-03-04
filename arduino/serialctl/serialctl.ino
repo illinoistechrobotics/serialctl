@@ -71,19 +71,21 @@ void loop() {
   wdt_reset();
   print_data();
   comm_parse();
-
+   if (!is_estop()) { //is_estop in hw.ino
+   
   // MRDC Manipulator 2019
   //manipulator_spinwheel();
   //manipulator_rope();
   //manipulator_winch();
-  manipulator_actuator(); //Lift for arm
+  //manipulator_actuator(); //Lift for arm
 
   tank_drive();
-
+   }
   //limits data rate
   delay(75);
 }
 void tank_drive() {
+
   int power_out = 0;
   int turn_out  = 0;
   int zeroed_power =    ((int)(astate->stickX) - 127);
