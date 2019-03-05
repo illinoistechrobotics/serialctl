@@ -2,7 +2,7 @@
 
 
 
-#define SPINNER_PIN 2
+#define VAC_PIN 10
 #define AUX_PIN 3
 
 #define EXTEND_PIN 7
@@ -18,7 +18,7 @@
 #define FORWARD_CMD 1000
 #define REVERSE_CMD 1900
 
-Servo spinwheel;
+Servo vac;
 Servo bowling_ball2;
 
 Servo extend;
@@ -26,7 +26,7 @@ Servo bowling_ball1;
 Servo actuator;
 
 void manipulator_setup();
-void manipulator_spinwheel();
+void manipulator_vacuum();
 void manipulator_bowling_ball();
 void manipulator_extend();
 void manipulator_actuator();

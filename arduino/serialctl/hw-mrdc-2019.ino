@@ -6,13 +6,13 @@
 #include "globals.h"
  
 // keep states so we aren't wasting too many cycles
-//int spinwheel_state = 0;
+int vac_running = 0;
 //int rope_state = 0;
 int actuator_state = 0;
 //int winch_state = 0;
 
 void manipulator_setup() {
-  //pinMode(SPINNER_PIN, OUTPUT);
+  pinMode(VAC_PIN, OUTPUT);
   pinMode(BOWLING_BALL_PIN2, OUTPUT);
   pinMode(BOWLING_BALL_PIN1, OUTPUT);
   pinMode(EXTEND_PIN, OUTPUT);
@@ -23,7 +23,7 @@ void manipulator_setup() {
 
   //spinwheel.writeMicroseconds(OFF_SPEED);
   //spinwheel_aux.writeMicroseconds(FORWARD_CMD);
-
+  vac.attach(VAC_PIN);
   bowling_ball1.attach(BOWLING_BALL_PIN1);
   bowling_ball2.attach(BOWLING_BALL_PIN2);
 
@@ -36,15 +36,18 @@ void manipulator_setup() {
 void manipulator_bowling_ball() {
   if ((get_button(2))/*&& actuator_state != 1*/) {
     //SerComm.write("Moving arm up ");
-    bowling_ball1.writeMicroseconds(1000);
-    bowling_ball2.writeMicroseconds(1000);
+    bowling_ball1.writeMicroseconds(2000);
+    bowling_ball2.writeMicroseconds(2000);
     //actuator_state = 1;
   } else if (get_button(3) /*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
-    bowling_ball1.writeMicroseconds(2000);
-    bowling_ball2.writeMicroseconds(2000);
+    bowling_ball1.writeMicroseconds(1000);
+    
     //actuator_state = -1;
-  } else if (/*actuator_state != 0*/ true) {
+  } else if (get_button(0)){
+
+    bowling_ball2.writeMicroseconds(1000);
+    }else if (/*actuator_state != 0*/ true) {
     bowling_ball1.writeMicroseconds(1500);
     bowling_ball2.writeMicroseconds(1500);
     //actuator_state = 0;
@@ -52,11 +55,11 @@ void manipulator_bowling_ball() {
 }
 
 void manipulator_extend() {
-  if ((get_button(4))/*&& actuator_state != 1*/) {
+  if ((get_button(6))/*&& actuator_state != 1*/) {
     //SerComm.write("Moving arm up ");
     extend.writeMicroseconds(1000);
     //actuator_state = 1;
-  } else if ((get_button(6)) /*&& actuator_state != -1*/) {
+  } else if ((get_button(4)) /*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
     extend.writeMicroseconds(2000);
     //actuator_state = -1;
@@ -76,6 +79,24 @@ void manipulator_actuator() {
     actuator.writeMicroseconds(2000);
     //actuator_state = -1;
   } else if (/*actuator_state != 0*/ true) {
+    actuator.writeMicroseconds(1500);
+    //actuator_state = 0;
+  }
+}
+
+void manipulator_vacuum() {
+  if ((get_button(1))/*&& actuator_state != 1*/) {
+    if(vac_running == 1){
+      vac_running = 0;
+    }else{
+      vac_running = 1;
+    }
+  }
+  if (vac_running==1 /*&& actuator_state != -1*/) {
+    //SerComm.write("Moving arm down ");
+    actuator.writeMicroseconds(1000);
+    //actuator_state = -1;
+  } else{
     actuator.writeMicroseconds(1500);
     //actuator_state = 0;
   }
