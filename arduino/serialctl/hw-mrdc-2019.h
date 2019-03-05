@@ -5,7 +5,7 @@
 #define SPINNER_PIN 2
 #define AUX_PIN 3
 
-#define WINCH_PIN 4
+#define EXTEND_PIN 7
 
 #define ROPE_PIN 6
 
@@ -20,7 +20,7 @@
 Servo spinwheel;
 Servo spinwheel_aux;
 
-Servo winch;
+Servo extend;
 Servo rope;
 Servo actuator;
 

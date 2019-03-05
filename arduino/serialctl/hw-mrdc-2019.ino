@@ -15,7 +15,7 @@ void manipulator_setup() {
   //pinMode(SPINNER_PIN, OUTPUT);
   //pinMode(AUX_PIN, OUTPUT);
   //pinMode(ROPE_PIN, OUTPUT);
-  //pinMode(WINCH_PIN, OUTPUT);
+  pinMode(EXTEND_PIN, OUTPUT);
   pinMode(ACTUATOR_PIN, OUTPUT);
   
   //spinwheel.attach(SPINNER_PIN);
@@ -26,7 +26,7 @@ void manipulator_setup() {
 
   //rope.attach(ROPE_PIN);
 
-  //winch.attach(WINCH_PIN);
+  extend.attach(EXTEND_PIN);
 
   actuator.attach(ACTUATOR_PIN);
 }
@@ -61,30 +61,30 @@ void manipulator_rope() {
   }
 }
 
-void manipulator_winch() {
-  // up/down on dpad stretches and releases winch
-  if (get_button(3) && get_button(JOYSTICK_PAD_UP) && !get_button(JOYSTICK_PAD_DOWN) /* && winch_state != 1*/) {
-    //SerComm.write("Stretching winch ");
-    winch.writeMicroseconds(1250);
-    //winch_state = 1;
-  } else if (get_button(3) && get_button(JOYSTICK_PAD_DOWN) && !get_button(JOYSTICK_PAD_UP) /*&& winch_state != -1*/) {
-    //SerComm.write("Releasing winch ");
-    winch.writeMicroseconds(1750);
-    //winch_state = -1;
-  } else if (/*winch_state != 0*/ true) {
-    winch.writeMicroseconds(1500);
-    //winch_state = 0;
+
+void manipulator_extend() {
+  if ((get_button(JOYSTICK_PAD_LEFT))/*&& actuator_state != 1*/) {
+    //SerComm.write("Moving arm up ");
+    extend.writeMicroseconds(1000);
+    //actuator_state = 1;
+  } else if ((get_button(JOYSTICK_PAD_RIGHT)) /*&& actuator_state != -1*/) {
+    //SerComm.write("Moving arm down ");
+    extend.writeMicroseconds(2000);
+    //actuator_state = -1;
+  } else if (/*actuator_state != 0*/ true) {
+    extend.writeMicroseconds(1500);
+    //actuator_state = 0;
   }
 }
 
 void manipulator_actuator() {
-  if (!(get_button(6))/*&& actuator_state != 1*/) {
+  if ((get_button(JOYSTICK_PAD_DOWN))/*&& actuator_state != 1*/) {
     //SerComm.write("Moving arm up ");
-    actuator.writeMicroseconds(1250);
+    actuator.writeMicroseconds(1000);
     //actuator_state = 1;
-  } else if ((get_button(5)) /*&& actuator_state != -1*/) {
+  } else if ((get_button(JOYSTICK_PAD_UP)) /*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
-    actuator.writeMicroseconds(1750);
+    actuator.writeMicroseconds(2000);
     //actuator_state = -1;
   } else if (/*actuator_state != 0*/ true) {
     actuator.writeMicroseconds(1500);
