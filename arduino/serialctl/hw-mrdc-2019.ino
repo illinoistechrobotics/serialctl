@@ -32,24 +32,6 @@ void manipulator_setup() {
   actuator.attach(ACTUATOR_PIN);
 }
 
-void manipulator_spinwheel() {
-  if (get_button(1) && !get_button(2) /*&& spinwheel_state != 1*/) {
-    //SerComm.write("Spinning Forward ");
-    spinwheel.writeMicroseconds(LAUNCH_SPEED);
-    spinwheel_aux.writeMicroseconds(FORWARD_CMD);
-    // don't waste processor time if we can help it
-    //spinwheel_state = 1;
-  } else if (get_button(2) && !get_button(1) /*&& spinwheel_state != -1*/) {
-    //SerComm.write("Spinning Reversed ");
-    spinwheel.writeMicroseconds(LAUNCH_SPEED);
-    spinwheel_aux.writeMicroseconds(REVERSE_CMD);
-    //spinwheel_state = -1;
-  } else if (/*spinwheel_state != 0*/ true) {
-    spinwheel.writeMicroseconds(OFF_SPEED);
-    spinwheel_aux.writeMicroseconds(OFF_SPEED);
-    //spinwheel_state = 0;
-  }
-}
 
 void manipulator_bowling_ball() {
   if ((get_button(2))/*&& actuator_state != 1*/) {
@@ -64,7 +46,7 @@ void manipulator_bowling_ball() {
     //actuator_state = -1;
   } else if (/*actuator_state != 0*/ true) {
     bowling_ball1.writeMicroseconds(1500);
-    bowling_ball2.writeMiceoseconds(1500);
+    bowling_ball2.writeMicroseconds(1500);
     //actuator_state = 0;
   }
 }
