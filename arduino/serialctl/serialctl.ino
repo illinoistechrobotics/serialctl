@@ -99,7 +99,9 @@ void loop(){
 	wdt_reset();
 	print_data();
 	comm_parse();
-	
+  if (getButton(1) == 1)
+  up_down();
+  else
 	tank_drive();
 
   //bombayservo
@@ -138,4 +140,13 @@ void tank_drive(){
 	
 	drive_left(left_out);
 	drive_right(right_out);
+}
+void up_down(){
+  int right_out = -1* ((int)(astate->stickLY) - 128);
+  
+ 
+  right_out = (right_out * abs(right_out)) / 127;
+  
+  
+  up_down(right_out);
 }

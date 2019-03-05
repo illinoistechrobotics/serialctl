@@ -35,3 +35,7 @@ void door_down(){
 void door_up(){
   bs1.write(0);
 }
+void up_down(int power){
+  power = map(constrain(power,-127,127),127,-127,1000,2000);
+  bs2.write(power);
+}
