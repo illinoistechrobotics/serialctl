@@ -105,20 +105,20 @@ void refresh_ui(packet_t * ctl, char * msg, int overflow){
   }
   char * mesg[1] = {msg};
   setCDKLabelMessage(status_box,mesg, 1);
-  if(getButton(ctl,6)){
+  if(getButton(ctl,10)){
     setCDKLabelMessage(turbo_box,turbo_on, 1);
   } else {
     setCDKLabelMessage(turbo_box,turbo_off, 1);
   }
-  if(getButton(ctl,4)){
+  if(getButton(ctl,11)){
     setCDKLabelMessage(precision_box,precision_on, 1);
   } else {
     setCDKLabelMessage(precision_box,precision_off, 1);
   }
-  if(getButton(ctl,7)){
+  if(getButton(ctl,9)){
     estop = false;
   }
-  if(getButton(ctl,5)){
+  if(getButton(ctl,8)){
     estop = true;
   }
   if(estop){

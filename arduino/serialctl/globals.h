@@ -26,6 +26,6 @@ extern char comm_ok;
 //Configurable ESTOP 
 //MUST ALSO UPDATE IN ui.c
 
-#define ESTOP_ENABLE 5
-#define ESTOP_DISABLE 7
+#define ESTOP_ENABLE 8
+#define ESTOP_DISABLE 9
 

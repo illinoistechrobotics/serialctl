@@ -39,7 +39,7 @@ void manipulator_bowling_ball() {
     bowling_ball1.writeMicroseconds(1000);
     bowling_ball2.writeMicroseconds(1000);
     //actuator_state = 1;
-  } else if ((3) /*&& actuator_state != -1*/) {
+  } else if (get_button(3) /*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
     bowling_ball1.writeMicroseconds(2000);
     bowling_ball2.writeMicroseconds(2000);
@@ -52,11 +52,11 @@ void manipulator_bowling_ball() {
 }
 
 void manipulator_extend() {
-  if ((get_button(JOYSTICK_PAD_LEFT))/*&& actuator_state != 1*/) {
+  if ((get_button(4))/*&& actuator_state != 1*/) {
     //SerComm.write("Moving arm up ");
     extend.writeMicroseconds(1000);
     //actuator_state = 1;
-  } else if ((get_button(JOYSTICK_PAD_RIGHT)) /*&& actuator_state != -1*/) {
+  } else if ((get_button(6)) /*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
     extend.writeMicroseconds(2000);
     //actuator_state = -1;
@@ -67,11 +67,11 @@ void manipulator_extend() {
 }
 
 void manipulator_actuator() {
-  if ((get_button(JOYSTICK_PAD_DOWN))/*&& actuator_state != 1*/) {
+  if ((get_button(5))/*&& actuator_state != 1*/) {
     //SerComm.write("Moving arm up ");
     actuator.writeMicroseconds(1000);
     //actuator_state = 1;
-  } else if ((get_button(JOYSTICK_PAD_UP)) /*&& actuator_state != -1*/) {
+  } else if ((get_button(7)) /*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
     actuator.writeMicroseconds(2000);
     //actuator_state = -1;

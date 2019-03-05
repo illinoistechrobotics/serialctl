@@ -107,11 +107,11 @@ void tank_drive() {
   }
   int left_out =     (power_out + (turn_out / 2)) / 2;
   int right_out = (power_out - (turn_out / 2)) / 2;
-  if (get_button(4)) {
+  if (get_button(11)) {
     left_out = left_out / 2;
     right_out = right_out / 2;
   }
-  if (get_button(6)) {
+  if (get_button(10)) {
     left_out = left_out * 2;
     right_out = right_out * 2;
   }
