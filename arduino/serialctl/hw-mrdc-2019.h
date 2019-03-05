@@ -7,7 +7,8 @@
 
 #define EXTEND_PIN 7
 
-#define ROPE_PIN 6
+#define BOWLING_BALL_PIN1 8
+#define BOWLING_BALL_PIN2 9
 
 #define ACTUATOR_PIN 6
 
@@ -18,14 +19,14 @@
 #define REVERSE_CMD 1900
 
 Servo spinwheel;
-Servo spinwheel_aux;
+Servo bowling_ball2;
 
 Servo extend;
-Servo rope;
+Servo bowling_ball1;
 Servo actuator;
 
 void manipulator_setup();
 void manipulator_spinwheel();
-void manipulator_rope();
-void manipulator_winch();
+void manipulator_bowling_ball();
+void manipulator_extend();
 void manipulator_actuator();

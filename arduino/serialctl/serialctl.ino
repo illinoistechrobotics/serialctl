@@ -75,7 +75,7 @@ void loop() {
    
   // MRDC Manipulator 2019
   //manipulator_spinwheel();
-  //manipulator_rope();
+  manipulator_bowling_ball();
   manipulator_extend();
   manipulator_actuator(); //Lift for arm
 

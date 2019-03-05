@@ -13,8 +13,8 @@ int actuator_state = 0;
 
 void manipulator_setup() {
   //pinMode(SPINNER_PIN, OUTPUT);
-  //pinMode(AUX_PIN, OUTPUT);
-  //pinMode(ROPE_PIN, OUTPUT);
+  pinMode(BOWLING_BALL_PIN2, OUTPUT);
+  pinMode(BOWLING_BALL_PIN1, OUTPUT);
   pinMode(EXTEND_PIN, OUTPUT);
   pinMode(ACTUATOR_PIN, OUTPUT);
   
@@ -24,7 +24,8 @@ void manipulator_setup() {
   //spinwheel.writeMicroseconds(OFF_SPEED);
   //spinwheel_aux.writeMicroseconds(FORWARD_CMD);
 
-  //rope.attach(ROPE_PIN);
+  bowling_ball1.attach(BOWLING_BALL_PIN1);
+  bowling_ball2.attach(BOWLING_BALL_PIN2);
 
   extend.attach(EXTEND_PIN);
 
@@ -50,17 +51,23 @@ void manipulator_spinwheel() {
   }
 }
 
-void manipulator_rope() {
-  if (get_button(0) /*&& rope_state == 0*/) {
-    //SerComm.write("Pulling rope ");
-    rope.writeMicroseconds(1700);
-    //rope_state = 1;
-  } else if (/*rope_state == 1*/ true) {
-    rope.writeMicroseconds(1500);
-    //rope_state = 0;
+void manipulator_bowling_ball() {
+  if ((get_button(2))/*&& actuator_state != 1*/) {
+    //SerComm.write("Moving arm up ");
+    bowling_ball1.writeMicroseconds(1000);
+    bowling_ball2.writeMicroseconds(1000);
+    //actuator_state = 1;
+  } else if ((3) /*&& actuator_state != -1*/) {
+    //SerComm.write("Moving arm down ");
+    bowling_ball1.writeMicroseconds(2000);
+    bowling_ball2.writeMicroseconds(2000);
+    //actuator_state = -1;
+  } else if (/*actuator_state != 0*/ true) {
+    bowling_ball1.writeMicroseconds(1500);
+    bowling_ball2.writeMiceoseconds(1500);
+    //actuator_state = 0;
   }
 }
-
 
 void manipulator_extend() {
   if ((get_button(JOYSTICK_PAD_LEFT))/*&& actuator_state != 1*/) {
