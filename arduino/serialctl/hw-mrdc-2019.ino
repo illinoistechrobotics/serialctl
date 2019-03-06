@@ -85,19 +85,13 @@ void manipulator_actuator() {
 }
 
 void manipulator_vacuum() {
-  if ((get_button(1))/*&& actuator_state != 1*/) {
-    if(vac_running == 1){
-      vac_running = 0;
-    }else{
-      vac_running = 1;
-    }
-  }
-  if (vac_running==1 /*&& actuator_state != -1*/) {
+ 
+  if (get_button(1)/*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
-    actuator.writeMicroseconds(1000);
+    digitalWrite(VAC_PIN,HIGH);
     //actuator_state = -1;
   } else{
-    actuator.writeMicroseconds(1500);
+    digitalWrite(VAC_PIN,LOW);
     //actuator_state = 0;
   }
 }
