@@ -4,9 +4,10 @@
 
 #include "hw.h"
 #include "globals.h"
- 
+
 // keep states so we aren't wasting too many cycles
 int vac_running = 0;
+int vac_button_last_state = 0;
 //int rope_state = 0;
 int actuator_state = 0;
 //int winch_state = 0;
@@ -17,13 +18,13 @@ void manipulator_setup() {
   pinMode(BOWLING_BALL_PIN1, OUTPUT);
   pinMode(EXTEND_PIN, OUTPUT);
   pinMode(ACTUATOR_PIN, OUTPUT);
-  
+
   //spinwheel.attach(SPINNER_PIN);
   //spinwheel_aux.attach(AUX_PIN);
 
   //spinwheel.writeMicroseconds(OFF_SPEED);
   //spinwheel_aux.writeMicroseconds(FORWARD_CMD);
-  vac.attach(VAC_PIN);
+  //vac.attach(VAC_PIN);
   bowling_ball1.attach(BOWLING_BALL_PIN1);
   bowling_ball2.attach(BOWLING_BALL_PIN2);
 
@@ -42,12 +43,12 @@ void manipulator_bowling_ball() {
   } else if (get_button(3) /*&& actuator_state != -1*/) {
     //SerComm.write("Moving arm down ");
     bowling_ball1.writeMicroseconds(1000);
-    
+
     //actuator_state = -1;
-  } else if (get_button(0)){
+  } else if (get_button(0)) {
 
     bowling_ball2.writeMicroseconds(1000);
-    }else if (/*actuator_state != 0*/ true) {
+  } else if (/*actuator_state != 0*/ true) {
     bowling_ball1.writeMicroseconds(1500);
     bowling_ball2.writeMicroseconds(1500);
     //actuator_state = 0;
@@ -85,13 +86,16 @@ void manipulator_actuator() {
 }
 
 void manipulator_vacuum() {
- 
-  if (get_button(1)/*&& actuator_state != -1*/) {
+  if(get_button(1) == vac_button_last_state){}else{
+    vac_button_last_state = get_button(1);
+  if (get_button(1)/*&& actuator_state != -1*/) {vac_running = abs(vac_running-1);}
+  if(vac_running==1){
     //SerComm.write("Moving arm down ");
-    digitalWrite(VAC_PIN,HIGH);
+    digitalWrite(VAC_PIN, HIGH);
     //actuator_state = -1;
-  } else{
-    digitalWrite(VAC_PIN,LOW);
+  } else {
+    digitalWrite(VAC_PIN, LOW);
     //actuator_state = 0;
+  }
   }
 }
