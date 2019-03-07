@@ -12,7 +12,7 @@ void print_data(){
 void init_drive(){
 	lm.attach(2);
 	rm.attach(3);
-	bs1.attach(4);
+	bs1.attach(7);
 	bs2.attach(5);
 	/*fl.writeMicroseconds(1500);
 	fr.writeMicroseconds(1500);
@@ -30,7 +30,7 @@ void drive_right(int power){
 	rm.write(power);
 }
 void door_down(){
-  bs1.write(100);
+  bs1.write(180);
 }
 void door_up(){
   bs1.write(0);
