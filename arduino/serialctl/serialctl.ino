@@ -171,9 +171,10 @@ void fast_loop() {
   } else if (getButton(DIAMOND_UP)) {
     // raise sequencing arm
   }
-} 
-void slow_loop() {    
+}
+void slow_loop() {
   //2x per second
+  compressor_ctl();
 } 
 
 void tank_drive() { // not actually tank drive
