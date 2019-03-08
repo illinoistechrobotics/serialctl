@@ -54,19 +54,9 @@ void tick_sequencing() {
         SerCommDbg.print(i);
         SerCommDbg.println();
         #endif
-        if (fire_pins[i] == USE_SABERTOOTH) {
-          // Left, fire using sabertooth
-          setMotor(fire_motors[i], 127);
-        } else {
-          digitalWrite(fire_pins[i], HIGH);
-        }   
+        digitalWrite(fire_pins[i], HIGH);
 		  } else {
-				if (fire_pins[i] == USE_SABERTOOTH) {
-          // Left, fire using sabertooth
-          setMotor(fire_motors[i], 0);
-        } else {
-          digitalWrite(fire_pins[i], LOW);
-        }
+        digitalWrite(fire_pins[i], LOW);
 		  }
 		}
     #ifdef PRINTMOTORS

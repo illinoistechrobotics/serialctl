@@ -160,13 +160,13 @@ void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
 
-  if (getButton(SMALL_RIGHT)) {
+  if (getButton(SMALL_RIGHT) && !getButton(DPAD_DOWN)) {
     start_sequencing();
   } else if (getButton(SMALL_LEFT)) {
     stop_sequencing();
   }
 
-  if (getButton(DPAD_DOWN)) {
+  if (getButton(DPAD_DOWN) && !getButton(DPAD_UP)) {
     // lower sequencing arm
   } else if (getButton(DPAD_UP)) {
     // raise sequencing arm
@@ -179,9 +179,9 @@ void fast_loop() {
   }
 
   if (getButton(DIAMOND_DOWN)) {
-    digitalWrite(VACUUM_RELAY, HIGH);
-  } else {
     digitalWrite(VACUUM_RELAY, LOW);
+  } else {
+    digitalWrite(VACUUM_RELAY, HIGH);
   }
 }
 void slow_loop() {
