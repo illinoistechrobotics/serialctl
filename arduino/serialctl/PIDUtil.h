@@ -4,8 +4,8 @@
 
 #define PID_OUTPUT_LIMIT 64.0
 #define PID_SAMPLE_TIME 20
-#define ENCODER_LEFT_ADDR 5
-#define ENCODER_RIGHT_ADDR 6
+#define ENCODER_LEFT_ADDR 6
+#define ENCODER_RIGHT_ADDR 5
 
 void PIDWriteTunings();
 void PIDLoadTunings();

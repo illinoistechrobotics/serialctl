@@ -166,15 +166,28 @@ void fast_loop() {
     stop_sequencing();
   }
 
-  if (getButton(DIAMOND_DOWN)) {
+  if (getButton(DPAD_DOWN)) {
     // lower sequencing arm
-  } else if (getButton(DIAMOND_UP)) {
+  } else if (getButton(DPAD_UP)) {
     // raise sequencing arm
+  }
+
+  if (getButton(DIAMOND_UP)) {
+    door_latch.write(180);
+  } else {
+    door_latch.write(0);
+  }
+
+  if (getButton(DIAMOND_DOWN)) {
+    digitalWrite(VACUUM_RELAY, HIGH);
+  } else {
+    digitalWrite(VACUUM_RELAY, LOW);
   }
 }
 void slow_loop() {
   //2x per second
   compressor_ctl();
+  tick_sequencing();
 } 
 
 void tank_drive() { // not actually tank drive
@@ -284,5 +297,3 @@ void tank_drive() { // not actually tank drive
   drive_left(left_enabled,left_out);
   drive_right(right_enabled,right_out);
 }
-
-

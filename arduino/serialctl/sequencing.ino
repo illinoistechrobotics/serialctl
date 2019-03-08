@@ -15,13 +15,30 @@ void stop_sequencing() {
 
 void tick_sequencing() {
 	if (!play_game) {
+    #ifdef PRINTMOTORS
+    SerCommDbg.print("Sequencing OFF: ");
+    #endif
 		for (int i = 0; i < BUTTONS; i++) {
+      #ifdef PRINTMOTORS
+      SerCommDbg.print(i);
+      SerCommDbg.print(": ");
+      SerCommDbg.print(analogRead(light_sensor_pins[i]));
+      SerCommDbg.print("; ");
+      #endif
 			digitalWrite(fire_pins[i], LOW);
 		}
 	} else {
 		int fireable_pins = 0;
-
+    #ifdef PRINTMOTORS
+    SerCommDbg.print("Sequencing  ON: ");
+    #endif
 		for (int i = 0; i < BUTTONS; i++) {
+      #ifdef PRINTMOTORS
+      SerCommDbg.print(i);
+      SerCommDbg.print(": ");
+      SerCommDbg.print(analogRead(light_sensor_pins[i]));
+      SerCommDbg.print("; ");
+      #endif
 			if (analogRead(light_sensor_pins[i]) > DETECT_THRESHOLD) {
 				ticks_detected[i]++;
 				if (ticks_detected[i] >= LIGHT_SENSOR_TICKS)
@@ -30,12 +47,30 @@ void tick_sequencing() {
 				ticks_detected[i] = 0;
 			}
 		}
-		
 		for (int i = 0; i < BUTTONS; i++) {
-			if (fireable_pins == 1 && ticks_detected[i] >= LIGHT_SENSOR_TICKS)
-				digitalWrite(fire_pins[i], HIGH);
-			else
-				digitalWrite(fire_pins[i], LOW);
+			if (fireable_pins == 1 && ticks_detected[i] >= LIGHT_SENSOR_TICKS) {
+        #ifdef PRINTMOTORS
+        SerCommDbg.print("Sequencing FIRING ");
+        SerCommDbg.print(i);
+        SerCommDbg.println();
+        #endif
+        if (fire_pins[i] == USE_SABERTOOTH) {
+          // Left, fire using sabertooth
+          setMotor(fire_motors[i], 127);
+        } else {
+          digitalWrite(fire_pins[i], HIGH);
+        }   
+		  } else {
+				if (fire_pins[i] == USE_SABERTOOTH) {
+          // Left, fire using sabertooth
+          setMotor(fire_motors[i], 0);
+        } else {
+          digitalWrite(fire_pins[i], LOW);
+        }
+		  }
 		}
+    #ifdef PRINTMOTORS
+    SerCommDbg.println();
+    #endif
 	}
 }

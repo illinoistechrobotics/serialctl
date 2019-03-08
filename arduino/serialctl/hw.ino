@@ -7,7 +7,7 @@ void init_pins() {
   osmc_init();
   //Linear Actuators
   SABERTOOTH12.begin(9600);
-  //SABERTOOTH34.begin(9600);
+  SABERTOOTH34.begin(9600);
   delay(10);
   //failsafes
   for (int i = 0; i < 3; i++) {
@@ -18,6 +18,11 @@ void init_pins() {
     ST12.motor(2, 0);
     ST34.motor(2, 0);
   }
+
+  //Vacuum assembly
+  pinMode(DOOR_LATCH, OUTPUT);
+  pinMode(VACUUM_RELAY, OUTPUT);
+  door_latch.attach(DOOR_LATCH);
 
   //Gen purpose I/O
   pinMode(13, OUTPUT);
@@ -70,6 +75,9 @@ void print_data() {
   SerComm.print(psi);
   SerComm.print("PSI | X(arm): ");
   SerComm.print(armcount);
+  if (play_game) {
+    SerComm.print(" SEQ ");
+  }
   SerComm.println();
 }
 
@@ -219,4 +227,3 @@ void compressor_ctl(){
     setMotor(COMPRESSOR_MOTOR,0);
   }
 }
-

@@ -5,13 +5,17 @@
 #define CURRENT_LEFT A1
 
 #define SABERTOOTH12 Serial2
+#define SABERTOOTH34 Serial3 
 
 #define LINAC_PRECISION 64
 #define ARM_LINAC_PRECISION 96
 
 #define PRESSURE_OFFSET 160
 
+#define DOOR_LATCH 5
+#define VACUUM_RELAY 35
 
+Servo door_latch;
 
 float current_offset_left, current_offset_right;
 int offset_measured = 0;
@@ -33,4 +37,3 @@ float psi;
 
 #define GRIP_VALVE 40
 #define ADC2PSI(x) ((analogRead(x)-(float)PRESSURE_OFFSET)/1.024)
-
