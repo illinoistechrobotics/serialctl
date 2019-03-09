@@ -30,9 +30,8 @@ extern double leftIn, leftOut, leftSet, rightIn, rightOut, rightSet;
 #define RESET_BUTTON 9  //Button to use for system reset, requires watchdog timer to function
 
 /* Sabertooth input mappings */
-#define UPPER_ARM_MOTOR 1
-#define EXT_ARM_MOTOR 2
-#define COMPRESSOR_MOTOR 4
+#define WINCH_MOTOR 1
+#define COMPRESSOR_MOTOR 2
 
 
 // pins for motor controller 1 (right)

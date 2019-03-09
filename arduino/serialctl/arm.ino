@@ -19,7 +19,7 @@ void arm_loop() {
   if(comm_ok){
   switch (homed) {
     case 1:
-      setMotor(EXT_ARM_MOTOR,-POWER);
+      //setMotor(EXT_ARM_MOTOR,-POWER);
       homed = 2;
       /* Play it safe, these types are 4 words long! */
       ATOMIC_BLOCK(ATOMIC_RESTORESTATE){
@@ -36,7 +36,7 @@ void arm_loop() {
           count = 0;
         }
         armcount=0;
-        setMotor(EXT_ARM_MOTOR,0);
+        //setMotor(EXT_ARM_MOTOR,0);
       }
       break;
     default:
@@ -48,7 +48,7 @@ void arm_loop() {
 }
 
 void arm_safe() {
-  setMotor(EXT_ARM_MOTOR,0);
+  //setMotor(EXT_ARM_MOTOR,0);
 }
 
 void isrA() {
@@ -66,13 +66,13 @@ void move_arm(int8_t dir, bool precision) {
   
   if (homed == 3) {
     if (abs(dir) != 1) {
-        setMotor(EXT_ARM_MOTOR,0);
+        //setMotor(EXT_ARM_MOTOR,0);
         return; 
     }
     m_speed = (precision ? ARM_LINAC_PRECISION : 127)*dir;
     if (dir < 0 && armcount < MIN_EXTEND ||
         dir > 0 && armcount > MAX_EXTEND )
         return;
-    setMotor(EXT_ARM_MOTOR,m_speed);
+    //setMotor(EXT_ARM_MOTOR,m_speed);
   }
 }

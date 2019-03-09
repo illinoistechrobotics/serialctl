@@ -9,7 +9,6 @@
 
 #define LINAC_PRECISION 64
 #define ARM_LINAC_PRECISION 96
-
 #define PRESSURE_OFFSET 160
 
 #define DOOR_LATCH 5
@@ -28,6 +27,8 @@ void fast_pwm();
 void compressor_ctl();
 char try_enable_osmc(char enabled, char enablepin, char readypin, char ali, char bli, char ahi, char bhi);
 void drive_osmc(char enabled, char enablepin, int rawpower, char brake, char ali, char bli, char ahi, char bhi);
+bool pumping = 0;
+bool auto_pump_enable = 0;
 
 /* Pneumatics */
 float psi;

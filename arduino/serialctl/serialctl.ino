@@ -40,10 +40,10 @@ static int power_constraint = 0;
  */
 static unsigned char pid_interlock=0;
 
-
 #ifdef WATCHDOG_
 #include <avr/wdt.h>      //watchdog library timer loop resets the watch dog
 #endif
+
 unsigned int getButton(unsigned int num) {
   if (num <= 7) {
     return (astate->btnlo >> num) & 0x01;
@@ -159,23 +159,19 @@ void loop() {
 void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
+  tick_sequencing();
 
-  if (getButton(SMALL_RIGHT) && !getButton(DPAD_DOWN)) {
-    start_sequencing();
-  } else if (getButton(SMALL_LEFT)) {
-    stop_sequencing();
-  }
-
-  if (getButton(DPAD_DOWN) && !getButton(DPAD_UP)) {
-    // lower sequencing arm
-  } else if (getButton(DPAD_UP)) {
-    // raise sequencing arm
+  static bool lastSmallRightState = false;
+  if (getButton(SMALL_RIGHT) != lastSmallRightState) {
+    if (getButton(SMALL_RIGHT))
+      toggle_sequencing();
+    lastSmallRightState = getButton(SMALL_RIGHT);
   }
 
   if (getButton(DIAMOND_UP)) {
-    door_latch.write(180);
-  } else {
     door_latch.write(0);
+  } else {
+    door_latch.write(90);
   }
 
   if (getButton(DIAMOND_DOWN)) {
@@ -183,11 +179,20 @@ void fast_loop() {
   } else {
     digitalWrite(VACUUM_RELAY, HIGH);
   }
+
+  if (getButton(SMALL_LEFT)) {
+    auto_pump_enable = !auto_pump_enable;
+  }
+
+  if (!auto_pump_enable && getButton(SHOULDER_BOTTOM_RIGHT)) {
+    pumping = 1;
+  } else if (!auto_pump_enable) {
+    pumping = 0;
+  }
 }
 void slow_loop() {
   //2x per second
   compressor_ctl();
-  tick_sequencing();
 } 
 
 void tank_drive() { // not actually tank drive

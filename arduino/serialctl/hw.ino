@@ -23,6 +23,7 @@ void init_pins() {
   pinMode(DOOR_LATCH, OUTPUT);
   pinMode(VACUUM_RELAY, OUTPUT);
   door_latch.attach(DOOR_LATCH);
+  digitalWrite(VACUUM_RELAY, HIGH);
 
   //Gen purpose I/O
   pinMode(13, OUTPUT);
@@ -73,11 +74,15 @@ void print_data() {
   SerComm.print("A | ");
   SerComm.print("AIR:");
   SerComm.print(psi);
-  SerComm.print("PSI | X(arm): ");
-  SerComm.print(armcount);
+  SerComm.print("PSI ");
   if (play_game) {
     SerComm.print(" SEQ ");
   }
+  /*
+  if (pumping) {
+    SerComm.print(" PUMP ");
+  }
+  */
   SerComm.println();
 }
 
@@ -189,7 +194,7 @@ void drive_osmc(char enabled, char enablepin, int rawpower, char brake,
   }
   //Reverse!
   if (power < 0) {
-    digitalWrite(ahi, LOW);
+    digitalWrite(ahi, LOW); 
     digitalWrite(bli, LOW);
     delayMicroseconds(63);
     digitalWrite(bhi, HIGH);
@@ -198,7 +203,6 @@ void drive_osmc(char enabled, char enablepin, int rawpower, char brake,
 }
 
 void compressor_ctl(){
-  static char pumping=0;
   int i;
   psi=0;
   for(i=0;i<5;i++){
@@ -207,14 +211,14 @@ void compressor_ctl(){
   }
   psi = psi/5;
   DEBUGPRINT(psi);
-  if(comm_ok == 1){
+  if(comm_ok == 1 && auto_pump_enable){
     //Read pressures and pump if needed
-    if(psi < MIN_PRESS){
+    if (psi < MIN_PRESS) {
       pumping = 1;
-    } else if(psi >= MAX_PRESS){
+    } else if (psi >= MAX_PRESS){
       pumping = 0;
     }
-  } else{
+  } else if (comm_ok == 0) {
     //No control link, stop compressor
     pumping=0;
   }
@@ -222,7 +226,7 @@ void compressor_ctl(){
   if(pumping == 1){
     //Go!
     setMotor(COMPRESSOR_MOTOR,127);
-  } else{
+  } else {
     //Stop!
     setMotor(COMPRESSOR_MOTOR,0);
   }
