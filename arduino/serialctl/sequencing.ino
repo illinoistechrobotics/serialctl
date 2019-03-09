@@ -34,12 +34,16 @@ void tick_sequencing() {
     #endif
     if (getButton(DPAD_DOWN)) {
       digitalWrite(fire_pins[0], HIGH);
+      SerComm.print("FIRE 0 ");
     } else if (getButton(DPAD_UP)) {
-      digitalWrite(fire_pins[0], HIGH);
+      digitalWrite(fire_pins[1], HIGH);
+      SerComm.print("FIRE 1 ");
     } else if (getButton(DPAD_LEFT)) {
-      digitalWrite(fire_pins[0], HIGH);
+      digitalWrite(fire_pins[2], HIGH);
+      SerComm.print("FIRE 2 ");
     } else if (getButton(DPAD_RIGHT)) {
-      digitalWrite(fire_pins[0], HIGH);
+      digitalWrite(fire_pins[3], HIGH);
+      SerComm.print("FIRE 3 ");
     }
     /*if (getButton(DPAD_DOWN) && getButton(DPAD_LEFT)) {
       digitalWrite(fire_pins[0], HIGH);

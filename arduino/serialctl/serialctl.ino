@@ -97,8 +97,8 @@ void setup() {
   DEBUGPRINT("Initializing RC communication subsystems...");
   SerComm.begin(57600);
   comm_init(); //Initialize the communication FSM
-  DEBUGPRINT("Initializing sequencing game...");
-  init_sequencing();
+  //DEBUGPRINT("Initializing sequencing game...");
+  //init_sequencing();
   last_f = millis();
   last_s = millis();
   drive_left(0,0);  //Ensure both motors are stopped, technically redundant
@@ -159,14 +159,14 @@ void loop() {
 void fast_loop() {
   //About 25 iterations per sec
   PIDTuner();
-  tick_sequencing();
+  //tick_sequencing();
 
-  static bool lastSmallRightState = false;
+  /*static bool lastSmallRightState = false;
   if (getButton(SMALL_RIGHT) != lastSmallRightState) {
     if (getButton(SMALL_RIGHT))
       toggle_sequencing();
     lastSmallRightState = getButton(SMALL_RIGHT);
-  }
+  }*/
 
   if (getButton(DIAMOND_UP)) {
     door_latch.write(0);
@@ -180,7 +180,7 @@ void fast_loop() {
     digitalWrite(VACUUM_RELAY, HIGH);
   }
 
-  if (getButton(SMALL_LEFT)) {
+  /*if (getButton(SMALL_LEFT)) {
     auto_pump_enable = !auto_pump_enable;
   }
 
@@ -188,11 +188,11 @@ void fast_loop() {
     pumping = 1;
   } else if (!auto_pump_enable) {
     pumping = 0;
-  }
+  }*/
 }
 void slow_loop() {
   //2x per second
-  compressor_ctl();
+  //compressor_ctl();
 } 
 
 void tank_drive() { // not actually tank drive
