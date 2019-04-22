@@ -2,6 +2,7 @@
 double pidLeftP=0, pidLeftI=0, pidLeftD=0, pidRightP=0, pidRightI=0, pidRightD=0;
 double leftIn=0, leftOut=0, leftSet=0, rightIn=0, rightOut=0, rightSet=0;
 extern char comm_ok, left_enabled, right_enabled;
+extern uint32_t left_tick_count, right_tick_count;
 
 PID leftPID(&leftIn, &leftOut, &leftSet, pidLeftP, pidLeftI, pidLeftD, REVERSE);
 PID rightPID(&rightIn, &rightOut, &rightSet, pidRightP, pidRightI, pidRightD, DIRECT);
@@ -9,14 +10,15 @@ PID rightPID(&rightIn, &rightOut, &rightSet, pidRightP, pidRightI, pidRightD, DI
 int PIDEncoderCheck(){
   int rv=1;
   #ifdef DEBUGPRINT
-  double dummy;
-  if(iic_encoder_read(ENCODER_LEFT_ADDR,&dummy)){
+  double dummy_dbl;
+  uint32_t dummy_int;
+  if(iic_encoder_read(ENCODER_LEFT_ADDR,&dummy_dbl,&dummy_int)){
     DEBUGPRINT("Left Encoder Data OK!");
   } else {
     DEBUGPRINT("Left Encoder Data Bus Fault!");
     rv = -1;
   }
-  if(iic_encoder_read(ENCODER_RIGHT_ADDR,&dummy)){
+  if(iic_encoder_read(ENCODER_RIGHT_ADDR,&dummy_dbl,&dummy_int)){
     DEBUGPRINT("Right Encoder Data OK!");
   } else {
     DEBUGPRINT("Right Encoder Data Bus Fault!");
@@ -28,9 +30,11 @@ int PIDEncoderCheck(){
 
 void PIDDrive(){
   if(leftPID.NeedsCompute()){
-    if(iic_encoder_read(ENCODER_LEFT_ADDR,&leftIn)){
+    uint32_t left_read_ticks;
+    if(iic_encoder_read(ENCODER_LEFT_ADDR,&leftIn,&left_read_ticks)){
     //Successfully read the left encoder
       leftPID.Compute();
+      left_tick_count += left_read_ticks;
     } else {
       //Bus fault!
       leftOut=0;
@@ -38,14 +42,18 @@ void PIDDrive(){
     #ifdef PRINTMOTORS
     SerCommDbg.print("PID(L): ");
     SerCommDbg.print(leftOut);
+    SerCommDbg.print(", Total ticks: ");
+    SerCommDbg.print(left_tick_count);
     SerCommDbg.println();
     #endif
     drive_left(left_enabled,leftOut);
   }
   if(rightPID.NeedsCompute()){
-    if(iic_encoder_read(ENCODER_RIGHT_ADDR,&rightIn)){
+    uint32_t right_read_ticks;
+    if(iic_encoder_read(ENCODER_RIGHT_ADDR,&rightIn,&right_read_ticks)){
     //Successfully read the left encoder
       rightPID.Compute();
+      right_tick_count += right_read_ticks;
     } else {
       //Bus fault!
       rightOut=0;
@@ -53,6 +61,8 @@ void PIDDrive(){
     #ifdef PRINTMOTORS
     SerCommDbg.print("PID(R): ");
     SerCommDbg.print(rightOut);
+    SerCommDbg.print(", Total ticks: ");
+    SerCommDbg.print(right_tick_count);
     SerCommDbg.println();
     #endif
     drive_right(right_enabled,rightOut);
@@ -225,4 +235,3 @@ void PIDLoadTunings(){
     
   PIDRefreshTunings();
 }
-

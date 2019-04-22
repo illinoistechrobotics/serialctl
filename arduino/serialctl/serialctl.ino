@@ -30,6 +30,7 @@ packet_t *astate, *incoming;
 comm_state cs;
 char left_enabled = 0, right_enabled = 0;
 long last_f = 0, last_s = 0, t_start = 0, usec;
+uint32_t left_tick_count = 0, right_tick_count = 0;
 Sabertooth ST12(128, SABERTOOTH12);
 Sabertooth ST34(129, SABERTOOTH12);
 static uint8_t reset_counter = 0;
