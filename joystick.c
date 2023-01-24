@@ -4,12 +4,16 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+
+SDL_Joystick *jstick;
 int minv(int a, int b) {
         return a<b ? a : b;
 }
 int joystick_init(int id){
         SDL_Init(SDL_INIT_JOYSTICK);
         // Initialize the joystick subsystem
+        printf("%i joysticks were found.\n\n", SDL_NumJoysticks() );
         signal(SIGINT,SIG_DFL);
         // Check for joystick
         if (SDL_NumJoysticks() > id) {
@@ -39,7 +43,7 @@ int joystick_update(packet_t *ctl){
 
  //populate controller struct
         ctl->stickX = (SDL_JoystickGetAxis(jstick, 1)/256)+128;
-        ctl->stickY = (SDL_JoystickGetAxis(jstick, 2)/256)+128;
+        ctl->stickY = (SDL_JoystickGetAxis(jstick, 0)/256)+128;
         ctl->btnlo = 0;
         ctl->btnhi = 0;
         for(i=0; (i<minv(SDL_JoystickNumButtons(jstick), 12)); i++){ //16 bits available - 4 for dpad
