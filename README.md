@@ -8,6 +8,8 @@ It is split into three components: PC input, communications, and Arduino robot c
 
 The branches of the repository contain the source needed for each robot ITR runs with this software. For example, the Fenrir branch has the modifications to the Arduino code to interface with the PID speed servos on the robot. Goliath has code for the pneumatics on board.
 
+For ITR's convenience, this repo includes a copy of the Sabertooth library. It is not modified from the original source. 
+
 ##PC
 
 The PC code for `serialctl` acts as the interface between the input device (typically a 'PS2 style' game controller), the communications channel, and a display. It has a simple data flow. The code reads the state of the game controller, packs it into a struct, transmits it over the comm channel, and writes the state to the display.
