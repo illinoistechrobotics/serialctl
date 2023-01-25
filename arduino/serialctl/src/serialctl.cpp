@@ -247,8 +247,8 @@ void tank_drive() { // not actually tank drive
       //PID can engage
       // Setpoints are in terms of motor shaft RPM, max 4800RPM (note 8.3:1 speed reducer)
       // 8 is probably OK
-      leftSet = -2*(power_out+turn_out);
-      rightSet = -2*(power_out-turn_out);
+      leftSet = -3*(power_out+turn_out);
+      rightSet = -3*(power_out-turn_out);
       leftPID.SetMode(AUTOMATIC);
       rightPID.SetMode(AUTOMATIC);
       /* Allow PID to stay engaged */

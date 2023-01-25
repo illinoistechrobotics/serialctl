@@ -2,7 +2,7 @@
 #include <EEPROM.h>
 #include <PID_v2.h>
 
-#define PID_OUTPUT_LIMIT 32.0
+#define PID_OUTPUT_LIMIT 96.0
 #define PID_SAMPLE_TIME 20
 #define ENCODER_LEFT_ADDR 6
 #define ENCODER_RIGHT_ADDR 5
