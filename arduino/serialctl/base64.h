@@ -16,6 +16,10 @@ extern "C"{
  */
 extern const char b64_alphabet[];
 
+inline void a3_to_a4(unsigned char * a4, unsigned char * a3);
+inline void a4_to_a3(unsigned char * a3, unsigned char * a4);
+inline unsigned char b64_lookup(char c);
+
 /* base64_encode:
  * 		Description:
  * 			Encode a string of characters as base64

@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "packet.h": "c",
+        "ncurses.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
+}
