@@ -64,7 +64,7 @@ void setup() {
   memcpy(astate, &safe, sizeof(packet_t));
 
   // MRDC Manipulator 2019
-  manipulator_setup();
+  // manipulator_setup();
 }
 void loop() {
   //Every line sent to the computer gets us a new state
@@ -74,39 +74,70 @@ void loop() {
    if (!is_estop()) { //is_estop in hw.ino
    
   // MRDC Manipulator 2019
-  manipulator_vacuum();
-  manipulator_bowling_ball();
-  manipulator_extend();
-  manipulator_actuator(); //Lift for arm
+  // manipulator_vacuum();
+  // manipulator_bowling_ball();
+  // manipulator_extend();
+  // manipulator_actuator(); //Lift for arm
 
   tank_drive();
    }
   //limits data rate
   delay(75);
 }
+// void tank_drive() {
+
+//   int power_out = 0;
+//   int turn_out  = 0;
+//   int zeroed_power =    ((int)(astate->stickX) - 127);
+//   int zeroed_turn =     -1 * ((int)(astate->stickY) - 127);
+
+//   if (abs(zeroed_power) > DEADBAND_HALF_WIDTH) {
+//     if (zeroed_power > 0) {
+//       power_out = zeroed_power - DEADBAND_HALF_WIDTH;
+//     } else {
+//       power_out = zeroed_power + DEADBAND_HALF_WIDTH;
+//     }
+//   }
+//   if (abs(zeroed_turn) > DEADBAND_HALF_WIDTH) {
+//     if (zeroed_turn > 0) {
+//       turn_out = zeroed_turn - DEADBAND_HALF_WIDTH;
+//     } else {
+//       turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
+//     }
+//   }
+//   int left_out =     (power_out + (turn_out / 2)) / 2;
+//   int right_out = (power_out - (turn_out / 2)) / 2;
+//   if (get_button(11)) {
+//     left_out = left_out / 2;
+//     right_out = right_out / 2;
+//   }
+//   if (get_button(10)) {
+//     left_out = left_out * 2;
+//     right_out = right_out * 2;
+//   }
+//   drive_left(left_out);
+//   drive_right(right_out);
+// }
+
 void tank_drive() {
-
-  int power_out = 0;
-  int turn_out  = 0;
-  int zeroed_power =    ((int)(astate->stickX) - 127);
-  int zeroed_turn =     -1 * ((int)(astate->stickY) - 127);
-
-  if (abs(zeroed_power) > DEADBAND_HALF_WIDTH) {
-    if (zeroed_power > 0) {
-      power_out = zeroed_power - DEADBAND_HALF_WIDTH;
+  int right_out = 0;
+  int left_out = 0;\
+  int zeroed_right =    ((int)(astate->stickX) - 127);
+  int zeroed_left =     ((int)(astate->stickY) - 127);
+  if (abs(zeroed_left) > DEADBAND_HALF_WIDTH) {
+    if (zeroed_left > 0) {
+      left_out = zeroed_left - DEADBAND_HALF_WIDTH;
     } else {
-      power_out = zeroed_power + DEADBAND_HALF_WIDTH;
+      left_out = zeroed_left + DEADBAND_HALF_WIDTH;
     }
   }
-  if (abs(zeroed_turn) > DEADBAND_HALF_WIDTH) {
-    if (zeroed_turn > 0) {
-      turn_out = zeroed_turn - DEADBAND_HALF_WIDTH;
+  if (abs(zeroed_right) > DEADBAND_HALF_WIDTH) {
+    if (zeroed_right > 0) {
+      right_out = zeroed_right - DEADBAND_HALF_WIDTH;
     } else {
-      turn_out = zeroed_turn + DEADBAND_HALF_WIDTH;
+      right_out = zeroed_right + DEADBAND_HALF_WIDTH;
     }
   }
-  int left_out =     (power_out + (turn_out / 2)) / 2;
-  int right_out = (power_out - (turn_out / 2)) / 2;
   if (get_button(11)) {
     left_out = left_out / 2;
     right_out = right_out / 2;
