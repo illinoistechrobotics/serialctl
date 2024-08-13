@@ -1,11 +1,12 @@
 CC=gcc
 CFLAGS=-c -Wall -Werror -g
-LDFLAGS=-lncurses
+#LDFLAGS=-static
 SOURCES=base64.c crc16.c serio.c main.c joystick.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=serialctl
 SDL_CFLAGS := $(shell sdl2-config --cflags)
 SDL_LDFLAGS := $(shell sdl2-config --libs)
+#SDL_LDFLAGS += -static
 all: $(SOURCES) $(EXECUTABLE)
 	    
 $(EXECUTABLE): $(OBJECTS) 
@@ -14,3 +15,26 @@ $(EXECUTABLE): $(OBJECTS)
 	    $(CC) $< -o $@ $(SDL_CFLAGS) $(CFLAGS) 
 clean:
 	    rm *.o $(EXECUTABLE)
+
+# Compiling for Windows
+# Install Cygwin https://www.cygwin.com/setup-x86_64.exe
+# Add packages when prompted: libSDL2-devel libSDL2_2.0_0 make git gcc-core
+# Use latest stable package versions.
+
+# Open Cygwin64 Terminal
+# git clone https://github.com/illinoistechrobotics/serialctl -b goliath2023
+# cd serialctl
+# make windows
+# the folder `release` now contains a portable windows build with the necessary DLLs. Run from commandline like on Linux, just specify a serial port like COM4 and gamepad as normal (0).
+
+windows: $(EXECUTABLE)
+	@echo "Creating release directory..."
+	mkdir -p release
+	@echo "Copying executable to release folder..."
+	cp $(EXECUTABLE).exe release/
+	@echo "Copying required DLLs to release folder..."
+	@for dll in $$(cygcheck ./$(EXECUTABLE).exe | grep '.dll' | grep -v '\\WINDOWS\\system32\\'); do \
+		echo "$$dll"; \
+		cp $$dll release/; \
+	done
+	@echo "Built serialctl & DLLs in ./release/"
