@@ -25,7 +25,8 @@ clean:
 # git clone https://github.com/illinoistechrobotics/serialctl -b goliath2023
 # cd serialctl
 # make windows
-# the folder `release` now contains a portable windows build with the necessary DLLs. Run from commandline like on Linux, just specify a serial port like COM4 and gamepad as normal (0).
+# the folder `release` now contains a portable windows build with the necessary DLLs. Run from commandline like on Linux
+# note for the COM port, if it is e.g. COM5 in device manager, which translates to /dev/com5 in Cygwin. So an example commmand to run is `serialctl.exe /dev/com5 0`
 
 windows: $(EXECUTABLE)
 	@echo "Creating release directory..."
