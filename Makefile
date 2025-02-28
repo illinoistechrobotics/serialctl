@@ -32,10 +32,11 @@ windows: $(EXECUTABLE)
 	@echo "Creating release directory..."
 	mkdir -p release
 	@echo "Copying executable to release folder..."
-	cp $(EXECUTABLE).exe release/
+	cp "$(EXECUTABLE).exe" release/
 	@echo "Copying required DLLs to release folder..."
+	@echo "Ignore errors from Adoptium, those files are unnecessary anyway"
 	@for dll in $$(cygcheck ./$(EXECUTABLE).exe | grep '.dll' | grep -v '\\WINDOWS\\system32\\'); do \
 		echo "$$dll"; \
-		cp $$dll release/; \
+		cp "$$dll" release/; \
 	done
 	@echo "Built serialctl & DLLs in ./release/"
